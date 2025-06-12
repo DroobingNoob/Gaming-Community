@@ -126,7 +126,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
-                    className="w-12 h-12 object-contain"
+                    className="w-15 h-15 object-contain"
                   />
                   {/* <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
                     Gaming Community
