@@ -1,5 +1,5 @@
 import React from 'react';
-import { Gamepad2, Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react';
+import { Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const quickLinks = [
@@ -27,11 +27,13 @@ const Footer: React.FC = () => {
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="bg-gradient-to-r from-cyan-400 to-orange-500 p-3 rounded-2xl shadow-lg">
-                <Gamepad2 className="w-8 h-8 text-white" />
-              </div>
+              <img 
+                src="/1000156095.jpg" 
+                alt="Gaming Community" 
+                className="w-12 h-12 object-contain bg-white/10 rounded-xl p-2"
+              />
               <span className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
-                GameStore
+                Gaming Community
               </span>
             </div>
             <p className="text-gray-300 mb-6 text-lg leading-relaxed max-w-md">
@@ -51,7 +53,7 @@ const Footer: React.FC = () => {
                 <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-2 rounded-lg">
                   <Mail className="w-4 h-4 text-white" />
                 </div>
-                <span>support@gamestore.com</span>
+                <span>support@gamingcommunity.com</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-300 hover:text-cyan-400 transition-colors">
                 <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-2 rounded-lg">
@@ -64,7 +66,7 @@ const Footer: React.FC = () => {
             {/* Social Links */}
             <div className="flex space-x-4">
               <a
-                href="https://instagram.com/gamestore"
+                href="https://instagram.com/gamingcommunity"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gradient-to-r from-gray-800 to-gray-700 hover:from-cyan-400 hover:to-orange-500 p-3 rounded-xl transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-xl"
@@ -72,7 +74,7 @@ const Footer: React.FC = () => {
                 <Instagram className="w-6 h-6" />
               </a>
               <a
-                href="https://youtube.com/gamestore"
+                href="https://youtube.com/gamingcommunity"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gradient-to-r from-gray-800 to-gray-700 hover:from-cyan-400 hover:to-orange-500 p-3 rounded-xl transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-xl"
@@ -152,7 +154,7 @@ const Footer: React.FC = () => {
         <div className="border-t border-gray-700/50 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400 text-sm">
-              © 2024 GameStore. All rights reserved.
+              © 2024 Gaming Community. All rights reserved.
             </p>
             <div className="flex items-center space-x-2">
               <span className="text-gray-400 text-sm">Powered by</span>

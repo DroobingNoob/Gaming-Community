@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, ShoppingCart, User, Menu, X, Gamepad2 } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -59,9 +59,15 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                 </div>
 
                 {/* Logo */}
-                <div className="flex items-center space-x-2">
-                  <Gamepad2 className="w-8 h-8 text-cyan-400" />
-                  <span className="text-2xl font-bold text-cyan-400">GameStore</span>
+                <div className="flex items-center space-x-3">
+                  <img 
+                    src="/1000156095.jpg" 
+                    alt="Gaming Community" 
+                    className="w-12 h-12 object-contain"
+                  />
+                  <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
+                    Gaming Community
+                  </span>
                 </div>
 
                 {/* Auth & Cart */}
@@ -117,8 +123,14 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                 </button>
 
                 <div className="flex items-center space-x-2">
-                  <Gamepad2 className="w-6 h-6 text-cyan-400" />
-                  <span className="text-xl font-bold text-cyan-400">GameStore</span>
+                  <img 
+                    src="/1000156095.jpg" 
+                    alt="Gaming Community" 
+                    className="w-8 h-8 object-contain"
+                  />
+                  <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
+                    Gaming Community
+                  </span>
                 </div>
 
                 <div className="flex items-center space-x-2">
