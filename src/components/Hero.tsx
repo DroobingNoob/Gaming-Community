@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const Hero: React.FC = () => {
+interface HeroProps {
+  onShopBestsellers: () => void;
+  onBrowseCategories: () => void;
+}
+
+const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   
   const slides = [
@@ -60,10 +65,16 @@ const Hero: React.FC = () => {
                     Discover the best gaming deals on PS4 and PS5 titles. Instant delivery, guaranteed lowest prices.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button className="bg-cyan-400 hover:bg-cyan-500 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    <button 
+                      onClick={onShopBestsellers}
+                      className="bg-cyan-400 hover:bg-cyan-500 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    >
                       Shop Bestsellers
                     </button>
-                    <button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    <button 
+                      onClick={onBrowseCategories}
+                      className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    >
                       Browse Categories
                     </button>
                   </div>

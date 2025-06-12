@@ -38,12 +38,12 @@ const Vouches: React.FC = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentVouch((prev) => (prev + 1) % vouches.length);
-    }, 5000);
+    }, 4000); // Slower transition for better readability
     return () => clearInterval(timer);
   }, [vouches.length]);
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-white overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
@@ -54,16 +54,14 @@ const Vouches: React.FC = () => {
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto">
-          <div className="relative">
-            {vouches.map((vouch, index) => (
+        {/* Continuous Scrolling Testimonials */}
+        <div className="relative max-w-6xl mx-auto">
+          <div className="flex space-x-6 animate-scroll">
+            {/* Duplicate vouches for seamless loop */}
+            {[...vouches, ...vouches].map((vouch, index) => (
               <div
                 key={index}
-                className={`transition-all duration-500 ${
-                  index === currentVouch 
-                    ? 'opacity-100 transform translate-x-0' 
-                    : 'opacity-0 transform translate-x-4 absolute inset-0'
-                }`}
+                className="flex-shrink-0 w-96"
               >
                 {/* WhatsApp Chat Interface */}
                 <div className="bg-gradient-to-b from-green-500 to-green-600 rounded-t-2xl p-4">
@@ -119,21 +117,27 @@ const Vouches: React.FC = () => {
               </div>
             ))}
           </div>
-
-          {/* Indicators */}
-          <div className="flex justify-center space-x-2 mt-8">
-            {vouches.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentVouch(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentVouch ? 'bg-green-500' : 'bg-gray-300'
-                }`}
-              />
-            ))}
-          </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        
+        .animate-scroll {
+          animation: scroll 20s linear infinite;
+        }
+        
+        .animate-scroll:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
     </section>
   );
 };

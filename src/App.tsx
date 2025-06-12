@@ -36,7 +36,7 @@ interface Game {
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-  const [isProductPageOpen, setIsProductPageOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<'home' | 'product'>('home');
   const [selectedProduct, setSelectedProduct] = useState<Game | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([
@@ -45,7 +45,7 @@ function App() {
       title: "Grand Theft Auto V Premium Edition",
       price: 19.99,
       quantity: 1,
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=300&h=533"
+      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400"
     }
   ]);
 
@@ -59,7 +59,12 @@ function App() {
 
   const handleGameClick = (game: Game) => {
     setSelectedProduct(game);
-    setIsProductPageOpen(true);
+    setCurrentView('product');
+  };
+
+  const handleBackToHome = () => {
+    setCurrentView('home');
+    setSelectedProduct(null);
   };
 
   const handleAddToCart = (product: Game) => {
@@ -100,6 +105,60 @@ function App() {
     setCartItems(items => items.filter(item => item.id !== id));
   };
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  if (currentView === 'product' && selectedProduct) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header
+          onLoginClick={() => setIsLoginModalOpen(true)}
+          onCartClick={handleCartClick}
+          isLoggedIn={isLoggedIn}
+          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+        />
+        
+        {/* Blue Strip */}
+        <div className="bg-cyan-400 text-white py-2">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-sm md:text-base font-medium">
+              🕹️ Trusted by Top Streamers and Gamers – Shop the Same Games They Play!
+            </p>
+          </div>
+        </div>
+
+        <ProductPage
+          product={selectedProduct}
+          onAddToCart={handleAddToCart}
+          onBackToHome={handleBackToHome}
+          onGameClick={handleGameClick}
+        />
+
+        <Footer />
+
+        <LoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          onLogin={handleLogin}
+        />
+
+        <CartModal
+          isOpen={isCartModalOpen}
+          onClose={() => setIsCartModalOpen(false)}
+          cartItems={cartItems}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+        />
+
+        <WhatsAppButton />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <Header
@@ -110,11 +169,15 @@ function App() {
       />
       
       <main>
-        <Hero />
+        <Hero onShopBestsellers={() => scrollToSection('bestsellers')} onBrowseCategories={() => scrollToSection('categories')} />
         <TrustIndicators />
         <Vouches />
-        <BestSellers onGameClick={handleGameClick} />
-        <Categories />
+        <div id="bestsellers">
+          <BestSellers onGameClick={handleGameClick} />
+        </div>
+        <div id="categories">
+          <Categories />
+        </div>
       </main>
 
       <Footer />
@@ -131,13 +194,6 @@ function App() {
         cartItems={cartItems}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
-      />
-
-      <ProductPage
-        product={selectedProduct}
-        isOpen={isProductPageOpen}
-        onClose={() => setIsProductPageOpen(false)}
-        onAddToCart={handleAddToCart}
       />
 
       <WhatsAppButton />

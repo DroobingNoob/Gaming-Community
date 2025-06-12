@@ -61,7 +61,7 @@ const CartModal: React.FC<CartModalProps> = ({
                   <img
                     src={item.image}
                     alt={item.title}
-                    className="w-16 aspect-[9/16] object-cover rounded"
+                    className="w-16 aspect-square object-cover rounded"
                   />
                   
                   <div className="flex-1">

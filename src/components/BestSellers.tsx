@@ -24,7 +24,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
     {
       id: 1,
       title: "Grand Theft Auto V Premium Edition",
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=300&h=533",
+      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 59.99,
       salePrice: 19.99,
       rating: 4.8,
@@ -49,7 +49,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
     {
       id: 2,
       title: "Black Myth: Wukong",
-      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=300&h=533",
+      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 69.99,
       salePrice: 49.99,
       rating: 4.9,
@@ -74,7 +74,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
     {
       id: 3,
       title: "Assassin's Creed Shadows",
-      image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=300&h=533",
+      image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 79.99,
       salePrice: 59.99,
       rating: 4.7,
@@ -99,7 +99,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
     {
       id: 4,
       title: "Xbox Game Pass Ultimate (Lifetime)",
-      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=300&h=533",
+      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 299.99,
       salePrice: 199.99,
       rating: 4.9,
@@ -124,7 +124,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
     {
       id: 5,
       title: "Spider-Man 2",
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=300&h=533",
+      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 69.99,
       salePrice: 39.99,
       rating: 4.8,
@@ -149,7 +149,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
     {
       id: 6,
       title: "Call of Duty: Modern Warfare III",
-      image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=300&h=533",
+      image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 69.99,
       salePrice: 44.99,
       rating: 4.6,
@@ -197,7 +197,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
                 <img
                   src={game.image}
                   alt={game.title}
-                  className="w-full aspect-[9/16] object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 {game.discount > 0 && (
                   <div className="absolute top-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
