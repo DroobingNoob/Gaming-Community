@@ -1,0 +1,190 @@
+import React, { useState } from 'react';
+import { Search, ShoppingCart, User, Menu, X, Gamepad2 } from 'lucide-react';
+
+interface HeaderProps {
+  onLoginClick: () => void;
+  onCartClick: () => void;
+  isLoggedIn: boolean;
+  cartItemCount: number;
+}
+
+const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, cartItemCount }) => {
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearchClick = () => {
+    setIsSearchExpanded(true);
+  };
+
+  const handleSearchClose = () => {
+    setIsSearchExpanded(false);
+    setSearchQuery('');
+  };
+
+  const navItems = ['Home', 'Categories', 'FAQ', 'Contact'];
+
+  return (
+    <>
+      <header className="bg-white shadow-md relative">
+        {!isSearchExpanded ? (
+          <div className="container mx-auto px-4 py-4">
+            {/* Desktop Header */}
+            <div className="hidden md:block">
+              {/* Top row with search icon, logo, and auth/cart */}
+              <div className="flex items-center justify-between mb-4">
+                {/* Search Icon */}
+                <div className="flex-1">
+                  <button
+                    onClick={handleSearchClick}
+                    className="text-cyan-600 hover:text-orange-500 transition-colors p-2"
+                  >
+                    <Search className="w-6 h-6" />
+                  </button>
+                </div>
+
+                {/* Logo */}
+                <div className="flex items-center space-x-2">
+                  <Gamepad2 className="w-8 h-8 text-cyan-400" />
+                  <span className="text-2xl font-bold text-cyan-400">GameStore</span>
+                </div>
+
+                {/* Auth & Cart */}
+                <div className="flex items-center space-x-4 flex-1 justify-end">
+                  <button
+                    onClick={onLoginClick}
+                    className="flex items-center space-x-2 px-4 py-2 text-cyan-600 hover:text-orange-500 transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>{isLoggedIn ? 'Account' : 'Login'}</span>
+                  </button>
+                  
+                  <button
+                    onClick={onCartClick}
+                    className="relative flex items-center space-x-2 px-4 py-2 text-cyan-600 hover:text-orange-500 transition-colors"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    <span>Cart</span>
+                    {cartItemCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {cartItemCount}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Navigation */}
+              <nav className="flex justify-center">
+                <ul className="flex space-x-8">
+                  {navItems.map((item) => (
+                    <li key={item}>
+                      <a
+                        href={`#${item.toLowerCase()}`}
+                        className="text-cyan-600 hover:text-orange-500 font-medium transition-colors py-2"
+                      >
+                        {item}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
+
+            {/* Mobile Header */}
+            <div className="md:hidden">
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="text-cyan-600"
+                >
+                  {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </button>
+
+                <div className="flex items-center space-x-2">
+                  <Gamepad2 className="w-6 h-6 text-cyan-400" />
+                  <span className="text-xl font-bold text-cyan-400">GameStore</span>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <button onClick={handleSearchClick} className="text-cyan-600">
+                    <Search className="w-5 h-5" />
+                  </button>
+                  <button onClick={onCartClick} className="relative text-cyan-600">
+                    <ShoppingCart className="w-5 h-5" />
+                    {cartItemCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                        {cartItemCount}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Mobile Menu */}
+              {isMobileMenuOpen && (
+                <div className="mt-4 pb-4 border-t border-gray-200">
+                  <nav className="mt-4">
+                    {navItems.map((item) => (
+                      <a
+                        key={item}
+                        href={`#${item.toLowerCase()}`}
+                        className="block py-2 text-cyan-600 hover:text-orange-500 transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {item}
+                      </a>
+                    ))}
+                  </nav>
+                  <button
+                    onClick={onLoginClick}
+                    className="mt-4 w-full text-left py-2 text-cyan-600 hover:text-orange-500 transition-colors"
+                  >
+                    {isLoggedIn ? 'Account' : 'Login with Google'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* Expanded Search */
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={handleSearchClose}
+                className="text-cyan-600 hover:text-orange-500 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="Search for games..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border-2 border-cyan-400 rounded-full focus:outline-none focus:border-orange-400 transition-colors text-lg"
+                  autoFocus
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-5 h-5" />
+              </div>
+              <button className="bg-cyan-400 hover:bg-orange-500 text-white px-6 py-3 rounded-full font-medium transition-colors">
+                Search
+              </button>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Blue Strip */}
+      <div className="bg-cyan-400 text-white py-2">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-sm md:text-base font-medium">
+            🕹️ Trusted by Top Streamers and Gamers – Shop the Same Games They Play!
+          </p>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Header;
