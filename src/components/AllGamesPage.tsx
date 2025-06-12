@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, Search, Filter, ChevronDown, Grid, List } from 'lucide-react';
+import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
 
 interface Game {
   id: number;
@@ -7,7 +7,6 @@ interface Game {
   image: string;
   originalPrice: number;
   salePrice: number;
-  rating: number;
   platform: string;
   discount: number;
   description: string;
@@ -39,7 +38,6 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
       image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 59.99,
       salePrice: 19.99,
-      rating: 4.8,
       platform: "PS5",
       discount: 67,
       description: "Experience the award-winning Grand Theft Auto V with enhanced graphics and performance on PlayStation 5.",
@@ -52,7 +50,6 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
       image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 69.99,
       salePrice: 49.99,
-      rating: 4.9,
       platform: "PS5",
       discount: 29,
       description: "Embark on an epic journey as the legendary Monkey King in this action RPG.",
@@ -65,7 +62,6 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
       image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 79.99,
       salePrice: 59.99,
-      rating: 4.7,
       platform: "PS5",
       discount: 25,
       description: "Step into feudal Japan as a legendary shinobi and samurai.",
@@ -78,7 +74,6 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
       image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 69.99,
       salePrice: 39.99,
-      rating: 4.8,
       platform: "PS5",
       discount: 43,
       description: "Swing through New York City as both Peter Parker and Miles Morales.",
@@ -91,7 +86,6 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
       image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 69.99,
       salePrice: 44.99,
-      rating: 4.6,
       platform: "PS5",
       discount: 36,
       description: "Experience the most advanced Call of Duty ever with Modern Warfare III.",
@@ -104,7 +98,6 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
       image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 59.99,
       salePrice: 29.99,
-      rating: 4.5,
       platform: "PS4",
       discount: 50,
       description: "The world's game returns with FIFA 24, featuring enhanced gameplay and realism.",
@@ -117,7 +110,6 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
       image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 69.99,
       salePrice: 34.99,
-      rating: 4.8,
       platform: "PS4",
       discount: 50,
       description: "Join Aloy as she braves the Forbidden West - a majestic but dangerous frontier.",
@@ -130,7 +122,6 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
       image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 69.99,
       salePrice: 39.99,
-      rating: 4.9,
       platform: "PS4",
       discount: 43,
       description: "Embark on an epic and heartfelt journey as Kratos and Atreus struggle with holding on and letting go.",
@@ -144,7 +135,6 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
       image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 59.99,
       salePrice: 29.99 + (i % 3) * 10,
-      rating: 4.0 + (i % 10) * 0.1,
       platform: i % 2 === 0 ? "PS5" : "PS4",
       discount: 30 + (i % 5) * 10,
       description: `This is an amazing game with incredible features and gameplay mechanics that will keep you entertained for hours.`,
@@ -174,8 +164,6 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
           return a.salePrice - b.salePrice;
         case 'price-high':
           return b.salePrice - a.salePrice;
-        case 'rating':
-          return b.rating - a.rating;
         default:
           return 0;
       }
@@ -195,31 +183,31 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
             <button
               onClick={onBackToHome}
-              className="flex items-center space-x-2 text-cyan-600 hover:text-orange-500 transition-colors"
+              className="flex items-center space-x-2 text-cyan-600 hover:text-orange-500 transition-colors bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Back</span>
             </button>
-            <h1 className="text-3xl font-bold text-gray-800">All Games</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Games</h1>
           </div>
           
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-              className="p-2 text-gray-600 hover:text-cyan-600 transition-colors"
+              className="p-2 text-gray-600 hover:text-cyan-600 transition-colors bg-white/80 backdrop-blur-sm rounded-full shadow-lg"
             >
               {viewMode === 'grid' ? <List className="w-5 h-5" /> : <Grid className="w-5 h-5" />}
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden flex items-center space-x-2 bg-cyan-400 text-white px-4 py-2 rounded-lg hover:bg-cyan-500 transition-colors"
+              className="lg:hidden flex items-center space-x-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-4 py-2 rounded-full hover:from-cyan-500 hover:to-blue-600 transition-colors shadow-lg"
             >
               <Filter className="w-4 h-4" />
               <span>Filters</span>
@@ -230,12 +218,12 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
           <div className={`lg:block ${showFilters ? 'block' : 'hidden'} space-y-6`}>
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Filters</h3>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
+              <h3 className="text-lg font-bold text-gray-800 mb-4">Filters</h3>
               
               {/* Search */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Search Games</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Search Games</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
@@ -250,7 +238,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
 
               {/* Platform Filter */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Platform</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Platform</label>
                 <select
                   value={selectedPlatform}
                   onChange={(e) => setSelectedPlatform(e.target.value)}
@@ -264,7 +252,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
 
               {/* Price Range */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Price Range: ${priceRange[0]} - ${priceRange[1]}
                 </label>
                 <div className="space-y-2">
@@ -289,7 +277,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
 
               {/* Sort By */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Sort By</label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
@@ -299,7 +287,6 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                   <option value="name-desc">Name (Z-A)</option>
                   <option value="price-low">Price (Low to High)</option>
                   <option value="price-high">Price (High to Low)</option>
-                  <option value="rating">Rating (Highest)</option>
                 </select>
               </div>
             </div>
@@ -320,30 +307,30 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                 {paginatedGames.map((game) => (
                   <div
                     key={game.id}
-                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer group"
+                    className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 cursor-pointer group"
                     onClick={() => onGameClick(game)}
                   >
                     <div className="relative overflow-hidden">
                       <img
                         src={game.image}
                         alt={game.title}
-                        className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full aspect-square object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                       {game.discount > 0 && (
-                        <div className="absolute top-3 left-3 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                        <div className="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
                           -{game.discount}%
                         </div>
                       )}
-                      <div className="absolute top-3 right-3 bg-cyan-400 text-white px-2 py-1 rounded text-xs font-medium">
+                      <div className="absolute top-3 right-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 py-1 rounded text-xs font-medium shadow-lg">
                         {game.platform}
                       </div>
                     </div>
                     <div className="p-4">
-                      <h3 className="font-semibold text-gray-800 text-sm mb-2 line-clamp-2">
+                      <h3 className="font-bold text-gray-800 text-sm mb-2 line-clamp-2">
                         {game.title}
                       </h3>
                       <div className="flex items-center space-x-2 mb-3">
-                        <span className="text-lg font-bold text-orange-500">
+                        <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
                           ${game.salePrice}
                         </span>
                         {game.originalPrice > game.salePrice && (
@@ -352,7 +339,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                           </span>
                         )}
                       </div>
-                      <button className="w-full bg-cyan-400 hover:bg-orange-500 text-white py-2 px-3 rounded-lg font-medium text-sm transition-colors">
+                      <button className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white py-2 px-3 rounded-lg font-medium text-sm transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
                         Select Options
                       </button>
                     </div>
@@ -364,7 +351,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                 {paginatedGames.map((game) => (
                   <div
                     key={game.id}
-                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                    className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
                     onClick={() => onGameClick(game)}
                   >
                     <div className="flex items-center p-6">
@@ -376,18 +363,17 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                       <div className="flex-1">
                         <div className="flex items-start justify-between">
                           <div>
-                            <h3 className="font-semibold text-gray-800 text-lg mb-2">{game.title}</h3>
+                            <h3 className="font-bold text-gray-800 text-lg mb-2">{game.title}</h3>
                             <p className="text-gray-600 text-sm mb-2 line-clamp-2">{game.description}</p>
                             <div className="flex items-center space-x-2">
-                              <span className="bg-cyan-400 text-white px-2 py-1 rounded text-xs font-medium">
+                              <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
                                 {game.platform}
                               </span>
-                              <span className="text-sm text-gray-500">Rating: {game.rating}</span>
                             </div>
                           </div>
                           <div className="text-right">
                             <div className="flex items-center space-x-2 mb-3">
-                              <span className="text-2xl font-bold text-orange-500">
+                              <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
                                 ${game.salePrice}
                               </span>
                               {game.originalPrice > game.salePrice && (
@@ -396,7 +382,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                                 </span>
                               )}
                             </div>
-                            <button className="bg-cyan-400 hover:bg-orange-500 text-white py-2 px-6 rounded-lg font-medium transition-colors">
+                            <button className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white py-2 px-6 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
                               Select Options
                             </button>
                           </div>
@@ -414,7 +400,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                 <button
                   onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 text-gray-600 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-lg hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg"
                 >
                   Previous
                 </button>
@@ -425,10 +411,10 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                     <button
                       key={page}
                       onClick={() => handlePageChange(page)}
-                      className={`px-4 py-2 rounded-lg transition-colors ${
+                      className={`px-4 py-2 rounded-lg transition-colors shadow-lg ${
                         currentPage === page
-                          ? 'bg-cyan-400 text-white'
-                          : 'text-gray-600 bg-white border border-gray-300 hover:bg-gray-50'
+                          ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white'
+                          : 'text-gray-600 bg-white/80 backdrop-blur-sm border border-gray-300 hover:bg-white/90'
                       }`}
                     >
                       {page}
@@ -441,10 +427,10 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                     <span className="px-2 text-gray-500">...</span>
                     <button
                       onClick={() => handlePageChange(totalPages)}
-                      className={`px-4 py-2 rounded-lg transition-colors ${
+                      className={`px-4 py-2 rounded-lg transition-colors shadow-lg ${
                         currentPage === totalPages
-                          ? 'bg-cyan-400 text-white'
-                          : 'text-gray-600 bg-white border border-gray-300 hover:bg-gray-50'
+                          ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white'
+                          : 'text-gray-600 bg-white/80 backdrop-blur-sm border border-gray-300 hover:bg-white/90'
                       }`}
                     >
                       {totalPages}
@@ -455,7 +441,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                 <button
                   onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 text-gray-600 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-lg hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg"
                 >
                   Next
                 </button>

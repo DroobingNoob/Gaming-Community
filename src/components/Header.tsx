@@ -6,9 +6,10 @@ interface HeaderProps {
   onCartClick: () => void;
   isLoggedIn: boolean;
   cartItemCount: number;
+  onNavigation: (section: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, cartItemCount }) => {
+const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, cartItemCount, onNavigation }) => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,7 +23,21 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
     setSearchQuery('');
   };
 
-  const navItems = ['Home', 'Categories', 'FAQ', 'Contact'];
+  const navItems = [
+    { name: 'Home', id: 'home' },
+    { name: 'Categories', id: 'categories' },
+    { name: 'FAQ', id: 'faq' },
+    { name: 'Contact', id: 'contact' }
+  ];
+
+  const handleNavClick = (itemId: string) => {
+    if (itemId === 'home') {
+      onNavigation('home');
+    } else {
+      onNavigation(itemId);
+    }
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <>
@@ -78,13 +93,13 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
               <nav className="flex justify-center">
                 <ul className="flex space-x-8">
                   {navItems.map((item) => (
-                    <li key={item}>
-                      <a
-                        href={`#${item.toLowerCase()}`}
+                    <li key={item.id}>
+                      <button
+                        onClick={() => handleNavClick(item.id)}
                         className="text-cyan-600 hover:text-orange-500 font-medium transition-colors py-2"
                       >
-                        {item}
-                      </a>
+                        {item.name}
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -126,14 +141,13 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                 <div className="mt-4 pb-4 border-t border-gray-200">
                   <nav className="mt-4">
                     {navItems.map((item) => (
-                      <a
-                        key={item}
-                        href={`#${item.toLowerCase()}`}
-                        className="block py-2 text-cyan-600 hover:text-orange-500 transition-colors"
-                        onClick={() => setIsMobileMenuOpen(false)}
+                      <button
+                        key={item.id}
+                        onClick={() => handleNavClick(item.id)}
+                        className="block w-full text-left py-2 text-cyan-600 hover:text-orange-500 transition-colors"
                       >
-                        {item}
-                      </a>
+                        {item.name}
+                      </button>
                     ))}
                   </nav>
                   <button

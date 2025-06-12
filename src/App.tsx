@@ -154,7 +154,7 @@ function App() {
 
   if (currentView === 'product' && selectedProduct) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
         <Header
           onLoginClick={() => setIsLoginModalOpen(true)}
           onCartClick={handleCartClick}
@@ -193,7 +193,7 @@ function App() {
 
   if (currentView === 'allgames') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
         <Header
           onLoginClick={() => setIsLoginModalOpen(true)}
           onCartClick={handleCartClick}
@@ -229,7 +229,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
       <Header
         onLoginClick={() => setIsLoginModalOpen(true)}
         onCartClick={handleCartClick}

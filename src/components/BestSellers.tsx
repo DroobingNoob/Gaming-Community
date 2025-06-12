@@ -1,5 +1,4 @@
 import React from 'react';
-import { Star } from 'lucide-react';
 
 interface Game {
   id: number;
@@ -7,7 +6,6 @@ interface Game {
   image: string;
   originalPrice: number;
   salePrice: number;
-  rating: number;
   platform: string;
   discount: number;
   description: string;
@@ -27,7 +25,6 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
       image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 59.99,
       salePrice: 19.99,
-      rating: 4.8,
       platform: "PS5",
       discount: 67,
       description: "Experience the award-winning Grand Theft Auto V with enhanced graphics and performance on PlayStation 5. The Premium Edition includes the complete GTA V story, GTA Online, and the Criminal Enterprise Starter Pack.",
@@ -52,7 +49,6 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
       image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 69.99,
       salePrice: 49.99,
-      rating: 4.9,
       platform: "PS5",
       discount: 29,
       description: "Embark on an epic journey as the legendary Monkey King in this action RPG inspired by the classic Chinese novel Journey to the West. Experience stunning visuals and challenging combat.",
@@ -77,7 +73,6 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
       image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 79.99,
       salePrice: 59.99,
-      rating: 4.7,
       platform: "PS5",
       discount: 25,
       description: "Step into feudal Japan as a legendary shinobi and samurai in the latest Assassin's Creed adventure. Experience dual protagonists with unique gameplay styles.",
@@ -102,7 +97,6 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
       image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 299.99,
       salePrice: 199.99,
-      rating: 4.9,
       platform: "Xbox",
       discount: 33,
       description: "Get unlimited access to hundreds of high-quality games with Xbox Game Pass Ultimate. Includes Xbox Live Gold, PC Game Pass, and cloud gaming.",
@@ -127,7 +121,6 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
       image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 69.99,
       salePrice: 39.99,
-      rating: 4.8,
       platform: "PS5",
       discount: 43,
       description: "Swing through New York City as both Peter Parker and Miles Morales in this spectacular superhero adventure. Face new threats and master new abilities.",
@@ -152,7 +145,6 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
       image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
       originalPrice: 69.99,
       salePrice: 44.99,
-      rating: 4.6,
       platform: "PS5",
       discount: 36,
       description: "Experience the most advanced Call of Duty ever with Modern Warfare III. Features campaign, multiplayer, and the all-new Zombies mode.",
@@ -179,10 +171,10 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
   };
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-gradient-to-br from-white via-blue-50/30 to-orange-50/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
             Best Selling Games
           </h2>
           <p className="text-gray-600 text-lg">
@@ -194,7 +186,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
           {games.map((game) => (
             <div
               key={game.id}
-              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group cursor-pointer"
+              className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 group cursor-pointer"
               onClick={() => onGameClick(game)}
             >
               {/* Image Container */}
@@ -202,44 +194,28 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
                 <img
                   src={game.image}
                   alt={game.title}
-                  className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full aspect-square object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 {game.discount > 0 && (
-                  <div className="absolute top-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  <div className="absolute top-4 left-4 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
                     -{game.discount}%
                   </div>
                 )}
-                <div className="absolute top-3 right-3 bg-cyan-400 text-white px-2 py-1 rounded text-xs font-medium">
+                <div className="absolute top-4 right-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">
                   {game.platform}
                 </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
 
               {/* Content */}
               <div className="p-6">
-                <h3 className="font-semibold text-gray-800 text-lg mb-2 line-clamp-2">
+                <h3 className="font-bold text-gray-800 text-lg mb-3 line-clamp-2 group-hover:text-cyan-600 transition-colors">
                   {game.title}
                 </h3>
-                
-                {/* Rating */}
-                <div className="flex items-center space-x-1 mb-4">
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${
-                          i < Math.floor(game.rating)
-                            ? 'fill-orange-400 text-orange-400'
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm text-gray-600">({game.rating})</span>
-                </div>
 
                 {/* Pricing */}
-                <div className="flex items-center space-x-2 mb-4">
-                  <span className="text-2xl font-bold text-orange-500">
+                <div className="flex items-center space-x-3 mb-6">
+                  <span className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
                     ${game.salePrice}
                   </span>
                   {game.originalPrice > game.salePrice && (
@@ -250,7 +226,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
                 </div>
 
                 {/* Select Options Button */}
-                <button className="w-full bg-cyan-400 hover:bg-orange-500 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2 group">
+                <button className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 group shadow-lg hover:shadow-xl transform hover:scale-105">
                   <span>Select Options</span>
                 </button>
               </div>
@@ -261,7 +237,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
         <div className="text-center mt-12">
           <button 
             onClick={handleViewAllGames}
-            className="bg-transparent border-2 border-cyan-400 text-cyan-600 hover:bg-cyan-400 hover:text-white px-8 py-3 rounded-full font-semibold transition-all duration-300"
+            className="bg-gradient-to-r from-white to-gray-50 border-2 border-cyan-400 text-cyan-600 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-blue-500 hover:text-white px-8 py-4 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             View All Games
           </button>
