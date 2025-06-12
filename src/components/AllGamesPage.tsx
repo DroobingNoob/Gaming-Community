@@ -205,7 +205,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
               className="flex items-center space-x-2 text-cyan-600 hover:text-orange-500 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
-              <span>Back to Home</span>
+              <span>Back</span>
             </button>
             <h1 className="text-3xl font-bold text-gray-800">All Games</h1>
           </div>
