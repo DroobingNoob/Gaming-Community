@@ -124,7 +124,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
           className="flex items-center space-x-2 text-cyan-600 hover:text-orange-500 transition-colors mb-8"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Back to Games</span>
+          <span>Back</span>
         </button>
 
         {/* Desktop Layout */}
