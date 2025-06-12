@@ -44,7 +44,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
     {
       name: "GameMaster_Pro",
       time: "2 hours ago",
-      message: "Just downloaded this game! Works perfectly on PS5. Thanks GameStore! 🎮",
+      message: "Just downloaded this game! Works perfectly on PS5. Thanks Gaming Community! 🎮",
       avatar: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150"
     },
     {
@@ -129,13 +129,13 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
         {/* Back Button */}
         <button
           onClick={onBackToHome}
-          className="flex items-center space-x-2 text-cyan-600 hover:text-orange-500 transition-colors mb-8 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg"
+          className="flex items-center space-x-1 sm:space-x-2 text-cyan-600 hover:text-orange-500 transition-colors mb-6 sm:mb-8 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-lg text-sm sm:text-base"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           <span>Back</span>
         </button>
 
@@ -365,21 +365,21 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
 
         {/* Mobile/Tablet Layout */}
         <div className="lg:hidden">
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {/* Product Image */}
             <div className="flex justify-center">
-              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/20">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl border border-white/20">
                 <img
                   src={product.image}
                   alt={product.title}
-                  className="w-full max-w-sm aspect-square object-cover rounded-2xl"
+                  className="w-full max-w-xs sm:max-w-sm aspect-square object-cover rounded-xl sm:rounded-2xl"
                 />
               </div>
             </div>
 
             {/* Product Details */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/20">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">{product.title}</h1>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl border border-white/20">
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">{product.title}</h1>
               
               <div className="flex items-center space-x-2 mb-4">
                 <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
@@ -428,12 +428,12 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
               </div>
 
               {/* Pricing */}
-              <div className="flex items-center space-x-4 mb-6">
-                <span className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+              <div className="flex items-center space-x-3 sm:space-x-4 mb-6">
+                <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
                   ${calculatePrice().toFixed(2)}
                 </span>
                 {selectedType === 'Rent' && (
-                  <span className="text-2xl text-gray-500 line-through">
+                  <span className="text-xl sm:text-2xl text-gray-500 line-through">
                     ${product.salePrice}
                   </span>
                 )}
@@ -443,19 +443,19 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
               </div>
 
               {/* Action Buttons */}
-              <div className="space-y-3 mb-8">
+              <div className="space-y-3 mb-6 sm:mb-8">
                 <button
                   onClick={handleAddToCart}
-                  className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   Add to Cart
                 </button>
-                <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
                   Buy Now
                 </button>
                 <button
                   onClick={handleShare}
-                  className="w-full border-2 border-cyan-400 text-cyan-600 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-blue-500 hover:text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                  className="w-full border-2 border-cyan-400 text-cyan-600 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-blue-500 hover:text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                 >
                   <Share2 className="w-5 h-5" />
                   <span>Share</span>
@@ -463,22 +463,22 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
               </div>
 
               {/* Trust Labels */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <div className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
                   <Shield className="w-6 h-6 text-green-500" />
                   <div>
                     <div className="font-bold text-gray-800 text-sm">Lifetime Warranty</div>
                     <div className="text-gray-600 text-xs">100% Guaranteed</div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-200">
+                <div className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-200">
                   <Clock className="w-6 h-6 text-blue-500" />
                   <div>
                     <div className="font-bold text-gray-800 text-sm">Instant Delivery</div>
                     <div className="text-gray-600 text-xs">Within 5 minutes</div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+                <div className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
                   <Headphones className="w-6 h-6 text-purple-500" />
                   <div>
                     <div className="font-bold text-gray-800 text-sm">Customer Support</div>
@@ -489,7 +489,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
 
               {/* Tabs for Mobile */}
               <div className="border-b border-gray-200 mb-6">
-                <nav className="flex space-x-8">
+                <nav className="flex space-x-4 sm:space-x-8">
                   {['details', 'additional', 'faq'].map((tab) => (
                     <button
                       key={tab}
@@ -508,16 +508,16 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                 </nav>
               </div>
 
-              <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 mb-8">
+              <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
                 {activeAccordion === 'details' && (
                   <div className="space-y-4">
-                    <p className="text-gray-600 leading-relaxed">{product.description}</p>
-                    <h4 className="text-lg font-bold text-gray-800 mt-6 mb-3">Key Features</h4>
+                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">{product.description}</p>
+                    <h4 className="text-base sm:text-lg font-bold text-gray-800 mt-6 mb-3">Key Features</h4>
                     <ul className="space-y-2">
                       {product.features.map((feature, index) => (
                         <li key={index} className="flex items-start space-x-2">
                           <span className="text-cyan-400 mt-1">•</span>
-                          <span className="text-gray-600">{feature}</span>
+                          <span className="text-gray-600 text-sm sm:text-base">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -545,7 +545,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                   <div className="space-y-4">
                     {faqs.map((faq, index) => (
                       <div key={index}>
-                        <h5 className="font-semibold text-gray-800 mb-2">{faq.question}</h5>
+                        <h5 className="font-semibold text-gray-800 mb-2 text-sm sm:text-base">{faq.question}</h5>
                         <p className="text-gray-600 text-sm mb-4">{faq.answer}</p>
                       </div>
                     ))}
@@ -557,23 +557,23 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
         </div>
 
         {/* Testimonials Section */}
-        <div id="testimonials-section" className="mb-12">
-          <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-6">Customer Reviews</h3>
-          <div className="space-y-4">
+        <div id="testimonials-section" className="mb-8 sm:mb-12">
+          <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">Customer Reviews</h3>
+          <div className="space-y-3 sm:space-y-4">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-                <div className="flex items-start space-x-4">
+              <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-white/20">
+                <div className="flex items-start space-x-3 sm:space-x-4">
                   <img
                     src={testimonial.avatar}
                     alt={testimonial.name}
-                    className="w-12 h-12 rounded-full object-cover"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
                   />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <span className="font-bold text-gray-800">{testimonial.name}</span>
-                      <span className="text-gray-500 text-sm">{testimonial.time}</span>
+                      <span className="font-bold text-gray-800 text-sm sm:text-base">{testimonial.name}</span>
+                      <span className="text-gray-500 text-xs sm:text-sm">{testimonial.time}</span>
                     </div>
-                    <p className="text-gray-600">{testimonial.message}</p>
+                    <p className="text-gray-600 text-sm sm:text-base">{testimonial.message}</p>
                   </div>
                 </div>
               </div>
@@ -582,13 +582,13 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
         </div>
 
         {/* You May Also Like */}
-        <div className="mb-12">
-          <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-6">You May Also Like</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="mb-8 sm:mb-12">
+          <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">You May Also Like</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {relatedGames.map((game) => (
               <div 
                 key={game.id} 
-                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2"
+                className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 sm:hover:-translate-y-2"
                 onClick={() => onGameClick(game)}
               >
                 <img
@@ -596,13 +596,13 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                   alt={game.title}
                   className="w-full aspect-square object-cover"
                 />
-                <div className="p-4">
-                  <h4 className="font-bold text-gray-800 text-sm mb-2 line-clamp-2">
+                <div className="p-3 sm:p-4">
+                  <h4 className="font-bold text-gray-800 text-xs sm:text-sm mb-2 line-clamp-2">
                     {game.title}
                   </h4>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-orange-500 font-bold">${game.salePrice}</span>
-                    <span className="text-gray-500 line-through text-sm">${game.originalPrice}</span>
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <span className="text-orange-500 font-bold text-sm sm:text-base">${game.salePrice}</span>
+                    <span className="text-gray-500 line-through text-xs sm:text-sm">${game.originalPrice}</span>
                   </div>
                 </div>
               </div>

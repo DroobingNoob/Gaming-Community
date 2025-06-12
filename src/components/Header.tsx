@@ -43,9 +43,9 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
     <>
       <header className="bg-white shadow-md relative">
         {!isSearchExpanded ? (
-          <div className="container mx-auto px-4 py-4">
+          <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
             {/* Desktop Header */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               {/* Top row with search icon, logo, and auth/cart */}
               <div className="flex items-center justify-between mb-4">
                 {/* Search Icon */}
@@ -113,34 +113,34 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
             </div>
 
             {/* Mobile Header */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <div className="flex items-center justify-between">
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="text-cyan-600"
+                  className="text-cyan-600 p-1"
                 >
-                  {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                  {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
 
                 <div className="flex items-center space-x-2">
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
-                    className="w-12 h-12 object-contain"
+                    className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
                   />
-                  {/* <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
+                  <span className="text-sm sm:text-base font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
                     Gaming Community
-                  </span> */}
+                  </span>
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <button onClick={handleSearchClick} className="text-cyan-600">
-                    <Search className="w-5 h-5" />
+                  <button onClick={handleSearchClick} className="text-cyan-600 p-1">
+                    <Search className="w-4 h-4" />
                   </button>
-                  <button onClick={onCartClick} className="relative text-cyan-600">
-                    <ShoppingCart className="w-5 h-5" />
+                  <button onClick={onCartClick} className="relative text-cyan-600 p-1">
+                    <ShoppingCart className="w-4 h-4" />
                     {cartItemCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                      <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
                         {cartItemCount}
                       </span>
                     )}
@@ -151,12 +151,12 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
               {/* Mobile Menu */}
               {isMobileMenuOpen && (
                 <div className="mt-4 pb-4 border-t border-gray-200">
-                  <nav className="mt-4">
+                  <nav className="mt-4 space-y-2">
                     {navItems.map((item) => (
                       <button
                         key={item.id}
                         onClick={() => handleNavClick(item.id)}
-                        className="block w-full text-left py-2 text-cyan-600 hover:text-orange-500 transition-colors"
+                        className="block w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg"
                       >
                         {item.name}
                       </button>
@@ -164,7 +164,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   </nav>
                   <button
                     onClick={onLoginClick}
-                    className="mt-4 w-full text-left py-2 text-cyan-600 hover:text-orange-500 transition-colors"
+                    className="mt-4 w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg"
                   >
                     {isLoggedIn ? 'Account' : 'Login with Google'}
                   </button>
@@ -174,13 +174,13 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
           </div>
         ) : (
           /* Expanded Search */
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center space-x-4">
+          <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <button
                 onClick={handleSearchClose}
-                className="text-cyan-600 hover:text-orange-500 transition-colors"
+                className="text-cyan-600 hover:text-orange-500 transition-colors p-1"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
               <div className="flex-1 relative">
                 <input
@@ -188,12 +188,12 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   placeholder="Search for games..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-cyan-400 rounded-full focus:outline-none focus:border-orange-400 transition-colors text-lg"
+                  className="w-full pl-8 sm:pl-10 pr-4 py-2 sm:py-3 border-2 border-cyan-400 rounded-full focus:outline-none focus:border-orange-400 transition-colors text-sm sm:text-lg"
                   autoFocus
                 />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-5 h-5" />
+                <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <button className="bg-cyan-400 hover:bg-orange-500 text-white px-6 py-3 rounded-full font-medium transition-colors">
+              <button className="bg-cyan-400 hover:bg-orange-500 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-base">
                 Search
               </button>
             </div>
@@ -203,8 +203,8 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
 
       {/* Blue Strip */}
       <div className="bg-cyan-400 text-white py-2">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm md:text-base font-medium">
+        <div className="container mx-auto px-3 sm:px-4 text-center">
+          <p className="text-xs sm:text-sm md:text-base font-medium">
             🕹️ Trusted by Top Streamers and Gamers – Shop the Same Games They Play!
           </p>
         </div>
