@@ -18,6 +18,8 @@ interface CartItem {
   price: number;
   quantity: number;
   image: string;
+  platform: string;
+  type: string;
 }
 
 interface Game {
@@ -26,7 +28,6 @@ interface Game {
   image: string;
   originalPrice: number;
   salePrice: number;
-  rating: number;
   platform: string;
   discount: number;
   description: string;
@@ -46,13 +47,16 @@ function App() {
       title: "Grand Theft Auto V Premium Edition",
       price: 19.99,
       quantity: 1,
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400"
+      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
+      platform: "PS5",
+      type: "Permanent"
     }
   ]);
 
   useEffect(() => {
     const handleViewAllGames = () => {
       setCurrentView('allgames');
+      window.scrollTo(0, 0);
     };
 
     window.addEventListener('viewAllGames', handleViewAllGames);
@@ -70,24 +74,32 @@ function App() {
   const handleGameClick = (game: Game) => {
     setSelectedProduct(game);
     setCurrentView('product');
+    window.scrollTo(0, 0);
   };
 
   const handleViewAllGames = () => {
     setCurrentView('allgames');
+    window.scrollTo(0, 0);
   };
 
   const handleBackToHome = () => {
     setCurrentView('home');
     setSelectedProduct(null);
+    window.scrollTo(0, 0);
   };
 
-  const handleAddToCart = (product: Game) => {
-    const existingItem = cartItems.find(item => item.id === product.id);
+  const handleAddToCart = (product: Game, platform: string, type: string, price: number) => {
+    const itemId = `${product.id}-${platform}-${type}`;
+    const existingItem = cartItems.find(item => 
+      item.id === product.id && 
+      item.platform === platform && 
+      item.type === type
+    );
     
     if (existingItem) {
       setCartItems(items =>
         items.map(item =>
-          item.id === product.id 
+          item.id === product.id && item.platform === platform && item.type === type
             ? { ...item, quantity: item.quantity + 1 }
             : item
         )
@@ -96,9 +108,11 @@ function App() {
       const newCartItem: CartItem = {
         id: product.id,
         title: product.title,
-        price: product.salePrice,
+        price: price,
         quantity: 1,
-        image: product.image
+        image: product.image,
+        platform: platform,
+        type: type
       };
       setCartItems(items => [...items, newCartItem]);
     }
@@ -126,17 +140,29 @@ function App() {
     }
   };
 
+  const handleNavigation = (section: string) => {
+    if (currentView !== 'home') {
+      setCurrentView('home');
+      setSelectedProduct(null);
+      setTimeout(() => {
+        scrollToSection(section);
+      }, 100);
+    } else {
+      scrollToSection(section);
+    }
+  };
+
   if (currentView === 'product' && selectedProduct) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <Header
           onLoginClick={() => setIsLoginModalOpen(true)}
           onCartClick={handleCartClick}
           isLoggedIn={isLoggedIn}
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+          onNavigation={handleNavigation}
         />
         
-    
         <ProductPage
           product={selectedProduct}
           onAddToCart={handleAddToCart}
@@ -167,15 +193,15 @@ function App() {
 
   if (currentView === 'allgames') {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <Header
           onLoginClick={() => setIsLoginModalOpen(true)}
           onCartClick={handleCartClick}
           isLoggedIn={isLoggedIn}
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+          onNavigation={handleNavigation}
         />
         
-
         <AllGamesPage
           onGameClick={handleGameClick}
           onBackToHome={handleBackToHome}
@@ -203,12 +229,13 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Header
         onLoginClick={() => setIsLoginModalOpen(true)}
         onCartClick={handleCartClick}
         isLoggedIn={isLoggedIn}
         cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+        onNavigation={handleNavigation}
       />
       
       <main>
