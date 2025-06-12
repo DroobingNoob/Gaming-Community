@@ -136,15 +136,7 @@ function App() {
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
         />
         
-        {/* Blue Strip */}
-        <div className="bg-cyan-400 text-white py-2">
-          <div className="container mx-auto px-4 text-center">
-            <p className="text-sm md:text-base font-medium">
-              🕹️ Trusted by Top Streamers and Gamers – Shop the Same Games They Play!
-            </p>
-          </div>
-        </div>
-
+    
         <ProductPage
           product={selectedProduct}
           onAddToCart={handleAddToCart}
@@ -183,14 +175,6 @@ function App() {
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
         />
         
-        {/* Blue Strip */}
-        <div className="bg-cyan-400 text-white py-2">
-          <div className="container mx-auto px-4 text-center">
-            <p className="text-sm md:text-base font-medium">
-              🕹️ Trusted by Top Streamers and Gamers – Shop the Same Games They Play!
-            </p>
-          </div>
-        </div>
 
         <AllGamesPage
           onGameClick={handleGameClick}
