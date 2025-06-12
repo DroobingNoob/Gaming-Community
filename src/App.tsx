@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import LoginModal from './components/LoginModal';
 import CartModal from './components/CartModal';
 import WhatsAppButton from './components/WhatsAppButton';
+import ProductPage from './components/ProductPage';
 
 interface CartItem {
   id: number;
@@ -18,9 +19,25 @@ interface CartItem {
   image: string;
 }
 
+interface Game {
+  id: number;
+  title: string;
+  image: string;
+  originalPrice: number;
+  salePrice: number;
+  rating: number;
+  platform: string;
+  discount: number;
+  description: string;
+  features: string[];
+  systemRequirements: string[];
+}
+
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [isProductPageOpen, setIsProductPageOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Game | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([
     {
@@ -28,7 +45,7 @@ function App() {
       title: "Grand Theft Auto V Premium Edition",
       price: 19.99,
       quantity: 1,
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=300"
+      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=300&h=533"
     }
   ]);
 
@@ -38,6 +55,37 @@ function App() {
 
   const handleCartClick = () => {
     setIsCartModalOpen(true);
+  };
+
+  const handleGameClick = (game: Game) => {
+    setSelectedProduct(game);
+    setIsProductPageOpen(true);
+  };
+
+  const handleAddToCart = (product: Game) => {
+    const existingItem = cartItems.find(item => item.id === product.id);
+    
+    if (existingItem) {
+      setCartItems(items =>
+        items.map(item =>
+          item.id === product.id 
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      );
+    } else {
+      const newCartItem: CartItem = {
+        id: product.id,
+        title: product.title,
+        price: product.salePrice,
+        quantity: 1,
+        image: product.image
+      };
+      setCartItems(items => [...items, newCartItem]);
+    }
+    
+    // Show success message or animation here
+    alert('Added to cart!');
   };
 
   const handleUpdateQuantity = (id: number, quantity: number) => {
@@ -65,7 +113,7 @@ function App() {
         <Hero />
         <TrustIndicators />
         <Vouches />
-        <BestSellers />
+        <BestSellers onGameClick={handleGameClick} />
         <Categories />
       </main>
 
@@ -83,6 +131,13 @@ function App() {
         cartItems={cartItems}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
+      />
+
+      <ProductPage
+        product={selectedProduct}
+        isOpen={isProductPageOpen}
+        onClose={() => setIsProductPageOpen(false)}
+        onAddToCart={handleAddToCart}
       />
 
       <WhatsAppButton />
