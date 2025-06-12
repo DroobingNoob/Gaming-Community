@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 interface Game {
   id: number;
@@ -173,6 +173,11 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
     }
   ];
 
+  const handleViewAllGames = () => {
+    // This will be handled by the parent component
+    window.dispatchEvent(new CustomEvent('viewAllGames'));
+  };
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -244,10 +249,9 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
                   )}
                 </div>
 
-                {/* Add to Cart Button */}
+                {/* Select Options Button */}
                 <button className="w-full bg-cyan-400 hover:bg-orange-500 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2 group">
-                  <ShoppingCart className="w-4 h-4" />
-                  <span>Add to Cart</span>
+                  <span>Select Options</span>
                 </button>
               </div>
             </div>
@@ -255,7 +259,10 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
         </div>
 
         <div className="text-center mt-12">
-          <button className="bg-transparent border-2 border-cyan-400 text-cyan-600 hover:bg-cyan-400 hover:text-white px-8 py-3 rounded-full font-semibold transition-all duration-300">
+          <button 
+            onClick={handleViewAllGames}
+            className="bg-transparent border-2 border-cyan-400 text-cyan-600 hover:bg-cyan-400 hover:text-white px-8 py-3 rounded-full font-semibold transition-all duration-300"
+          >
             View All Games
           </button>
         </div>

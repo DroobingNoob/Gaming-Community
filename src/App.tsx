@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import TrustIndicators from './components/TrustIndicators';
@@ -10,6 +10,7 @@ import LoginModal from './components/LoginModal';
 import CartModal from './components/CartModal';
 import WhatsAppButton from './components/WhatsAppButton';
 import ProductPage from './components/ProductPage';
+import AllGamesPage from './components/AllGamesPage';
 
 interface CartItem {
   id: number;
@@ -36,7 +37,7 @@ interface Game {
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'home' | 'product'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames'>('home');
   const [selectedProduct, setSelectedProduct] = useState<Game | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([
@@ -49,6 +50,15 @@ function App() {
     }
   ]);
 
+  useEffect(() => {
+    const handleViewAllGames = () => {
+      setCurrentView('allgames');
+    };
+
+    window.addEventListener('viewAllGames', handleViewAllGames);
+    return () => window.removeEventListener('viewAllGames', handleViewAllGames);
+  }, []);
+
   const handleLogin = () => {
     setIsLoggedIn(true);
   };
@@ -60,6 +70,10 @@ function App() {
   const handleGameClick = (game: Game) => {
     setSelectedProduct(game);
     setCurrentView('product');
+  };
+
+  const handleViewAllGames = () => {
+    setCurrentView('allgames');
   };
 
   const handleBackToHome = () => {
@@ -136,6 +150,51 @@ function App() {
           onAddToCart={handleAddToCart}
           onBackToHome={handleBackToHome}
           onGameClick={handleGameClick}
+        />
+
+        <Footer />
+
+        <LoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          onLogin={handleLogin}
+        />
+
+        <CartModal
+          isOpen={isCartModalOpen}
+          onClose={() => setIsCartModalOpen(false)}
+          cartItems={cartItems}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+        />
+
+        <WhatsAppButton />
+      </div>
+    );
+  }
+
+  if (currentView === 'allgames') {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header
+          onLoginClick={() => setIsLoginModalOpen(true)}
+          onCartClick={handleCartClick}
+          isLoggedIn={isLoggedIn}
+          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+        />
+        
+        {/* Blue Strip */}
+        <div className="bg-cyan-400 text-white py-2">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-sm md:text-base font-medium">
+              🕹️ Trusted by Top Streamers and Gamers – Shop the Same Games They Play!
+            </p>
+          </div>
+        </div>
+
+        <AllGamesPage
+          onGameClick={handleGameClick}
+          onBackToHome={handleBackToHome}
         />
 
         <Footer />
