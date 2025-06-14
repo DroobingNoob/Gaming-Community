@@ -26,33 +26,36 @@ const Footer: React.FC = () => {
           
           {/* Brand Section */}
           <div className="lg:col-span-2">
-            <div className="flex items-center justify-center md:justify-start space-x-3 mb-4 sm:mb-6">
+            <div className="flex items-center space-x-3 mb-4 sm:mb-6">
               <img 
                 src="/1000156095.jpg" 
                 alt="Gaming Community" 
-                className="w-16 h-16 sm:w-20 sm:h-20 object-contain bg-white/10 rounded-xl p-2 shadow-lg hover:scale-105 transition-transform duration-300"
+                className="w-10 h-10 sm:w-12 sm:h-12 object-contain bg-white/10 rounded-xl p-2"
               />
+              <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
+                Gaming Community
+              </span>
             </div>
-            <p className="text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base lg:text-lg leading-relaxed max-w-md text-center md:text-left">
+            <p className="text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base lg:text-lg leading-relaxed max-w-md">
               Your trusted destination for digital games. We provide instant delivery, 
               competitive prices, and excellent customer support for all your gaming needs.
             </p>
             
             {/* Contact Info */}
             <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-              <div className="flex items-center justify-center md:justify-start space-x-3 text-gray-300 hover:text-cyan-400 transition-colors">
+              <div className="flex items-center space-x-3 text-gray-300 hover:text-cyan-400 transition-colors">
                 <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-1.5 sm:p-2 rounded-lg">
                   <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
                 <span className="text-sm sm:text-base">+91 92665 14434</span>
               </div>
-              <div className="flex items-center justify-center md:justify-start space-x-3 text-gray-300 hover:text-cyan-400 transition-colors">
+              <div className="flex items-center space-x-3 text-gray-300 hover:text-cyan-400 transition-colors">
                 <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-1.5 sm:p-2 rounded-lg">
                   <Mail className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
                 <span className="text-sm sm:text-base">support@gamingcommunity.com</span>
               </div>
-              <div className="flex items-center justify-center md:justify-start space-x-3 text-gray-300 hover:text-cyan-400 transition-colors">
+              <div className="flex items-center space-x-3 text-gray-300 hover:text-cyan-400 transition-colors">
                 <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-1.5 sm:p-2 rounded-lg">
                   <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
@@ -61,7 +64,7 @@ const Footer: React.FC = () => {
             </div>
             
             {/* Social Links */}
-            <div className="flex justify-center md:justify-start space-x-3 sm:space-x-4">
+            <div className="flex space-x-3 sm:space-x-4">
               <a
                 href="https://instagram.com/gamiingcommunity"
                 target="_blank"
@@ -82,7 +85,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Quick Links */}
-          <div className="text-center md:text-left">
+          <div>
             <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-white bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Quick Links</h3>
             <div className="space-y-2 sm:space-y-3">
               {quickLinks.slice(0, 3).map((link) => (
@@ -98,7 +101,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Policies */}
-          <div className="text-center md:text-left">
+          <div>
             <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-white bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Policies</h3>
             <div className="space-y-2 sm:space-y-3">
               {quickLinks.slice(3).map((link) => (
