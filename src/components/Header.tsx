@@ -65,9 +65,6 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                     alt="Gaming Community" 
                     className="w-16 h-16 object-contain"
                   />
-                  <span className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
-                    Gaming Community
-                  </span>
                 </div>
 
                 {/* Auth & Cart */}
