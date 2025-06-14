@@ -63,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
-                    className="w-18 h-18 object-contain"
+                    className="w-17 h-17 object-contain"
                   />
                 </div>
 
