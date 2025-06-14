@@ -154,7 +154,7 @@ const Footer: React.FC = () => {
         <div className="border-t border-gray-700/50 pt-6 sm:pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400 text-xs sm:text-sm">
-              © 2024 Gaming Community. All rights reserved.
+              © 2025 Gaming Community. All rights reserved.
             </p>
             <div className="flex items-center space-x-2">
               <span className="text-gray-400 text-xs sm:text-sm">Powered by</span>
