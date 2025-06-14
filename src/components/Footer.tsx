@@ -66,7 +66,7 @@ const Footer: React.FC = () => {
             {/* Social Links */}
             <div className="flex space-x-3 sm:space-x-4">
               <a
-                href="https://instagram.com/gamingcommunity"
+                href="https://instagram.com/gamiingcommunity"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gradient-to-r from-gray-800 to-gray-700 hover:from-cyan-400 hover:to-orange-500 p-2 sm:p-3 rounded-xl transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-xl"
@@ -74,7 +74,7 @@ const Footer: React.FC = () => {
                 <Instagram className="w-5 h-5 sm:w-6 sm:h-6" />
               </a>
               <a
-                href="https://youtube.com/gamingcommunity"
+                href="https://youtube.com/@gamingcommunityps5?si=IEgM_DIgxHiKmKBa"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gradient-to-r from-gray-800 to-gray-700 hover:from-cyan-400 hover:to-orange-500 p-2 sm:p-3 rounded-xl transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-xl"
