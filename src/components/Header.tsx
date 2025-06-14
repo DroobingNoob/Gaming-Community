@@ -58,12 +58,12 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   </button>
                 </div>
 
-                {/* Logo - Made More Prominent */}
-                <div className="flex items-center space-x-4">
+                {/* Logo - Made Much More Prominent */}
+                <div className="flex items-center justify-center">
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
-                    className="w-17 h-17 object-contain"
+                    className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-xl"
                   />
                 </div>
 
@@ -119,16 +119,13 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
 
-                {/* Mobile Logo - Made More Prominent */}
-                <div className="flex items-center space-x-2 sm:space-x-3">
+                {/* Mobile Logo - Made Much More Prominent */}
+                <div className="flex items-center justify-center flex-1">
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
-                    className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+                    className="w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg"
                   />
-                  <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
-                    Gaming Community
-                  </span>
                 </div>
 
                 <div className="flex items-center space-x-2">
