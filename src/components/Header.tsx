@@ -58,14 +58,14 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   </button>
                 </div>
 
-                {/* Logo */}
-                <div className="flex items-center space-x-3">
+                {/* Logo - Made More Prominent */}
+                <div className="flex items-center space-x-4">
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
-                    className="w-12 h-12 object-contain"
+                    className="w-16 h-16 object-contain"
                   />
-                  <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
+                  <span className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
                     Gaming Community
                   </span>
                 </div>
@@ -122,13 +122,14 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
 
-                <div className="flex items-center space-x-2">
+                {/* Mobile Logo - Made More Prominent */}
+                <div className="flex items-center space-x-2 sm:space-x-3">
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
-                    className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+                    className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
                   />
-                  <span className="text-sm sm:text-base font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
+                  <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
                     Gaming Community
                   </span>
                 </div>

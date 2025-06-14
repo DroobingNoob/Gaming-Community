@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Shield, Clock, Headphones, Share2, ChevronDown, ChevronUp } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 interface Product {
   id: number;
@@ -106,7 +107,10 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
+      toast.success('Link copied to clipboard!', {
+        position: "top-right",
+        autoClose: 2000,
+      });
     }
   };
 

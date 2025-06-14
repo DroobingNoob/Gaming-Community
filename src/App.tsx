@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import TrustIndicators from './components/TrustIndicators';
@@ -11,6 +13,7 @@ import CartModal from './components/CartModal';
 import WhatsAppButton from './components/WhatsAppButton';
 import ProductPage from './components/ProductPage';
 import AllGamesPage from './components/AllGamesPage';
+import SubscriptionsPage from './components/SubscriptionsPage';
 
 interface CartItem {
   id: number;
@@ -38,7 +41,7 @@ interface Game {
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames' | 'subscriptions'>('home');
   const [selectedProduct, setSelectedProduct] = useState<Game | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([
@@ -59,8 +62,18 @@ function App() {
       window.scrollTo(0, 0);
     };
 
+    const handleViewSubscriptions = () => {
+      setCurrentView('subscriptions');
+      window.scrollTo(0, 0);
+    };
+
     window.addEventListener('viewAllGames', handleViewAllGames);
-    return () => window.removeEventListener('viewAllGames', handleViewAllGames);
+    window.addEventListener('viewSubscriptions', handleViewSubscriptions);
+    
+    return () => {
+      window.removeEventListener('viewAllGames', handleViewAllGames);
+      window.removeEventListener('viewSubscriptions', handleViewSubscriptions);
+    };
   }, []);
 
   const handleLogin = () => {
@@ -79,6 +92,11 @@ function App() {
 
   const handleViewAllGames = () => {
     setCurrentView('allgames');
+    window.scrollTo(0, 0);
+  };
+
+  const handleViewSubscriptions = () => {
+    setCurrentView('subscriptions');
     window.scrollTo(0, 0);
   };
 
@@ -117,8 +135,15 @@ function App() {
       setCartItems(items => [...items, newCartItem]);
     }
     
-    // Show success message or animation here
-    alert('Added to cart!');
+    // Show success toast
+    toast.success(`${product.title} added to cart!`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
   };
 
   const handleUpdateQuantity = (id: number, quantity: number) => {
@@ -187,6 +212,7 @@ function App() {
         />
 
         <WhatsAppButton />
+        <ToastContainer />
       </div>
     );
   }
@@ -224,6 +250,45 @@ function App() {
         />
 
         <WhatsAppButton />
+        <ToastContainer />
+      </div>
+    );
+  }
+
+  if (currentView === 'subscriptions') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+        <Header
+          onLoginClick={() => setIsLoginModalOpen(true)}
+          onCartClick={handleCartClick}
+          isLoggedIn={isLoggedIn}
+          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+          onNavigation={handleNavigation}
+        />
+        
+        <SubscriptionsPage
+          onGameClick={handleGameClick}
+          onBackToHome={handleBackToHome}
+        />
+
+        <Footer />
+
+        <LoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          onLogin={handleLogin}
+        />
+
+        <CartModal
+          isOpen={isCartModalOpen}
+          onClose={() => setIsCartModalOpen(false)}
+          cartItems={cartItems}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+        />
+
+        <WhatsAppButton />
+        <ToastContainer />
       </div>
     );
   }
@@ -246,7 +311,7 @@ function App() {
           <BestSellers onGameClick={handleGameClick} />
         </div>
         <div id="categories">
-          <Categories />
+          <Categories onViewAllGames={handleViewAllGames} onViewSubscriptions={handleViewSubscriptions} />
         </div>
       </main>
 
@@ -267,6 +332,7 @@ function App() {
       />
 
       <WhatsAppButton />
+      <ToastContainer />
     </div>
   );
 }
