@@ -53,7 +53,7 @@ const Footer: React.FC = () => {
                 <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-1.5 sm:p-2 rounded-lg">
                   <Mail className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
-                <span className="text-sm sm:text-base">support@gamingcommunity.com</span>
+                <span className="text-sm sm:text-base">psgamingcommunity@outlook.com</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-300 hover:text-cyan-400 transition-colors">
                 <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-1.5 sm:p-2 rounded-lg">
