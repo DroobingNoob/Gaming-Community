@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, Shield } from 'lucide-react';
 
 interface HeaderProps {
   onLoginClick: () => void;
   onCartClick: () => void;
   isLoggedIn: boolean;
+  isAdmin?: boolean;
   cartItemCount: number;
   onNavigation: (section: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, cartItemCount, onNavigation }) => {
+const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, isAdmin, cartItemCount, onNavigation }) => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,6 +30,11 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
     { name: 'FAQ', id: 'faq' },
     { name: 'Contact', id: 'contact' }
   ];
+
+  // Add admin option if user is admin
+  if (isAdmin) {
+    navItems.push({ name: 'Admin', id: 'admin' });
+  }
 
   const handleNavClick = (itemId: string) => {
     if (itemId === 'home') {
@@ -99,9 +105,12 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                     <li key={item.id}>
                       <button
                         onClick={() => handleNavClick(item.id)}
-                        className="text-cyan-600 hover:text-orange-500 font-medium transition-colors py-2"
+                        className={`text-cyan-600 hover:text-orange-500 font-medium transition-colors py-2 flex items-center space-x-1 ${
+                          item.id === 'admin' ? 'bg-gradient-to-r from-purple-100 to-indigo-100 px-3 rounded-full' : ''
+                        }`}
                       >
-                        {item.name}
+                        {item.id === 'admin' && <Shield className="w-4 h-4" />}
+                        <span>{item.name}</span>
                       </button>
                     </li>
                   ))}
@@ -151,9 +160,12 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                       <button
                         key={item.id}
                         onClick={() => handleNavClick(item.id)}
-                        className="block w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg"
+                        className={`block w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg flex items-center space-x-2 ${
+                          item.id === 'admin' ? 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200' : ''
+                        }`}
                       >
-                        {item.name}
+                        {item.id === 'admin' && <Shield className="w-4 h-4" />}
+                        <span>{item.name}</span>
                       </button>
                     ))}
                   </nav>

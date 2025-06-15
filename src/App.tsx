@@ -14,6 +14,7 @@ import WhatsAppButton from './components/WhatsAppButton';
 import ProductPage from './components/ProductPage';
 import AllGamesPage from './components/AllGamesPage';
 import SubscriptionsPage from './components/SubscriptionsPage';
+import AdminPage from './components/AdminPage';
 
 interface CartItem {
   id: number;
@@ -41,9 +42,10 @@ interface Game {
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames' | 'subscriptions'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames' | 'subscriptions' | 'admin'>('home');
   const [selectedProduct, setSelectedProduct] = useState<Game | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true); // Set to true for demo - in real app check user role
   const [cartItems, setCartItems] = useState<CartItem[]>([
     {
       id: 1,
@@ -97,6 +99,11 @@ function App() {
 
   const handleViewSubscriptions = () => {
     setCurrentView('subscriptions');
+    window.scrollTo(0, 0);
+  };
+
+  const handleViewAdmin = () => {
+    setCurrentView('admin');
     window.scrollTo(0, 0);
   };
 
@@ -166,6 +173,11 @@ function App() {
   };
 
   const handleNavigation = (section: string) => {
+    if (section === 'admin' && isAdmin) {
+      handleViewAdmin();
+      return;
+    }
+    
     if (currentView !== 'home') {
       setCurrentView('home');
       setSelectedProduct(null);
@@ -177,6 +189,40 @@ function App() {
     }
   };
 
+  if (currentView === 'admin') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+        <Header
+          onLoginClick={() => setIsLoginModalOpen(true)}
+          onCartClick={handleCartClick}
+          isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
+          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+          onNavigation={handleNavigation}
+        />
+        
+        <AdminPage onBackToHome={handleBackToHome} />
+
+        <LoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          onLogin={handleLogin}
+        />
+
+        <CartModal
+          isOpen={isCartModalOpen}
+          onClose={() => setIsCartModalOpen(false)}
+          cartItems={cartItems}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+        />
+
+        <WhatsAppButton />
+        <ToastContainer />
+      </div>
+    );
+  }
+
   if (currentView === 'product' && selectedProduct) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
@@ -184,6 +230,7 @@ function App() {
           onLoginClick={() => setIsLoginModalOpen(true)}
           onCartClick={handleCartClick}
           isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onNavigation={handleNavigation}
         />
@@ -224,6 +271,7 @@ function App() {
           onLoginClick={() => setIsLoginModalOpen(true)}
           onCartClick={handleCartClick}
           isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onNavigation={handleNavigation}
         />
@@ -262,6 +310,7 @@ function App() {
           onLoginClick={() => setIsLoginModalOpen(true)}
           onCartClick={handleCartClick}
           isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onNavigation={handleNavigation}
         />
@@ -299,6 +348,7 @@ function App() {
         onLoginClick={() => setIsLoginModalOpen(true)}
         onCartClick={handleCartClick}
         isLoggedIn={isLoggedIn}
+        isAdmin={isAdmin}
         cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
         onNavigation={handleNavigation}
       />
