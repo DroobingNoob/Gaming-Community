@@ -10,13 +10,7 @@ import {
   where,
   limit
 } from 'firebase/firestore';
-import { 
-  ref, 
-  uploadBytes, 
-  getDownloadURL, 
-  deleteObject 
-} from 'firebase/storage';
-import { db, storage } from '../config/firebase';
+import { db } from '../config/firebase';
 
 // Types
 export interface Game {
@@ -247,33 +241,6 @@ export const testimonialsService = {
       await deleteDoc(doc(db, 'testimonials', id));
     } catch (error) {
       console.error('Error deleting testimonial:', error);
-      throw error;
-    }
-  }
-};
-
-// Storage Service for image uploads
-export const storageService = {
-  // Upload image
-  async uploadImage(file: File, path: string): Promise<string> {
-    try {
-      const storageRef = ref(storage, path);
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      return downloadURL;
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      throw error;
-    }
-  },
-
-  // Delete image
-  async deleteImage(url: string): Promise<void> {
-    try {
-      const imageRef = ref(storage, url);
-      await deleteObject(imageRef);
-    } catch (error) {
-      console.error('Error deleting image:', error);
       throw error;
     }
   }

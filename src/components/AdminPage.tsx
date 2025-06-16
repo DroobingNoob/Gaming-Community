@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, Upload, Save, X } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Save, X, ExternalLink } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { 
   gamesService, 
   subscriptionsService, 
   testimonialsService, 
-  storageService,
   Game, 
   Testimonial 
 } from '../services/firebaseService';
@@ -20,7 +19,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [stockType, setStockType] = useState<'games' | 'subscriptions' | null>(null);
   const [crudOperation, setCrudOperation] = useState<'create' | 'read' | 'update' | 'delete' | null>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
   const [loading, setLoading] = useState(false);
 
@@ -28,25 +26,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const { games, refetch: refetchGames } = useGames();
   const { subscriptions, refetch: refetchSubscriptions } = useSubscriptions();
   const { testimonials, refetch: refetchTestimonials } = useTestimonials();
-
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      try {
-        setLoading(true);
-        const timestamp = Date.now();
-        const fileName = `${activeSection}/${timestamp}_${file.name}`;
-        const imageUrl = await storageService.uploadImage(file, fileName);
-        setFormData({ ...formData, image: imageUrl });
-        toast.success('Image uploaded successfully!');
-      } catch (error) {
-        toast.error('Failed to upload image');
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
 
   const handleSaveItem = async () => {
     try {
@@ -247,39 +226,44 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Image Upload */}
-            <div>
+            {/* Image URL Input */}
+            <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {isTestimonial ? 'Avatar' : 'Image'}
+                {isTestimonial ? 'Avatar URL' : 'Image URL'}
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                {formData.image ? (
-                  <div className="relative">
-                    <img src={formData.image} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
-                    <button
-                      onClick={() => setFormData({ ...formData, image: '' })}
-                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+              <div className="space-y-3">
+                <input
+                  type="url"
+                  value={formData.image || ''}
+                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  placeholder="https://example.com/image.jpg"
+                />
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start space-x-2">
+                    <ExternalLink className="w-5 h-5 text-blue-500 mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-blue-800 mb-2">Free Image Hosting Options:</h4>
+                      <ul className="text-sm text-blue-700 space-y-1">
+                        <li>• <strong>Imgur:</strong> Upload at imgur.com (right-click → copy image address)</li>
+                        <li>• <strong>Pexels:</strong> Use stock photos from pexels.com</li>
+                        <li>• <strong>Unsplash:</strong> Free photos from unsplash.com</li>
+                        <li>• <strong>Cloudinary:</strong> Free tier at cloudinary.com</li>
+                      </ul>
+                    </div>
                   </div>
-                ) : (
-                  <div>
-                    <Upload className="w-12 h-12 mx-auto text-gray-400 mb-2" />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      id="image-upload"
-                      disabled={loading}
+                </div>
+                {formData.image && (
+                  <div className="relative">
+                    <img 
+                      src={formData.image} 
+                      alt="Preview" 
+                      className="w-full max-w-xs h-48 object-cover rounded-lg border"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        toast.error('Invalid image URL');
+                      }}
                     />
-                    <label
-                      htmlFor="image-upload"
-                      className="cursor-pointer text-cyan-600 hover:text-cyan-700"
-                    >
-                      {loading ? 'Uploading...' : 'Click to upload image'}
-                    </label>
                   </div>
                 )}
               </div>
