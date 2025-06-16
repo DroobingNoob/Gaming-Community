@@ -1,18 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
-
-interface Game {
-  id: number;
-  title: string;
-  image: string;
-  originalPrice: number;
-  salePrice: number;
-  platform: string;
-  discount: number;
-  description: string;
-  features: string[];
-  systemRequirements: string[];
-}
+import { useSubscriptions } from '../hooks/useFirebaseData';
+import { Game } from '../services/firebaseService';
 
 interface SubscriptionsPageProps {
   onGameClick: (game: Game) => void;
@@ -20,6 +9,7 @@ interface SubscriptionsPageProps {
 }
 
 const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBackToHome }) => {
+  const { subscriptions, loading, error } = useSubscriptions();
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState([0, 300]);
   const [sortBy, setSortBy] = useState('name-asc');
@@ -29,109 +19,9 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
   
   const itemsPerPage = 24;
 
-  // Subscription services data
-  const allSubscriptions: Game[] = [
-    {
-      id: 101,
-      title: "Xbox Game Pass Ultimate (3 Months)",
-      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 44.99,
-      salePrice: 29.99,
-      platform: "Xbox",
-      discount: 33,
-      description: "Get unlimited access to hundreds of high-quality games with Xbox Game Pass Ultimate. Includes Xbox Live Gold, PC Game Pass, and cloud gaming.",
-      features: ["Access to 100+ games", "Day-one releases included", "Xbox Live Gold membership", "PC Game Pass included", "Cloud gaming support", "EA Play membership"],
-      systemRequirements: ["Xbox console or Windows PC", "Internet connection required", "Microsoft account", "Compatible device for cloud gaming"]
-    },
-    {
-      id: 102,
-      title: "PlayStation Plus Premium (12 Months)",
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 119.99,
-      salePrice: 89.99,
-      platform: "PlayStation",
-      discount: 25,
-      description: "PlayStation Plus Premium gives you access to a massive game catalog, classic games, and exclusive benefits.",
-      features: ["700+ games catalog", "Classic PS1, PS2, PSP games", "Game trials", "Cloud streaming", "Online multiplayer", "Monthly free games"],
-      systemRequirements: ["PlayStation 4 or PlayStation 5", "Internet connection required", "PlayStation Network account"]
-    },
-    {
-      id: 103,
-      title: "EA Play Pro (12 Months)",
-      image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 99.99,
-      salePrice: 79.99,
-      platform: "PC",
-      discount: 20,
-      description: "EA Play Pro gives you unlimited access to EA's best games, plus early access to new releases.",
-      features: ["Unlimited access to EA games", "Early access to new releases", "Exclusive member rewards", "No ads", "Premium support"],
-      systemRequirements: ["Windows PC", "Origin or Steam client", "Internet connection required"]
-    },
-    {
-      id: 104,
-      title: "Nintendo Switch Online + Expansion Pack (12 Months)",
-      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 49.99,
-      salePrice: 39.99,
-      platform: "Nintendo Switch",
-      discount: 20,
-      description: "Nintendo Switch Online + Expansion Pack includes classic games, online play, and exclusive content.",
-      features: ["Online multiplayer", "Classic NES & SNES games", "N64 & Genesis games", "Animal Crossing DLC", "Cloud saves", "Smartphone app"],
-      systemRequirements: ["Nintendo Switch console", "Internet connection required", "Nintendo Account"]
-    },
-    {
-      id: 105,
-      title: "Xbox Game Pass Ultimate (6 Months)",
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 89.99,
-      salePrice: 59.99,
-      platform: "Xbox",
-      discount: 33,
-      description: "6 months of Xbox Game Pass Ultimate with access to hundreds of games and premium features.",
-      features: ["Access to 100+ games", "Day-one releases", "Xbox Live Gold", "PC Game Pass", "Cloud gaming", "EA Play"],
-      systemRequirements: ["Xbox console or Windows PC", "Internet connection", "Microsoft account"]
-    },
-    {
-      id: 106,
-      title: "PlayStation Plus Essential (12 Months)",
-      image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 59.99,
-      salePrice: 44.99,
-      platform: "PlayStation",
-      discount: 25,
-      description: "PlayStation Plus Essential provides online multiplayer and monthly free games.",
-      features: ["Online multiplayer", "Monthly free games", "Exclusive discounts", "Cloud storage for saves", "Share Play"],
-      systemRequirements: ["PlayStation 4 or PlayStation 5", "Internet connection", "PlayStation Network account"]
-    },
-    {
-      id: 107,
-      title: "Ubisoft+ (3 Months)",
-      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 44.97,
-      salePrice: 29.99,
-      platform: "PC",
-      discount: 33,
-      description: "Ubisoft+ gives you access to Ubisoft's entire catalog of premium games.",
-      features: ["130+ premium games", "New releases included", "All DLCs included", "Cross-platform progression", "Premium editions"],
-      systemRequirements: ["Windows PC", "Ubisoft Connect", "Internet connection"]
-    },
-    {
-      id: 108,
-      title: "Apple Arcade (12 Months)",
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 59.88,
-      salePrice: 39.99,
-      platform: "Apple",
-      discount: 33,
-      description: "Apple Arcade offers premium games without ads or in-app purchases across all Apple devices.",
-      features: ["200+ premium games", "No ads or in-app purchases", "Family sharing", "Offline play", "Cross-device sync"],
-      systemRequirements: ["iPhone, iPad, Mac, or Apple TV", "iOS 13+ or macOS 10.15+", "Apple ID"]
-    }
-  ];
-
   // Filter and sort subscriptions
   const filteredAndSortedSubscriptions = useMemo(() => {
-    let filtered = allSubscriptions.filter(subscription => {
+    let filtered = subscriptions.filter(subscription => {
       const matchesSearch = subscription.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesPrice = subscription.salePrice >= priceRange[0] && subscription.salePrice <= priceRange[1];
       
@@ -155,7 +45,7 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
     });
 
     return filtered;
-  }, [allSubscriptions, searchQuery, priceRange, sortBy]);
+  }, [subscriptions, searchQuery, priceRange, sortBy]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedSubscriptions.length / itemsPerPage);
@@ -166,6 +56,55 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <button
+                onClick={onBackToHome}
+                className="flex items-center space-x-1 sm:space-x-2 text-cyan-600 hover:text-orange-500 transition-colors bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-lg text-sm sm:text-base"
+              >
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Back</span>
+              </button>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Subscriptions</h1>
+            </div>
+          </div>
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading subscriptions...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <button
+                onClick={onBackToHome}
+                className="flex items-center space-x-1 sm:space-x-2 text-cyan-600 hover:text-orange-500 transition-colors bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-lg text-sm sm:text-base"
+              >
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Back</span>
+              </button>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Subscriptions</h1>
+            </div>
+          </div>
+          <div className="text-center py-12">
+            <p className="text-red-600">Failed to load subscriptions. Please try again later.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
@@ -273,7 +212,11 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
             </div>
 
             {/* Subscriptions Grid/List */}
-            {viewMode === 'grid' ? (
+            {filteredAndSortedSubscriptions.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600">No subscriptions found matching your criteria.</p>
+              </div>
+            ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
                 {paginatedSubscriptions.map((subscription) => (
                   <div
@@ -293,7 +236,7 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
                         </div>
                       )}
                       <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium shadow-lg">
-                        {subscription.platform}
+                        {subscription.platform.join(', ')}
                       </div>
                     </div>
                     <div className="p-3 sm:p-4">
@@ -338,7 +281,7 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
                             <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2 hidden sm:block">{subscription.description}</p>
                             <div className="flex items-center space-x-2">
                               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
-                                {subscription.platform}
+                                {subscription.platform.join(', ')}
                               </span>
                             </div>
                           </div>

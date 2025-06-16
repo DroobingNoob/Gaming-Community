@@ -1,46 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import { Check, CheckCheck } from 'lucide-react';
+import { useTestimonials } from '../hooks/useFirebaseData';
 
 const Vouches: React.FC = () => {
+  const { testimonials, loading, error } = useTestimonials();
   const [currentVouch, setCurrentVouch] = useState(0);
-  
-  const vouches = [
-    {
-      name: "Alex StreamKing",
-      time: "Today 2:45 PM",
-      message: "Just got GTA V Premium Edition! Instant delivery as promised. You guys are amazing! 🎮",
-      reply: "Thank you Alex! Enjoy your gaming session! 🚀",
-      avatar: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150"
-    },
-    {
-      name: "Sarah GameQueen",
-      time: "Yesterday 11:30 PM",
-      message: "Had an issue at 2 AM and support resolved it within minutes! Customer service is incredible 👏",
-      reply: "We're always here to help! Thanks for choosing GameStore! 💙",
-      avatar: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150&h=150"
-    },
-    {
-      name: "Mike ProGamer",
-      time: "2 days ago",
-      message: "Saved hundreds switching to GameStore. Best prices and legitimate keys every time! Highly recommend 💯",
-      reply: "That's what we're here for! Happy gaming! 🎯",
-      avatar: "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=150&h=150"
-    },
-    {
-      name: "Emma GameReviewer",
-      time: "3 days ago",
-      message: "As a gaming journalist, I need reliable sources. GameStore delivers every time with fast service! ⭐⭐⭐⭐⭐",
-      reply: "Professional service for professional gamers! Thank you Emma! 🏆",
-      avatar: "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=150&h=150"
-    }
-  ];
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentVouch((prev) => (prev + 1) % vouches.length);
-    }, 4000); // Slower transition for better readability
-    return () => clearInterval(timer);
-  }, [vouches.length]);
+    if (testimonials.length > 0) {
+      const timer = setInterval(() => {
+        setCurrentVouch((prev) => (prev + 1) % testimonials.length);
+      }, 4000);
+      return () => clearInterval(timer);
+    }
+  }, [testimonials.length]);
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-white overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+              What Our Customers Say
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Real conversations from our satisfied gaming community
+            </p>
+          </div>
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading testimonials...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || testimonials.length === 0) {
+    return (
+      <section className="py-16 bg-white overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+              What Our Customers Say
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Real conversations from our satisfied gaming community
+            </p>
+          </div>
+          <div className="text-center py-12">
+            <p className="text-gray-600">No testimonials available at the moment.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-white overflow-hidden">
@@ -57,10 +71,10 @@ const Vouches: React.FC = () => {
         {/* Continuous Scrolling Testimonials */}
         <div className="relative max-w-6xl mx-auto">
           <div className="flex space-x-6 animate-scroll">
-            {/* Duplicate vouches for seamless loop */}
-            {[...vouches, ...vouches].map((vouch, index) => (
+            {/* Duplicate testimonials for seamless loop */}
+            {[...testimonials, ...testimonials].map((vouch, index) => (
               <div
-                key={index}
+                key={`${vouch.id}-${index}`}
                 className="flex-shrink-0 w-96"
               >
                 {/* WhatsApp Chat Interface */}

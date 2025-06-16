@@ -1,30 +1,15 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, Upload, Crop, Save, X } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Upload, Save, X } from 'lucide-react';
 import { toast } from 'react-toastify';
-
-interface Game {
-  id: number;
-  title: string;
-  image: string;
-  originalPrice: number;
-  salePrice: number;
-  rentPrice?: number;
-  platform: string[];
-  discount: number;
-  description: string;
-  features: string[];
-  systemRequirements: string[];
-  type: string[];
-}
-
-interface Testimonial {
-  id: number;
-  name: string;
-  time: string;
-  message: string;
-  reply: string;
-  avatar: string;
-}
+import { 
+  gamesService, 
+  subscriptionsService, 
+  testimonialsService, 
+  storageService,
+  Game, 
+  Testimonial 
+} from '../services/firebaseService';
+import { useGames, useSubscriptions, useTestimonials } from '../hooks/useFirebaseData';
 
 interface AdminPageProps {
   onBackToHome: () => void;
@@ -35,99 +20,121 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [stockType, setStockType] = useState<'games' | 'subscriptions' | null>(null);
   const [crudOperation, setCrudOperation] = useState<'create' | 'read' | 'update' | 'delete' | null>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [isImageCropperOpen, setIsImageCropperOpen] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-
-  // Sample data - in real app this would come from backend
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([
-    {
-      id: 1,
-      name: "Alex StreamKing",
-      time: "Today 2:45 PM",
-      message: "Just got GTA V Premium Edition! Instant delivery as promised. You guys are amazing! 🎮",
-      reply: "Thank you Alex! Enjoy your gaming session! 🚀",
-      avatar: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150"
-    }
-  ]);
-
-  const [games, setGames] = useState<Game[]>([
-    {
-      id: 1,
-      title: "Grand Theft Auto V Premium Edition",
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 59.99,
-      salePrice: 19.99,
-      rentPrice: 5.99,
-      platform: ["PS5"],
-      discount: 67,
-      description: "Experience the award-winning Grand Theft Auto V with enhanced graphics and performance on PlayStation 5.",
-      features: ["Enhanced graphics", "Complete story", "Online multiplayer"],
-      systemRequirements: ["PlayStation 5 console required", "50 GB storage"],
-      type: ["Permanent", "Rent"]
-    }
-  ]);
-
   const [formData, setFormData] = useState<any>({});
+  const [loading, setLoading] = useState(false);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Firebase data hooks
+  const { games, refetch: refetchGames } = useGames();
+  const { subscriptions, refetch: refetchSubscriptions } = useSubscriptions();
+  const { testimonials, refetch: refetchTestimonials } = useTestimonials();
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setUploadedImage(e.target?.result as string);
-        setIsImageCropperOpen(true);
-      };
-      reader.readAsDataURL(file);
+      try {
+        setLoading(true);
+        const timestamp = Date.now();
+        const fileName = `${activeSection}/${timestamp}_${file.name}`;
+        const imageUrl = await storageService.uploadImage(file, fileName);
+        setFormData({ ...formData, image: imageUrl });
+        toast.success('Image uploaded successfully!');
+      } catch (error) {
+        toast.error('Failed to upload image');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  const handleImageCrop = (croppedImage: string) => {
-    setFormData({ ...formData, image: croppedImage });
-    setIsImageCropperOpen(false);
-    setUploadedImage(null);
-    toast.success('Image cropped successfully!');
-  };
-
-  const handleSaveItem = () => {
-    if (activeSection === 'testimonials') {
-      if (crudOperation === 'create') {
-        const newTestimonial: Testimonial = {
-          id: Date.now(),
-          ...formData
-        };
-        setTestimonials([...testimonials, newTestimonial]);
-        toast.success('Testimonial added successfully!');
-      } else if (crudOperation === 'update' && selectedItem) {
-        setTestimonials(testimonials.map(t => t.id === selectedItem.id ? { ...t, ...formData } : t));
-        toast.success('Testimonial updated successfully!');
-      }
-    } else if (activeSection === 'stock') {
-      if (crudOperation === 'create') {
-        const newGame: Game = {
-          id: Date.now(),
+  const handleSaveItem = async () => {
+    try {
+      setLoading(true);
+      
+      if (activeSection === 'testimonials') {
+        if (crudOperation === 'create') {
+          await testimonialsService.add(formData);
+          toast.success('Testimonial added successfully!');
+          refetchTestimonials();
+        } else if (crudOperation === 'update' && selectedItem) {
+          await testimonialsService.update(selectedItem.id, formData);
+          toast.success('Testimonial updated successfully!');
+          refetchTestimonials();
+        }
+      } else if (activeSection === 'stock') {
+        // Calculate discount
+        const discount = formData.originalPrice && formData.salePrice 
+          ? Math.round(((formData.originalPrice - formData.salePrice) / formData.originalPrice) * 100)
+          : 0;
+        
+        const itemData = {
           ...formData,
-          discount: Math.round(((formData.originalPrice - formData.salePrice) / formData.originalPrice) * 100)
+          discount,
+          platform: Array.isArray(formData.platform) ? formData.platform : [formData.platform],
+          type: Array.isArray(formData.type) ? formData.type : [formData.type],
+          features: Array.isArray(formData.features) ? formData.features : formData.features?.split('\n').filter((f: string) => f.trim()) || [],
+          systemRequirements: Array.isArray(formData.systemRequirements) ? formData.systemRequirements : formData.systemRequirements?.split('\n').filter((r: string) => r.trim()) || []
         };
-        setGames([...games, newGame]);
-        toast.success('Game added successfully!');
-      } else if (crudOperation === 'update' && selectedItem) {
-        setGames(games.map(g => g.id === selectedItem.id ? { ...g, ...formData } : g));
-        toast.success('Game updated successfully!');
+
+        if (stockType === 'games') {
+          if (crudOperation === 'create') {
+            await gamesService.add(itemData);
+            toast.success('Game added successfully!');
+            refetchGames();
+          } else if (crudOperation === 'update' && selectedItem) {
+            await gamesService.update(selectedItem.id, itemData);
+            toast.success('Game updated successfully!');
+            refetchGames();
+          }
+        } else if (stockType === 'subscriptions') {
+          if (crudOperation === 'create') {
+            await subscriptionsService.add(itemData);
+            toast.success('Subscription added successfully!');
+            refetchSubscriptions();
+          } else if (crudOperation === 'update' && selectedItem) {
+            await subscriptionsService.update(selectedItem.id, itemData);
+            toast.success('Subscription updated successfully!');
+            refetchSubscriptions();
+          }
+        }
       }
+      
+      setFormData({});
+      setSelectedItem(null);
+      setCrudOperation(null);
+    } catch (error) {
+      toast.error('Failed to save item');
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-    
-    setFormData({});
-    setSelectedItem(null);
-    setCrudOperation(null);
   };
 
-  const handleDeleteItem = (id: number) => {
-    if (activeSection === 'testimonials') {
-      setTestimonials(testimonials.filter(t => t.id !== id));
-      toast.success('Testimonial deleted successfully!');
-    } else if (activeSection === 'stock') {
-      setGames(games.filter(g => g.id !== id));
-      toast.success('Game deleted successfully!');
+  const handleDeleteItem = async (id: string) => {
+    try {
+      setLoading(true);
+      
+      if (activeSection === 'testimonials') {
+        await testimonialsService.delete(id);
+        toast.success('Testimonial deleted successfully!');
+        refetchTestimonials();
+      } else if (activeSection === 'stock') {
+        if (stockType === 'games') {
+          await gamesService.delete(id);
+          toast.success('Game deleted successfully!');
+          refetchGames();
+        } else if (stockType === 'subscriptions') {
+          await subscriptionsService.delete(id);
+          toast.success('Subscription deleted successfully!');
+          refetchSubscriptions();
+        }
+      }
+    } catch (error) {
+      toast.error('Failed to delete item');
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -190,7 +197,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const renderCrudOperations = () => (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Choose Operation for {stockType === 'games' ? 'Games' : 'Subscriptions'}
+        Choose Operation for {activeSection === 'testimonials' ? 'Testimonials' : stockType === 'games' ? 'Games' : 'Subscriptions'}
       </h2>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -229,216 +236,280 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     </div>
   );
 
-  const renderGameForm = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        {crudOperation === 'create' ? 'Add New Game' : 'Edit Game'}
-      </h2>
-      
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Game Image */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Game Image</label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-              {formData.image ? (
-                <div className="relative">
-                  <img src={formData.image} alt="Game" className="w-full h-48 object-cover rounded-lg" />
-                  <button
-                    onClick={() => setFormData({ ...formData, image: '' })}
-                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <Upload className="w-12 h-12 mx-auto text-gray-400 mb-2" />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <label
-                    htmlFor="image-upload"
-                    className="cursor-pointer text-cyan-600 hover:text-cyan-700"
-                  >
-                    Click to upload image
-                  </label>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Game Title */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Game Title</label>
-            <input
-              type="text"
-              value={formData.title || ''}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="Enter game title"
-            />
-          </div>
-
-          {/* Platform Selection */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Platform</label>
-            <div className="space-y-2">
-              {['PS4', 'PS5'].map((platform) => (
-                <label key={platform} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.platform?.includes(platform) || false}
-                    onChange={(e) => {
-                      const platforms = formData.platform || [];
-                      if (e.target.checked) {
-                        setFormData({ ...formData, platform: [...platforms, platform] });
-                      } else {
-                        setFormData({ ...formData, platform: platforms.filter((p: string) => p !== platform) });
-                      }
-                    }}
-                    className="rounded"
-                  />
-                  <span>{platform}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Type Selection */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
-            <div className="space-y-2">
-              {['Permanent', 'Rent'].map((type) => (
-                <label key={type} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.type?.includes(type) || false}
-                    onChange={(e) => {
-                      const types = formData.type || [];
-                      if (e.target.checked) {
-                        setFormData({ ...formData, type: [...types, type] });
-                      } else {
-                        setFormData({ ...formData, type: types.filter((t: string) => t !== type) });
-                      }
-                    }}
-                    className="rounded"
-                  />
-                  <span>{type}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Pricing */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Original Price ($)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={formData.originalPrice || ''}
-              onChange={(e) => setFormData({ ...formData, originalPrice: parseFloat(e.target.value) })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="0.00"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Sale Price ($)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={formData.salePrice || ''}
-              onChange={(e) => setFormData({ ...formData, salePrice: parseFloat(e.target.value) })}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="0.00"
-            />
-          </div>
-
-          {formData.type?.includes('Rent') && (
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Rent Price ($)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.rentPrice || ''}
-                onChange={(e) => setFormData({ ...formData, rentPrice: parseFloat(e.target.value) })}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                placeholder="0.00"
-              />
-            </div>
-          )}
-
-          {/* Description */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-            <textarea
-              value={formData.description || ''}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={4}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="Enter game description"
-            />
-          </div>
-
-          {/* Features */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Features (one per line)</label>
-            <textarea
-              value={formData.features?.join('\n') || ''}
-              onChange={(e) => setFormData({ ...formData, features: e.target.value.split('\n').filter(f => f.trim()) })}
-              rows={4}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
-            />
-          </div>
-
-          {/* System Requirements */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">System Requirements (one per line)</label>
-            <textarea
-              value={formData.systemRequirements?.join('\n') || ''}
-              onChange={(e) => setFormData({ ...formData, systemRequirements: e.target.value.split('\n').filter(r => r.trim()) })}
-              rows={4}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="Requirement 1&#10;Requirement 2&#10;Requirement 3"
-            />
-          </div>
-        </div>
-
-        <div className="flex space-x-4 mt-6">
-          <button
-            onClick={handleSaveItem}
-            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
-          >
-            <Save className="w-5 h-5" />
-            <span>Save Game</span>
-          </button>
-          <button
-            onClick={() => {
-              setFormData({});
-              setCrudOperation(null);
-            }}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderItemsList = () => {
-    const items = activeSection === 'testimonials' ? testimonials : games;
+  const renderForm = () => {
+    const isTestimonial = activeSection === 'testimonials';
     
     return (
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {activeSection === 'testimonials' ? 'Testimonials' : 'Games'} List
+          {crudOperation === 'create' ? 'Add New' : 'Edit'} {isTestimonial ? 'Testimonial' : stockType === 'games' ? 'Game' : 'Subscription'}
+        </h2>
+        
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Image Upload */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                {isTestimonial ? 'Avatar' : 'Image'}
+              </label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                {formData.image ? (
+                  <div className="relative">
+                    <img src={formData.image} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
+                    <button
+                      onClick={() => setFormData({ ...formData, image: '' })}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <Upload className="w-12 h-12 mx-auto text-gray-400 mb-2" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="image-upload"
+                      disabled={loading}
+                    />
+                    <label
+                      htmlFor="image-upload"
+                      className="cursor-pointer text-cyan-600 hover:text-cyan-700"
+                    >
+                      {loading ? 'Uploading...' : 'Click to upload image'}
+                    </label>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Form fields based on type */}
+            {isTestimonial ? (
+              <>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
+                  <input
+                    type="text"
+                    value={formData.name || ''}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    placeholder="Enter customer name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Time</label>
+                  <input
+                    type="text"
+                    value={formData.time || ''}
+                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    placeholder="e.g., Today 2:45 PM"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+                  <textarea
+                    value={formData.message || ''}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    rows={3}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    placeholder="Customer message"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Reply</label>
+                  <textarea
+                    value={formData.reply || ''}
+                    onChange={(e) => setFormData({ ...formData, reply: e.target.value })}
+                    rows={2}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    placeholder="Your reply"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Title</label>
+                  <input
+                    type="text"
+                    value={formData.title || ''}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    placeholder="Enter title"
+                  />
+                </div>
+
+                {/* Platform Selection */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Platform</label>
+                  <div className="space-y-2">
+                    {(stockType === 'games' ? ['PS4', 'PS5'] : ['Xbox', 'PlayStation', 'PC', 'Nintendo Switch', 'Apple']).map((platform) => (
+                      <label key={platform} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={formData.platform?.includes(platform) || false}
+                          onChange={(e) => {
+                            const platforms = formData.platform || [];
+                            if (e.target.checked) {
+                              setFormData({ ...formData, platform: [...platforms, platform] });
+                            } else {
+                              setFormData({ ...formData, platform: platforms.filter((p: string) => p !== platform) });
+                            }
+                          }}
+                          className="rounded"
+                        />
+                        <span>{platform}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Type Selection */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
+                  <div className="space-y-2">
+                    {['Permanent', 'Rent'].map((type) => (
+                      <label key={type} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={formData.type?.includes(type) || false}
+                          onChange={(e) => {
+                            const types = formData.type || [];
+                            if (e.target.checked) {
+                              setFormData({ ...formData, type: [...types, type] });
+                            } else {
+                              setFormData({ ...formData, type: types.filter((t: string) => t !== type) });
+                            }
+                          }}
+                          className="rounded"
+                        />
+                        <span>{type}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Pricing */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Original Price ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.originalPrice || ''}
+                    onChange={(e) => setFormData({ ...formData, originalPrice: parseFloat(e.target.value) })}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Sale Price ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.salePrice || ''}
+                    onChange={(e) => setFormData({ ...formData, salePrice: parseFloat(e.target.value) })}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                {formData.type?.includes('Rent') && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Rent Price ($)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.rentPrice || ''}
+                      onChange={(e) => setFormData({ ...formData, rentPrice: parseFloat(e.target.value) })}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                      placeholder="0.00"
+                    />
+                  </div>
+                )}
+
+                {/* Description */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                  <textarea
+                    value={formData.description || ''}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={4}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    placeholder="Enter description"
+                  />
+                </div>
+
+                {/* Features */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Features (one per line)</label>
+                  <textarea
+                    value={Array.isArray(formData.features) ? formData.features.join('\n') : formData.features || ''}
+                    onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+                    rows={4}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
+                  />
+                </div>
+
+                {/* System Requirements */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">System Requirements (one per line)</label>
+                  <textarea
+                    value={Array.isArray(formData.systemRequirements) ? formData.systemRequirements.join('\n') : formData.systemRequirements || ''}
+                    onChange={(e) => setFormData({ ...formData, systemRequirements: e.target.value })}
+                    rows={4}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    placeholder="Requirement 1&#10;Requirement 2&#10;Requirement 3"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="flex space-x-4 mt-6">
+            <button
+              onClick={handleSaveItem}
+              disabled={loading}
+              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 disabled:opacity-50"
+            >
+              <Save className="w-5 h-5" />
+              <span>{loading ? 'Saving...' : 'Save'}</span>
+            </button>
+            <button
+              onClick={() => {
+                setFormData({});
+                setCrudOperation(null);
+                setSelectedItem(null);
+              }}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderItemsList = () => {
+    let items: any[] = [];
+    
+    if (activeSection === 'testimonials') {
+      items = testimonials;
+    } else if (stockType === 'games') {
+      items = games;
+    } else if (stockType === 'subscriptions') {
+      items = subscriptions;
+    }
+    
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+          {activeSection === 'testimonials' ? 'Testimonials' : stockType === 'games' ? 'Games' : 'Subscriptions'} List
         </h2>
         
         <div className="grid grid-cols-1 gap-4">
@@ -477,48 +548,24 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 </button>
                 <button
                   onClick={() => handleDeleteItem(item.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors"
+                  disabled={loading}
+                  className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors disabled:opacity-50"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
           ))}
+          
+          {items.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-600">No items found.</p>
+            </div>
+          )}
         </div>
       </div>
     );
   };
-
-  const renderImageCropper = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Crop Image</h3>
-        
-        <div className="mb-6">
-          <img src={uploadedImage || ''} alt="Crop preview" className="w-full max-h-96 object-contain rounded-lg" />
-        </div>
-        
-        <div className="flex space-x-4">
-          <button
-            onClick={() => handleImageCrop(uploadedImage || '')}
-            className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
-          >
-            <Crop className="w-5 h-5" />
-            <span>Apply Crop</span>
-          </button>
-          <button
-            onClick={() => {
-              setIsImageCropperOpen(false);
-              setUploadedImage(null);
-            }}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 
   const renderBackButton = () => (
     <button
@@ -552,8 +599,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         {activeSection === 'testimonials' && (
           <>
             {!crudOperation && renderCrudOperations()}
-            {crudOperation === 'create' && renderGameForm()}
-            {crudOperation === 'update' && renderGameForm()}
+            {(crudOperation === 'create' || crudOperation === 'update') && renderForm()}
             {crudOperation === 'read' && renderItemsList()}
           </>
         )}
@@ -562,13 +608,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           <>
             {!stockType && renderStockTypeSelection()}
             {stockType && !crudOperation && renderCrudOperations()}
-            {stockType && crudOperation === 'create' && renderGameForm()}
-            {stockType && crudOperation === 'update' && renderGameForm()}
+            {stockType && (crudOperation === 'create' || crudOperation === 'update') && renderForm()}
             {stockType && crudOperation === 'read' && renderItemsList()}
           </>
         )}
-        
-        {isImageCropperOpen && renderImageCropper()}
       </div>
     </div>
   );

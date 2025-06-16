@@ -1,18 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
-
-interface Game {
-  id: number;
-  title: string;
-  image: string;
-  originalPrice: number;
-  salePrice: number;
-  platform: string;
-  discount: number;
-  description: string;
-  features: string[];
-  systemRequirements: string[];
-}
+import { useGames } from '../hooks/useFirebaseData';
+import { Game } from '../services/firebaseService';
 
 interface AllGamesPageProps {
   onGameClick: (game: Game) => void;
@@ -20,6 +9,7 @@ interface AllGamesPageProps {
 }
 
 const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }) => {
+  const { games, loading, error } = useGames();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [priceRange, setPriceRange] = useState([0, 300]);
@@ -30,124 +20,11 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
   
   const itemsPerPage = 24;
 
-  // Extended games list for demonstration
-  const allGames: Game[] = [
-    {
-      id: 1,
-      title: "Grand Theft Auto V Premium Edition",
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 59.99,
-      salePrice: 19.99,
-      platform: "PS5",
-      discount: 67,
-      description: "Experience the award-winning Grand Theft Auto V with enhanced graphics and performance on PlayStation 5.",
-      features: ["Enhanced graphics", "Complete story", "Online multiplayer"],
-      systemRequirements: ["PlayStation 5 console required", "50 GB storage"]
-    },
-    {
-      id: 2,
-      title: "Black Myth: Wukong",
-      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 69.99,
-      salePrice: 49.99,
-      platform: "PS5",
-      discount: 29,
-      description: "Embark on an epic journey as the legendary Monkey King in this action RPG.",
-      features: ["Epic adventure", "Stunning graphics", "Boss battles"],
-      systemRequirements: ["PlayStation 5 console required", "45 GB storage"]
-    },
-    {
-      id: 3,
-      title: "Assassin's Creed Shadows",
-      image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 79.99,
-      salePrice: 59.99,
-      platform: "PS5",
-      discount: 25,
-      description: "Step into feudal Japan as a legendary shinobi and samurai.",
-      features: ["Dual protagonists", "Japan setting", "Stealth mechanics"],
-      systemRequirements: ["PlayStation 5 console required", "55 GB storage"]
-    },
-    {
-      id: 4,
-      title: "Spider-Man 2",
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 69.99,
-      salePrice: 39.99,
-      platform: "PS5",
-      discount: 43,
-      description: "Swing through New York City as both Peter Parker and Miles Morales.",
-      features: ["Dual Spider-Men", "Web-swinging", "Open world"],
-      systemRequirements: ["PlayStation 5 console required", "48 GB storage"]
-    },
-    {
-      id: 5,
-      title: "Call of Duty: Modern Warfare III",
-      image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 69.99,
-      salePrice: 44.99,
-      platform: "PS5",
-      discount: 36,
-      description: "Experience the most advanced Call of Duty ever with Modern Warfare III.",
-      features: ["Campaign", "Multiplayer", "Zombies mode"],
-      systemRequirements: ["PlayStation 5 console required", "65 GB storage"]
-    },
-    {
-      id: 6,
-      title: "FIFA 24",
-      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 59.99,
-      salePrice: 29.99,
-      platform: "PS4",
-      discount: 50,
-      description: "The world's game returns with FIFA 24, featuring enhanced gameplay and realism.",
-      features: ["Ultimate Team", "Career Mode", "Online seasons"],
-      systemRequirements: ["PlayStation 4 console required", "40 GB storage"]
-    },
-    {
-      id: 7,
-      title: "Horizon Forbidden West",
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 69.99,
-      salePrice: 34.99,
-      platform: "PS4",
-      discount: 50,
-      description: "Join Aloy as she braves the Forbidden West - a majestic but dangerous frontier.",
-      features: ["Open world", "Robot hunting", "Beautiful graphics"],
-      systemRequirements: ["PlayStation 4 console required", "90 GB storage"]
-    },
-    {
-      id: 8,
-      title: "God of War Ragnarök",
-      image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 69.99,
-      salePrice: 39.99,
-      platform: "PS4",
-      discount: 43,
-      description: "Embark on an epic and heartfelt journey as Kratos and Atreus struggle with holding on and letting go.",
-      features: ["Norse mythology", "Father-son journey", "Epic battles"],
-      systemRequirements: ["PlayStation 4 console required", "70 GB storage"]
-    },
-    // Add more games to demonstrate pagination
-    ...Array.from({ length: 40 }, (_, i) => ({
-      id: 9 + i,
-      title: `Game Title ${9 + i}`,
-      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      originalPrice: 59.99,
-      salePrice: 29.99 + (i % 3) * 10,
-      platform: i % 2 === 0 ? "PS5" : "PS4",
-      discount: 30 + (i % 5) * 10,
-      description: `This is an amazing game with incredible features and gameplay mechanics that will keep you entertained for hours.`,
-      features: ["Feature 1", "Feature 2", "Feature 3"],
-      systemRequirements: [`PlayStation ${i % 2 === 0 ? '5' : '4'} console required`, "50 GB storage"]
-    }))
-  ];
-
   // Filter and sort games
   const filteredAndSortedGames = useMemo(() => {
-    let filtered = allGames.filter(game => {
+    let filtered = games.filter(game => {
       const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesPlatform = selectedPlatform === 'all' || game.platform === selectedPlatform;
+      const matchesPlatform = selectedPlatform === 'all' || game.platform.includes(selectedPlatform);
       const matchesPrice = game.salePrice >= priceRange[0] && game.salePrice <= priceRange[1];
       
       return matchesSearch && matchesPlatform && matchesPrice;
@@ -170,7 +47,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
     });
 
     return filtered;
-  }, [allGames, searchQuery, selectedPlatform, priceRange, sortBy]);
+  }, [games, searchQuery, selectedPlatform, priceRange, sortBy]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedGames.length / itemsPerPage);
@@ -181,6 +58,55 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <button
+                onClick={onBackToHome}
+                className="flex items-center space-x-1 sm:space-x-2 text-cyan-600 hover:text-orange-500 transition-colors bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-lg text-sm sm:text-base"
+              >
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Back</span>
+              </button>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Games</h1>
+            </div>
+          </div>
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading games...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <button
+                onClick={onBackToHome}
+                className="flex items-center space-x-1 sm:space-x-2 text-cyan-600 hover:text-orange-500 transition-colors bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-lg text-sm sm:text-base"
+              >
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Back</span>
+              </button>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Games</h1>
+            </div>
+          </div>
+          <div className="text-center py-12">
+            <p className="text-red-600">Failed to load games. Please try again later.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
@@ -302,7 +228,11 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
             </div>
 
             {/* Games Grid/List */}
-            {viewMode === 'grid' ? (
+            {filteredAndSortedGames.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600">No games found matching your criteria.</p>
+              </div>
+            ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
                 {paginatedGames.map((game) => (
                   <div
@@ -322,7 +252,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                         </div>
                       )}
                       <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium shadow-lg">
-                        {game.platform}
+                        {game.platform.join(', ')}
                       </div>
                     </div>
                     <div className="p-3 sm:p-4">
@@ -367,7 +297,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                             <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2 hidden sm:block">{game.description}</p>
                             <div className="flex items-center space-x-2">
                               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
-                                {game.platform}
+                                {game.platform.join(', ')}
                               </span>
                             </div>
                           </div>
