@@ -4,11 +4,10 @@ import { toast } from 'react-toastify';
 import { 
   gamesService, 
   subscriptionsService, 
-  testimonialsService, 
-  Game, 
-  Testimonial 
-} from '../services/firebaseService';
-import { useGames, useSubscriptions, useTestimonials } from '../hooks/useFirebaseData';
+  testimonialsService
+} from '../services/supabaseService';
+import { Game, Testimonial } from '../config/supabase';
+import { useGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
 
 interface AdminPageProps {
   onBackToHome: () => void;
@@ -22,7 +21,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [formData, setFormData] = useState<any>({});
   const [loading, setLoading] = useState(false);
 
-  // Firebase data hooks
+  // Supabase data hooks
   const { games, refetch: refetchGames } = useGames();
   const { subscriptions, refetch: refetchSubscriptions } = useSubscriptions();
   const { testimonials, refetch: refetchTestimonials } = useTestimonials();
@@ -43,8 +42,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         }
       } else if (activeSection === 'stock') {
         // Calculate discount
-        const discount = formData.originalPrice && formData.salePrice 
-          ? Math.round(((formData.originalPrice - formData.salePrice) / formData.originalPrice) * 100)
+        const discount = formData.original_price && formData.sale_price 
+          ? Math.round(((formData.original_price - formData.sale_price) / formData.original_price) * 100)
           : 0;
         
         const itemData = {
@@ -53,7 +52,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           platform: Array.isArray(formData.platform) ? formData.platform : [formData.platform],
           type: Array.isArray(formData.type) ? formData.type : [formData.type],
           features: Array.isArray(formData.features) ? formData.features : formData.features?.split('\n').filter((f: string) => f.trim()) || [],
-          systemRequirements: Array.isArray(formData.systemRequirements) ? formData.systemRequirements : formData.systemRequirements?.split('\n').filter((r: string) => r.trim()) || []
+          system_requirements: Array.isArray(formData.system_requirements) ? formData.system_requirements : formData.system_requirements?.split('\n').filter((r: string) => r.trim()) || []
         };
 
         if (stockType === 'games') {
@@ -234,8 +233,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               <div className="space-y-3">
                 <input
                   type="url"
-                  value={formData.image || ''}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                  value={formData.image || formData.avatar || ''}
+                  onChange={(e) => setFormData({ ...formData, [isTestimonial ? 'avatar' : 'image']: e.target.value })}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
                   placeholder="https://example.com/image.jpg"
                 />
@@ -253,10 +252,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     </div>
                   </div>
                 </div>
-                {formData.image && (
+                {(formData.image || formData.avatar) && (
                   <div className="relative">
                     <img 
-                      src={formData.image} 
+                      src={formData.image || formData.avatar} 
                       alt="Preview" 
                       className="w-full max-w-xs h-48 object-cover rounded-lg border"
                       onError={(e) => {
@@ -382,8 +381,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   <input
                     type="number"
                     step="0.01"
-                    value={formData.originalPrice || ''}
-                    onChange={(e) => setFormData({ ...formData, originalPrice: parseFloat(e.target.value) })}
+                    value={formData.original_price || ''}
+                    onChange={(e) => setFormData({ ...formData, original_price: parseFloat(e.target.value) })}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
                     placeholder="0.00"
                   />
@@ -394,8 +393,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   <input
                     type="number"
                     step="0.01"
-                    value={formData.salePrice || ''}
-                    onChange={(e) => setFormData({ ...formData, salePrice: parseFloat(e.target.value) })}
+                    value={formData.sale_price || ''}
+                    onChange={(e) => setFormData({ ...formData, sale_price: parseFloat(e.target.value) })}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
                     placeholder="0.00"
                   />
@@ -407,8 +406,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     <input
                       type="number"
                       step="0.01"
-                      value={formData.rentPrice || ''}
-                      onChange={(e) => setFormData({ ...formData, rentPrice: parseFloat(e.target.value) })}
+                      value={formData.rent_price || ''}
+                      onChange={(e) => setFormData({ ...formData, rent_price: parseFloat(e.target.value) })}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
                       placeholder="0.00"
                     />
@@ -443,8 +442,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">System Requirements (one per line)</label>
                   <textarea
-                    value={Array.isArray(formData.systemRequirements) ? formData.systemRequirements.join('\n') : formData.systemRequirements || ''}
-                    onChange={(e) => setFormData({ ...formData, systemRequirements: e.target.value })}
+                    value={Array.isArray(formData.system_requirements) ? formData.system_requirements.join('\n') : formData.system_requirements || ''}
+                    onChange={(e) => setFormData({ ...formData, system_requirements: e.target.value })}
                     rows={4}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
                     placeholder="Requirement 1&#10;Requirement 2&#10;Requirement 3"
@@ -513,7 +512,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     <img src={item.image} alt={item.title} className="w-16 h-16 rounded-lg object-cover" />
                     <div>
                       <h3 className="font-bold text-gray-800">{item.title}</h3>
-                      <p className="text-gray-600 text-sm">${item.salePrice} - {item.platform?.join(', ')}</p>
+                      <p className="text-gray-600 text-sm">${item.sale_price} - {item.platform?.join(', ')}</p>
                     </div>
                   </>
                 )}

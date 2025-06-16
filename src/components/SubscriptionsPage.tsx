@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
-import { useSubscriptions } from '../hooks/useFirebaseData';
-import { Game } from '../services/firebaseService';
+import { useSubscriptions } from '../hooks/useSupabaseData';
+import { Game } from '../config/supabase';
 
 interface SubscriptionsPageProps {
   onGameClick: (game: Game) => void;
@@ -23,7 +23,7 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
   const filteredAndSortedSubscriptions = useMemo(() => {
     let filtered = subscriptions.filter(subscription => {
       const matchesSearch = subscription.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesPrice = subscription.salePrice >= priceRange[0] && subscription.salePrice <= priceRange[1];
+      const matchesPrice = subscription.sale_price >= priceRange[0] && subscription.sale_price <= priceRange[1];
       
       return matchesSearch && matchesPrice;
     });
@@ -36,9 +36,9 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
         case 'name-desc':
           return b.title.localeCompare(a.title);
         case 'price-low':
-          return a.salePrice - b.salePrice;
+          return a.sale_price - b.sale_price;
         case 'price-high':
-          return b.salePrice - a.salePrice;
+          return b.sale_price - a.sale_price;
         default:
           return 0;
       }
@@ -245,11 +245,11 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
                       </h3>
                       <div className="flex items-center space-x-1 sm:space-x-2 mb-2 sm:mb-3">
                         <span className="text-sm sm:text-lg font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                          ${subscription.salePrice}
+                          ${subscription.sale_price}
                         </span>
-                        {subscription.originalPrice > subscription.salePrice && (
+                        {subscription.original_price > subscription.sale_price && (
                           <span className="text-xs sm:text-sm text-gray-500 line-through">
-                            ${subscription.originalPrice}
+                            ${subscription.original_price}
                           </span>
                         )}
                       </div>
@@ -288,11 +288,11 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
                           <div className="text-left sm:text-right">
                             <div className="flex items-center space-x-2 mb-2 sm:mb-3">
                               <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                                ${subscription.salePrice}
+                                ${subscription.sale_price}
                               </span>
-                              {subscription.originalPrice > subscription.salePrice && (
+                              {subscription.original_price > subscription.sale_price && (
                                 <span className="text-sm sm:text-lg text-gray-500 line-through">
-                                  ${subscription.originalPrice}
+                                  ${subscription.original_price}
                                 </span>
                               )}
                             </div>

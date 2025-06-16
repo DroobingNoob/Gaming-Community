@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { gamesService, subscriptionsService, testimonialsService, Game, Testimonial } from '../services/firebaseService';
+import { gamesService, subscriptionsService, testimonialsService } from '../services/supabaseService';
+import { Game, Testimonial } from '../config/supabase';
 
 // Hook for games data
 export const useGames = () => {

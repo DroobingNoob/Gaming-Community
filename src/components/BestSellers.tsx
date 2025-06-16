@@ -1,6 +1,6 @@
 import React from 'react';
-import { useBestsellers } from '../hooks/useFirebaseData';
-import { Game } from '../services/firebaseService';
+import { useBestsellers } from '../hooks/useSupabaseData';
+import { Game } from '../config/supabase';
 
 interface BestSellersProps {
   onGameClick: (game: Game) => void;
@@ -118,11 +118,11 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
                 {/* Pricing */}
                 <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
                   <span className="text-lg sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                    ${game.salePrice}
+                    ${game.sale_price}
                   </span>
-                  {game.originalPrice > game.salePrice && (
+                  {game.original_price > game.sale_price && (
                     <span className="text-sm sm:text-base md:text-lg text-gray-500 line-through">
-                      ${game.originalPrice}
+                      ${game.original_price}
                     </span>
                   )}
                 </div>

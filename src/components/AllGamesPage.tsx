@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
-import { useGames } from '../hooks/useFirebaseData';
-import { Game } from '../services/firebaseService';
+import { useGames } from '../hooks/useSupabaseData';
+import { Game } from '../config/supabase';
 
 interface AllGamesPageProps {
   onGameClick: (game: Game) => void;
@@ -25,7 +25,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
     let filtered = games.filter(game => {
       const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesPlatform = selectedPlatform === 'all' || game.platform.includes(selectedPlatform);
-      const matchesPrice = game.salePrice >= priceRange[0] && game.salePrice <= priceRange[1];
+      const matchesPrice = game.sale_price >= priceRange[0] && game.sale_price <= priceRange[1];
       
       return matchesSearch && matchesPlatform && matchesPrice;
     });
@@ -38,9 +38,9 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
         case 'name-desc':
           return b.title.localeCompare(a.title);
         case 'price-low':
-          return a.salePrice - b.salePrice;
+          return a.sale_price - b.sale_price;
         case 'price-high':
-          return b.salePrice - a.salePrice;
+          return b.sale_price - a.sale_price;
         default:
           return 0;
       }
@@ -261,11 +261,11 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                       </h3>
                       <div className="flex items-center space-x-1 sm:space-x-2 mb-2 sm:mb-3">
                         <span className="text-sm sm:text-lg font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                          ${game.salePrice}
+                          ${game.sale_price}
                         </span>
-                        {game.originalPrice > game.salePrice && (
+                        {game.original_price > game.sale_price && (
                           <span className="text-xs sm:text-sm text-gray-500 line-through">
-                            ${game.originalPrice}
+                            ${game.original_price}
                           </span>
                         )}
                       </div>
@@ -304,11 +304,11 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                           <div className="text-left sm:text-right">
                             <div className="flex items-center space-x-2 mb-2 sm:mb-3">
                               <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                                ${game.salePrice}
+                                ${game.sale_price}
                               </span>
-                              {game.originalPrice > game.salePrice && (
+                              {game.original_price > game.sale_price && (
                                 <span className="text-sm sm:text-lg text-gray-500 line-through">
-                                  ${game.originalPrice}
+                                  ${game.original_price}
                                 </span>
                               )}
                             </div>

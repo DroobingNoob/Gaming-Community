@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Check, CheckCheck } from 'lucide-react';
-import { useTestimonials } from '../hooks/useFirebaseData';
+import { useTestimonials } from '../hooks/useSupabaseData';
 
 const Vouches: React.FC = () => {
   const { testimonials, loading, error } = useTestimonials();
