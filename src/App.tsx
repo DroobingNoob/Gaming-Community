@@ -15,28 +15,16 @@ import ProductPage from './components/ProductPage';
 import AllGamesPage from './components/AllGamesPage';
 import SubscriptionsPage from './components/SubscriptionsPage';
 import AdminPage from './components/AdminPage';
+import { Game } from './config/supabase';
 
 interface CartItem {
-  id: number;
+  id: string;
   title: string;
   price: number;
   quantity: number;
   image: string;
   platform: string;
   type: string;
-}
-
-interface Game {
-  id: number;
-  title: string;
-  image: string;
-  originalPrice: number;
-  salePrice: number;
-  platform: string;
-  discount: number;
-  description: string;
-  features: string[];
-  systemRequirements: string[];
 }
 
 function App() {
@@ -46,17 +34,7 @@ function App() {
   const [selectedProduct, setSelectedProduct] = useState<Game | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(true); // Set to true for demo - in real app check user role
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      title: "Grand Theft Auto V Premium Edition",
-      price: 19.99,
-      quantity: 1,
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      platform: "PS5",
-      type: "Permanent"
-    }
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
     const handleViewAllGames = () => {
@@ -116,22 +94,20 @@ function App() {
   const handleAddToCart = (product: Game, platform: string, type: string, price: number) => {
     const itemId = `${product.id}-${platform}-${type}`;
     const existingItem = cartItems.find(item => 
-      item.id === product.id && 
-      item.platform === platform && 
-      item.type === type
+      item.id === itemId
     );
     
     if (existingItem) {
       setCartItems(items =>
         items.map(item =>
-          item.id === product.id && item.platform === platform && item.type === type
+          item.id === itemId
             ? { ...item, quantity: item.quantity + 1 }
             : item
         )
       );
     } else {
       const newCartItem: CartItem = {
-        id: product.id,
+        id: itemId,
         title: product.title,
         price: price,
         quantity: 1,
@@ -153,7 +129,7 @@ function App() {
     });
   };
 
-  const handleUpdateQuantity = (id: number, quantity: number) => {
+  const handleUpdateQuantity = (id: string, quantity: number) => {
     setCartItems(items =>
       items.map(item =>
         item.id === id ? { ...item, quantity } : item
@@ -161,7 +137,7 @@ function App() {
     );
   };
 
-  const handleRemoveItem = (id: number) => {
+  const handleRemoveItem = (id: string) => {
     setCartItems(items => items.filter(item => item.id !== id));
   };
 

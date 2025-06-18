@@ -1,32 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Shield, Clock, Headphones, Share2, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'react-toastify';
-
-interface Product {
-  id: number;
-  title: string;
-  image: string;
-  originalPrice: number;
-  salePrice: number;
-  platform: string;
-  discount: number;
-  description: string;
-  features: string[];
-  systemRequirements: string[];
-}
+import { Game } from '../config/supabase';
 
 interface ProductPageProps {
-  product: Product;
-  onAddToCart: (product: Product, platform: string, type: string, price: number) => void;
+  product: Game;
+  onAddToCart: (product: Game, platform: string, type: string, price: number) => void;
   onBackToHome: () => void;
-  onGameClick: (game: Product) => void;
+  onGameClick: (game: Game) => void;
 }
 
 const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackToHome, onGameClick }) => {
   const [activeAccordion, setActiveAccordion] = useState<string | null>('details');
   const [isImageSticky, setIsImageSticky] = useState(true);
-  const [selectedPlatform, setSelectedPlatform] = useState('PS5');
-  const [selectedType, setSelectedType] = useState('Permanent');
+  const [selectedPlatform, setSelectedPlatform] = useState(product.platform[0] || 'PS5');
+  const [selectedType, setSelectedType] = useState(product.type[0] || 'Permanent');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,30 +44,34 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
     }
   ];
 
-  const relatedGames = [
+  const relatedGames: Game[] = [
     {
-      id: 2,
+      id: '2',
       title: "Black Myth: Wukong",
       image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      salePrice: 49.99,
-      originalPrice: 69.99,
-      platform: "PS5",
+      sale_price: 49.99,
+      original_price: 69.99,
+      platform: ["PS5"],
       discount: 29,
       description: "Embark on an epic journey as the legendary Monkey King in this action RPG inspired by the classic Chinese novel Journey to the West.",
       features: ["Epic single-player adventure", "Stunning next-gen graphics", "Challenging boss battles"],
-      systemRequirements: ["PlayStation 5 console required", "45 GB available storage space"]
+      system_requirements: ["PlayStation 5 console required", "45 GB available storage space"],
+      type: ["Permanent"],
+      category: 'game'
     },
     {
-      id: 5,
+      id: '5',
       title: "Spider-Man 2",
       image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      salePrice: 39.99,
-      originalPrice: 69.99,
-      platform: "PS5",
+      sale_price: 39.99,
+      original_price: 69.99,
+      platform: ["PS5"],
       discount: 43,
       description: "Swing through New York City as both Peter Parker and Miles Morales in this spectacular superhero adventure.",
       features: ["Play as both Spider-Men", "Enhanced web-swinging", "New York City open world"],
-      systemRequirements: ["PlayStation 5 console required", "48 GB available storage space"]
+      system_requirements: ["PlayStation 5 console required", "48 GB available storage space"],
+      type: ["Permanent"],
+      category: 'game'
     }
   ];
 
@@ -119,7 +111,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
   };
 
   const calculatePrice = () => {
-    let basePrice = product.salePrice;
+    let basePrice = product.sale_price;
     if (selectedType === 'Rent') {
       basePrice = basePrice * 0.3; // 30% of full price for rent
     }
@@ -167,7 +159,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                 
                 <div className="flex items-center space-x-2 mb-6">
                   <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg">
-                    {product.platform}
+                    {product.platform.join(', ')}
                   </span>
                 </div>
 
@@ -175,7 +167,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                 <div className="mb-6">
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
                   <div className="flex space-x-3">
-                    {['PS4', 'PS5'].map((platform) => (
+                    {product.platform.map((platform) => (
                       <button
                         key={platform}
                         onClick={() => setSelectedPlatform(platform)}
@@ -195,17 +187,17 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                 <div className="mb-8">
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
                   <div className="flex space-x-3">
-                    {['Permanent', 'Rent (30 Days)'].map((type) => (
+                    {product.type.map((type) => (
                       <button
                         key={type}
-                        onClick={() => setSelectedType(type.includes('Rent') ? 'Rent' : 'Permanent')}
+                        onClick={() => setSelectedType(type)}
                         className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                          selectedType === (type.includes('Rent') ? 'Rent' : 'Permanent')
+                          selectedType === type
                             ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
-                        {type}
+                        {type === 'Rent' ? 'Rent (30 Days)' : type}
                       </button>
                     ))}
                   </div>
@@ -218,7 +210,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                   </span>
                   {selectedType === 'Rent' && (
                     <span className="text-2xl text-gray-500 line-through">
-                      ${product.salePrice}
+                      ${product.sale_price}
                     </span>
                   )}
                   <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-full text-lg font-bold shadow-lg">
@@ -319,7 +311,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                       <div className="px-6 pb-6">
                         <h4 className="font-bold text-gray-800 mb-3">System Requirements</h4>
                         <ul className="space-y-2 mb-4">
-                          {product.systemRequirements.map((req, index) => (
+                          {product.system_requirements.map((req, index) => (
                             <li key={index} className="text-gray-600 text-sm">{req}</li>
                           ))}
                         </ul>
@@ -387,7 +379,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
               
               <div className="flex items-center space-x-2 mb-4">
                 <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                  {product.platform}
+                  {product.platform.join(', ')}
                 </span>
               </div>
 
@@ -395,7 +387,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
               <div className="mb-6">
                 <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
                 <div className="flex space-x-3">
-                  {['PS4', 'PS5'].map((platform) => (
+                  {product.platform.map((platform) => (
                     <button
                       key={platform}
                       onClick={() => setSelectedPlatform(platform)}
@@ -415,17 +407,17 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
               <div className="mb-6">
                 <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
                 <div className="flex space-x-3">
-                  {['Permanent', 'Rent (30 Days)'].map((type) => (
+                  {product.type.map((type) => (
                     <button
                       key={type}
-                      onClick={() => setSelectedType(type.includes('Rent') ? 'Rent' : 'Permanent')}
+                      onClick={() => setSelectedType(type)}
                       className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                        selectedType === (type.includes('Rent') ? 'Rent' : 'Permanent')
+                        selectedType === type
                           ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      {type}
+                      {type === 'Rent' ? 'Rent (30 Days)' : type}
                     </button>
                   ))}
                 </div>
@@ -438,7 +430,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                 </span>
                 {selectedType === 'Rent' && (
                   <span className="text-xl sm:text-2xl text-gray-500 line-through">
-                    ${product.salePrice}
+                    ${product.sale_price}
                   </span>
                 )}
                 <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
@@ -532,7 +524,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                   <div className="space-y-4">
                     <h4 className="font-bold text-gray-800 mb-3">System Requirements</h4>
                     <ul className="space-y-2 mb-4">
-                      {product.systemRequirements.map((req, index) => (
+                      {product.system_requirements.map((req, index) => (
                         <li key={index} className="text-gray-600 text-sm">{req}</li>
                       ))}
                     </ul>
@@ -605,8 +597,8 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                     {game.title}
                   </h4>
                   <div className="flex items-center space-x-1 sm:space-x-2">
-                    <span className="text-orange-500 font-bold text-sm sm:text-base">${game.salePrice}</span>
-                    <span className="text-gray-500 line-through text-xs sm:text-sm">${game.originalPrice}</span>
+                    <span className="text-orange-500 font-bold text-sm sm:text-base">${game.sale_price}</span>
+                    <span className="text-gray-500 line-through text-xs sm:text-sm">${game.original_price}</span>
                   </div>
                 </div>
               </div>

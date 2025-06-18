@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, Save, X, ExternalLink, Upload, Image } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Save, X, Upload, Image, Sparkles, Database, Settings } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { 
   gamesService, 
@@ -178,99 +178,204 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   };
 
   const renderMainMenu = () => (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-8">
-        Admin Dashboard
-      </h2>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <div className="flex items-center justify-center space-x-3 mb-4">
+          <div className="bg-gradient-to-r from-purple-500 to-indigo-500 p-3 rounded-full">
+            <Settings className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+            Admin Dashboard
+          </h2>
+        </div>
+        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          Manage your gaming community content with ease. Upload images, add games, and update testimonials.
+        </p>
+      </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <button
-          onClick={() => setActiveSection('testimonials')}
-          className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-        >
-          <div className="text-center">
-            <Image className="w-12 h-12 mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-2">Upload Screenshots</h3>
-            <p className="text-sm opacity-90">Upload customer phone screenshots</p>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200">
+          <div className="flex items-center space-x-4">
+            <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-3 rounded-xl">
+              <Database className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800">{games.length}</h3>
+              <p className="text-gray-600">Total Games</p>
+            </div>
           </div>
-        </button>
+        </div>
         
-        <button
-          onClick={() => setActiveSection('stock')}
-          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+        <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-200">
+          <div className="flex items-center space-x-4">
+            <div className="bg-gradient-to-r from-orange-400 to-red-500 p-3 rounded-xl">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800">{subscriptions.length}</h3>
+              <p className="text-gray-600">Subscriptions</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-200">
+          <div className="flex items-center space-x-4">
+            <div className="bg-gradient-to-r from-purple-400 to-indigo-500 p-3 rounded-xl">
+              <Image className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800">{testimonials.length}</h3>
+              <p className="text-gray-600">Screenshots</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Action Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div 
+          onClick={() => setActiveSection('testimonials')}
+          className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105"
         >
           <div className="text-center">
-            <Plus className="w-12 h-12 mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-2">Update Stock</h3>
-            <p className="text-sm opacity-90">Manage games and subscription inventory</p>
+            <div className="bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-600 p-6 rounded-2xl mx-auto w-fit mb-6 transition-all duration-300">
+              <Image className="w-12 h-12 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-cyan-600 transition-colors">
+              Upload Screenshots
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              Upload customer phone screenshots and testimonials. Drag & drop images with automatic Cloudinary integration.
+            </p>
+            <div className="mt-6 inline-flex items-center space-x-2 text-cyan-600 font-medium">
+              <span>Manage Screenshots</span>
+              <ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform" />
+            </div>
           </div>
-        </button>
+        </div>
+        
+        <div 
+          onClick={() => setActiveSection('stock')}
+          className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105"
+        >
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 group-hover:from-orange-600 group-hover:to-red-600 p-6 rounded-2xl mx-auto w-fit mb-6 transition-all duration-300">
+              <Plus className="w-12 h-12 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-orange-600 transition-colors">
+              Update Stock
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              Manage games and subscription inventory. Add new products, update pricing, and organize your catalog.
+            </p>
+            <div className="mt-6 inline-flex items-center space-x-2 text-orange-600 font-medium">
+              <span>Manage Inventory</span>
+              <ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 
   const renderStockTypeSelection = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Choose Stock Type</h2>
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
+          Choose Stock Type
+        </h2>
+        <p className="text-gray-600 text-lg">Select the type of content you want to manage</p>
+      </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <button
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div 
           onClick={() => setStockType('games')}
-          className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+          className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
         >
-          <h3 className="text-lg font-bold">Games</h3>
-          <p className="text-sm opacity-90">Manage PS4 & PS5 games</p>
-        </button>
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-purple-500 to-indigo-500 group-hover:from-purple-600 group-hover:to-indigo-600 p-4 rounded-xl mx-auto w-fit mb-4 transition-all duration-300">
+              <Database className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-purple-600 transition-colors">Games</h3>
+            <p className="text-gray-600">Manage PS4 & PS5 games</p>
+          </div>
+        </div>
         
-        <button
+        <div 
           onClick={() => setStockType('subscriptions')}
-          className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+          className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
         >
-          <h3 className="text-lg font-bold">Subscriptions</h3>
-          <p className="text-sm opacity-90">Manage subscription services</p>
-        </button>
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-green-500 to-emerald-500 group-hover:from-green-600 group-hover:to-emerald-600 p-4 rounded-xl mx-auto w-fit mb-4 transition-all duration-300">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-green-600 transition-colors">Subscriptions</h3>
+            <p className="text-gray-600">Manage subscription services</p>
+          </div>
+        </div>
       </div>
     </div>
   );
 
   const renderCrudOperations = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Choose Operation for {activeSection === 'testimonials' ? 'Screenshots' : stockType === 'games' ? 'Games' : 'Subscriptions'}
-      </h2>
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
+          Choose Operation for {activeSection === 'testimonials' ? 'Screenshots' : stockType === 'games' ? 'Games' : 'Subscriptions'}
+        </h2>
+        <p className="text-gray-600 text-lg">Select what you want to do</p>
+      </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <button
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+        <div 
           onClick={() => setCrudOperation('create')}
-          className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg transition-colors"
+          className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
         >
-          <Plus className="w-6 h-6 mx-auto mb-2" />
-          <span className="text-sm font-medium">Add</span>
-        </button>
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-green-500 to-emerald-500 group-hover:from-green-600 group-hover:to-emerald-600 p-3 rounded-xl mx-auto w-fit mb-3 transition-all duration-300">
+              <Plus className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-sm font-medium text-gray-800 group-hover:text-green-600 transition-colors">Add New</span>
+          </div>
+        </div>
         
-        <button
+        <div 
           onClick={() => setCrudOperation('read')}
-          className="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg transition-colors"
+          className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
         >
-          <Edit className="w-6 h-6 mx-auto mb-2" />
-          <span className="text-sm font-medium">View</span>
-        </button>
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-blue-500 to-cyan-500 group-hover:from-blue-600 group-hover:to-cyan-600 p-3 rounded-xl mx-auto w-fit mb-3 transition-all duration-300">
+              <Edit className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors">View All</span>
+          </div>
+        </div>
         
-        <button
+        <div 
           onClick={() => setCrudOperation('update')}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white p-4 rounded-lg transition-colors"
+          className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
         >
-          <Edit className="w-6 h-6 mx-auto mb-2" />
-          <span className="text-sm font-medium">Edit</span>
-        </button>
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-yellow-500 to-orange-500 group-hover:from-yellow-600 group-hover:to-orange-600 p-3 rounded-xl mx-auto w-fit mb-3 transition-all duration-300">
+              <Edit className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-sm font-medium text-gray-800 group-hover:text-yellow-600 transition-colors">Edit</span>
+          </div>
+        </div>
         
-        <button
+        <div 
           onClick={() => setCrudOperation('delete')}
-          className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-lg transition-colors"
+          className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
         >
-          <Trash2 className="w-6 h-6 mx-auto mb-2" />
-          <span className="text-sm font-medium">Delete</span>
-        </button>
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-red-500 to-pink-500 group-hover:from-red-600 group-hover:to-pink-600 p-3 rounded-xl mx-auto w-fit mb-3 transition-all duration-300">
+              <Trash2 className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-sm font-medium text-gray-800 group-hover:text-red-600 transition-colors">Delete</span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -279,52 +384,59 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     const isTestimonial = activeSection === 'testimonials';
     
     return (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {crudOperation === 'create' ? 'Add New' : 'Edit'} {isTestimonial ? 'Screenshot' : stockType === 'games' ? 'Game' : 'Subscription'}
-        </h2>
+      <div className="space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
+            {crudOperation === 'create' ? 'Add New' : 'Edit'} {isTestimonial ? 'Screenshot' : stockType === 'games' ? 'Game' : 'Subscription'}
+          </h2>
+          <p className="text-gray-600 text-lg">Fill in the details below</p>
+        </div>
         
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Image Upload Section */}
             <div className={isTestimonial ? "md:col-span-2" : "md:col-span-2"}>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-lg font-semibold text-gray-700 mb-4">
                 {isTestimonial ? 'Phone Screenshot Upload' : 'Game Image Upload'}
               </label>
               
               {/* File Upload Option */}
-              <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-cyan-400 transition-colors">
+              <div className="space-y-6">
+                <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-cyan-400 transition-colors bg-gradient-to-br from-gray-50 to-blue-50">
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => handleFileUpload(e, isTestimonial ? 'image' : 'image')}
+                    onChange={(e) => handleFileUpload(e, 'image')}
                     className="hidden"
                     id="file-upload"
                     disabled={uploading}
                   />
                   <label
                     htmlFor="file-upload"
-                    className={`cursor-pointer flex flex-col items-center space-y-2 ${uploading ? 'opacity-50' : ''}`}
+                    className={`cursor-pointer flex flex-col items-center space-y-4 ${uploading ? 'opacity-50' : ''}`}
                   >
-                    <Upload className="w-8 h-8 text-gray-400" />
-                    <span className="text-sm text-gray-600">
-                      {uploading ? 'Uploading...' : `Click to upload ${isTestimonial ? 'phone screenshot' : 'game image'}`}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {isTestimonial ? 'Phone resolution (9:16 aspect ratio recommended)' : 'Square format recommended (1:1 aspect ratio)'}
-                    </span>
+                    <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-4 rounded-2xl">
+                      <Upload className="w-10 h-10 text-white" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-lg font-medium text-gray-700 block mb-2">
+                        {uploading ? 'Uploading...' : `Click to upload ${isTestimonial ? 'phone screenshot' : 'game image'}`}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {isTestimonial ? 'Phone resolution (9:16 aspect ratio recommended)' : 'Square format recommended (1:1 aspect ratio)'}
+                      </span>
+                    </div>
                   </label>
                 </div>
 
                 {/* Manual URL Input (Fallback) */}
                 <div className="relative">
-                  <span className="text-xs text-gray-500 mb-2 block">Or paste image URL manually:</span>
+                  <span className="text-sm text-gray-500 mb-3 block">Or paste image URL manually:</span>
                   <input
                     type="url"
                     value={formData.image || ''}
                     onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                     placeholder="https://res.cloudinary.com/your-cloud-name/image/upload/..."
                   />
                 </div>
@@ -335,7 +447,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     <img 
                       src={formData.image} 
                       alt="Preview" 
-                      className={`mx-auto rounded-lg border shadow-lg ${
+                      className={`mx-auto rounded-2xl border shadow-xl ${
                         isTestimonial 
                           ? 'w-48 h-auto max-h-96' // Phone screenshot dimensions
                           : 'w-full max-w-xs h-48 object-cover' // Game image dimensions
@@ -349,13 +461,15 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 )}
 
                 {/* Cloudinary Setup Instructions */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start space-x-2">
-                    <ExternalLink className="w-5 h-5 text-blue-500 mt-0.5" />
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                  <div className="flex items-start space-x-3">
+                    <div className="bg-blue-500 p-2 rounded-lg">
+                      <Upload className="w-5 h-5 text-white" />
+                    </div>
                     <div>
-                      <h4 className="font-semibold text-blue-800 mb-2">Cloudinary Setup Required:</h4>
-                      <ol className="text-sm text-blue-700 space-y-1 list-decimal list-inside">
-                        <li>Create account at <a href="https://cloudinary.com" target="_blank" rel="noopener noreferrer" className="underline">cloudinary.com</a></li>
+                      <h4 className="font-semibold text-blue-800 mb-3">Cloudinary Setup Required:</h4>
+                      <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
+                        <li>Create account at <a href="https://cloudinary.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">cloudinary.com</a></li>
                         <li>Replace "YOUR_CLOUD_NAME" in the code with your actual cloud name</li>
                         <li>Create an unsigned upload preset named "gaming_community"</li>
                         <li>Enable unsigned uploads in your Cloudinary settings</li>
@@ -370,22 +484,22 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             {!isTestimonial && (
               <>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Title</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Title</label>
                   <input
                     type="text"
                     value={formData.title || ''}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                     placeholder="Enter title"
                   />
                 </div>
 
                 {/* Platform Selection */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Platform</label>
-                  <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
+                  <div className="space-y-3">
                     {(stockType === 'games' ? ['PS4', 'PS5'] : ['Xbox', 'PlayStation', 'PC', 'Nintendo Switch', 'Apple']).map((platform) => (
-                      <label key={platform} className="flex items-center space-x-2">
+                      <label key={platform} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                         <input
                           type="checkbox"
                           checked={formData.platform?.includes(platform) || false}
@@ -397,9 +511,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                               setFormData({ ...formData, platform: platforms.filter((p: string) => p !== platform) });
                             }
                           }}
-                          className="rounded"
+                          className="rounded w-5 h-5 text-cyan-600"
                         />
-                        <span>{platform}</span>
+                        <span className="font-medium">{platform}</span>
                       </label>
                     ))}
                   </div>
@@ -407,10 +521,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
                 {/* Type Selection */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
-                  <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
+                  <div className="space-y-3">
                     {['Permanent', 'Rent'].map((type) => (
-                      <label key={type} className="flex items-center space-x-2">
+                      <label key={type} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                         <input
                           type="checkbox"
                           checked={formData.type?.includes(type) || false}
@@ -422,9 +536,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                               setFormData({ ...formData, type: types.filter((t: string) => t !== type) });
                             }
                           }}
-                          className="rounded"
+                          className="rounded w-5 h-5 text-orange-600"
                         />
-                        <span>{type}</span>
+                        <span className="font-medium">{type}</span>
                       </label>
                     ))}
                   </div>
@@ -432,38 +546,38 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
                 {/* Pricing */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Original Price ($)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Original Price ($)</label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.original_price || ''}
                     onChange={(e) => setFormData({ ...formData, original_price: parseFloat(e.target.value) })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                     placeholder="0.00"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Sale Price ($)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Sale Price ($)</label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.sale_price || ''}
                     onChange={(e) => setFormData({ ...formData, sale_price: parseFloat(e.target.value) })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                     placeholder="0.00"
                   />
                 </div>
 
                 {formData.type?.includes('Rent') && (
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Rent Price ($)</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Rent Price ($)</label>
                     <input
                       type="number"
                       step="0.01"
                       value={formData.rent_price || ''}
                       onChange={(e) => setFormData({ ...formData, rent_price: parseFloat(e.target.value) })}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                       placeholder="0.00"
                     />
                   </div>
@@ -471,36 +585,36 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
                 {/* Description */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Description</label>
                   <textarea
                     value={formData.description || ''}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={4}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                     placeholder="Enter description"
                   />
                 </div>
 
                 {/* Features */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Features (one per line)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Features (one per line)</label>
                   <textarea
                     value={Array.isArray(formData.features) ? formData.features.join('\n') : formData.features || ''}
                     onChange={(e) => setFormData({ ...formData, features: e.target.value })}
                     rows={4}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                     placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
                   />
                 </div>
 
                 {/* System Requirements */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">System Requirements (one per line)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">System Requirements (one per line)</label>
                   <textarea
                     value={Array.isArray(formData.system_requirements) ? formData.system_requirements.join('\n') : formData.system_requirements || ''}
                     onChange={(e) => setFormData({ ...formData, system_requirements: e.target.value })}
                     rows={4}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                     placeholder="Requirement 1&#10;Requirement 2&#10;Requirement 3"
                   />
                 </div>
@@ -508,11 +622,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             )}
           </div>
 
-          <div className="flex space-x-4 mt-6">
+          <div className="flex space-x-4 mt-8">
             <button
               onClick={handleSaveItem}
               disabled={loading || uploading}
-              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 disabled:opacity-50"
+              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-3 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <Save className="w-5 h-5" />
               <span>{loading ? 'Saving...' : uploading ? 'Uploading...' : 'Save'}</span>
@@ -523,7 +637,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 setCrudOperation(null);
                 setSelectedItem(null);
               }}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Cancel
             </button>
@@ -545,59 +659,65 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     }
     
     return (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {activeSection === 'testimonials' ? 'Screenshots' : stockType === 'games' ? 'Games' : 'Subscriptions'} List
-        </h2>
+      <div className="space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
+            {activeSection === 'testimonials' ? 'Screenshots' : stockType === 'games' ? 'Games' : 'Subscriptions'} List
+          </h2>
+          <p className="text-gray-600 text-lg">Manage your existing content</p>
+        </div>
         
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-6 max-w-4xl mx-auto">
           {items.map((item) => (
-            <div key={item.id} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20 flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+            <div key={item.id} className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 flex items-center justify-between hover:shadow-2xl transition-all duration-300">
+              <div className="flex items-center space-x-6">
                 {activeSection === 'testimonials' ? (
                   <>
-                    <img src={item.image} alt="Screenshot" className="w-12 h-20 rounded-lg object-cover" />
+                    <img src={item.image} alt="Screenshot" className="w-16 h-20 rounded-xl object-cover shadow-lg" />
                     <div>
-                      <h3 className="font-bold text-gray-800">Screenshot #{item.id?.slice(-6)}</h3>
-                      <p className="text-gray-600 text-sm">Uploaded {new Date(item.created_at).toLocaleDateString()}</p>
+                      <h3 className="font-bold text-gray-800 text-lg">Screenshot #{item.id?.slice(-6)}</h3>
+                      <p className="text-gray-600">Uploaded {new Date(item.created_at).toLocaleDateString()}</p>
                     </div>
                   </>
                 ) : (
                   <>
-                    <img src={item.image} alt={item.title} className="w-16 h-16 rounded-lg object-cover" />
+                    <img src={item.image} alt={item.title} className="w-20 h-20 rounded-xl object-cover shadow-lg" />
                     <div>
-                      <h3 className="font-bold text-gray-800">{item.title}</h3>
-                      <p className="text-gray-600 text-sm">${item.sale_price} - {item.platform?.join(', ')}</p>
+                      <h3 className="font-bold text-gray-800 text-lg">{item.title}</h3>
+                      <p className="text-gray-600">${item.sale_price} - {item.platform?.join(', ')}</p>
                     </div>
                   </>
                 )}
               </div>
               
-              <div className="flex space-x-2">
+              <div className="flex space-x-3">
                 <button
                   onClick={() => {
                     setSelectedItem(item);
                     setFormData(item);
                     setCrudOperation('update');
                   }}
-                  className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors"
+                  className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white p-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
-                  <Edit className="w-4 h-4" />
+                  <Edit className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => handleDeleteItem(item.id)}
                   disabled={loading}
-                  className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors disabled:opacity-50"
+                  className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white p-3 rounded-xl transition-all duration-300 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-5 h-5" />
                 </button>
               </div>
             </div>
           ))}
           
           {items.length === 0 && (
-            <div className="text-center py-8">
-              <p className="text-gray-600">No items found.</p>
+            <div className="text-center py-12">
+              <div className="bg-gray-100 rounded-full p-6 w-24 h-24 mx-auto mb-4 flex items-center justify-center">
+                <Database className="w-12 h-12 text-gray-400" />
+              </div>
+              <p className="text-gray-600 text-lg">No items found.</p>
             </div>
           )}
         </div>
@@ -620,10 +740,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           onBackToHome();
         }
       }}
-      className="flex items-center space-x-2 text-cyan-600 hover:text-orange-500 transition-colors mb-6 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg"
+      className="flex items-center space-x-3 text-cyan-600 hover:text-orange-500 transition-colors mb-8 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105"
     >
       <ArrowLeft className="w-5 h-5" />
-      <span>Back</span>
+      <span className="font-medium">Back</span>
     </button>
   );
 

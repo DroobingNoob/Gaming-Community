@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, ShoppingCart, User, Menu, X, Shield } from 'lucide-react';
+import { useGames, useSubscriptions } from '../hooks/useSupabaseData';
+import { Game } from '../config/supabase';
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -14,6 +16,27 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState<Game[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const { games } = useGames();
+  const { subscriptions } = useSubscriptions();
+
+  // Combine games and subscriptions for search
+  const allItems = [...games, ...subscriptions];
+
+  useEffect(() => {
+    if (searchQuery.trim().length > 0) {
+      const filtered = allItems.filter(item =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 5); // Limit to 5 suggestions
+      setSearchSuggestions(filtered);
+      setShowSuggestions(true);
+    } else {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [searchQuery, allItems]);
 
   const handleSearchClick = () => {
     setIsSearchExpanded(true);
@@ -22,6 +45,28 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
   const handleSearchClose = () => {
     setIsSearchExpanded(false);
     setSearchQuery('');
+    setShowSuggestions(false);
+  };
+
+  const handleSuggestionClick = (item: Game) => {
+    setSearchQuery('');
+    setShowSuggestions(false);
+    setIsSearchExpanded(false);
+    
+    // Navigate to the appropriate page based on item category
+    if (item.category === 'game') {
+      onNavigation('allgames');
+    } else {
+      onNavigation('subscriptions');
+    }
+  };
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      // Navigate to all games page with search query
+      onNavigation('allgames');
+      setIsSearchExpanded(false);
+    }
   };
 
   const navItems = [
@@ -195,12 +240,41 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   placeholder="Search for games..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                   className="w-full pl-8 sm:pl-10 pr-4 py-2 sm:py-3 border-2 border-cyan-400 rounded-full focus:outline-none focus:border-orange-400 transition-colors text-sm sm:text-lg"
                   autoFocus
                 />
                 <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-4 h-4 sm:w-5 sm:h-5" />
+                
+                {/* Search Suggestions */}
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 z-50 max-h-64 overflow-y-auto">
+                    {searchSuggestions.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => handleSuggestionClick(item)}
+                        className="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors text-left"
+                      >
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-10 h-10 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-800">{item.title}</div>
+                          <div className="text-sm text-gray-500">
+                            ${item.sale_price} • {item.platform.join(', ')}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-              <button className="bg-cyan-400 hover:bg-orange-500 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-base">
+              <button 
+                onClick={handleSearch}
+                className="bg-cyan-400 hover:bg-orange-500 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-base"
+              >
                 Search
               </button>
             </div>
