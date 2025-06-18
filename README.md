@@ -101,34 +101,44 @@ INSERT INTO games (title, image, original_price, sale_price, platform, discount,
 ('Grand Theft Auto V Premium Edition', 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400', 59.99, 19.99, ARRAY['PS5'], 67, 'Experience the award-winning Grand Theft Auto V with enhanced graphics and performance on PlayStation 5.', ARRAY['Enhanced graphics', 'Complete story', 'Online multiplayer'], ARRAY['PlayStation 5 console required', '50 GB storage'], ARRAY['Permanent'], 'game'),
 ('Xbox Game Pass Ultimate (3 Months)', 'https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400', 44.99, 29.99, ARRAY['Xbox'], 33, 'Get unlimited access to hundreds of high-quality games with Xbox Game Pass Ultimate.', ARRAY['Access to 100+ games', 'Day-one releases included', 'Xbox Live Gold membership'], ARRAY['Xbox console or Windows PC', 'Internet connection required'], ARRAY['Permanent'], 'subscription');
 
--- Insert sample testimonials
+-- Insert sample testimonials (with phone screenshot URLs)
 INSERT INTO testimonials (name, time, message, reply, avatar) VALUES
-('Alex StreamKing', 'Today 2:45 PM', 'Just got GTA V Premium Edition! Instant delivery as promised. You guys are amazing! 🎮', 'Thank you Alex! Enjoy your gaming session! 🚀', 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150'),
-('Sarah GameQueen', 'Yesterday 11:30 PM', 'Had an issue at 2 AM and support resolved it within minutes! Customer service is incredible 👏', 'We''re always here to help! Thanks for choosing GameStore! 💙', 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150&h=150');
+('Alex StreamKing', 'Today 2:45 PM', 'Just got GTA V Premium Edition! Instant delivery as promised. You guys are amazing! 🎮', 'Thank you Alex! Enjoy your gaming session! 🚀', 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=300&h=600'),
+('Sarah GameQueen', 'Yesterday 11:30 PM', 'Had an issue at 2 AM and support resolved it within minutes! Customer service is incredible 👏', 'We''re always here to help! Thanks for choosing GameStore! 💙', 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=300&h=600');
 ```
 
-## 🖼️ Image Hosting Options
+## 🖼️ Image Hosting with Cloudinary
 
-Since we're using external image hosting, here are the best free options:
+### **Automatic Upload Integration**
+The admin panel now supports **automatic image uploads** to Cloudinary:
 
-### **1. Imgur (Recommended)**
-- Upload at [imgur.com](https://imgur.com)
-- Right-click image → "Copy image address"
-- Direct image URLs work perfectly
+1. **Drag & Drop Upload**: Simply drag images into the upload area
+2. **Automatic Processing**: Images are uploaded to Cloudinary automatically
+3. **URL Auto-Fill**: Cloudinary URLs are automatically inserted into the database
+4. **Real-time Preview**: See uploaded images immediately
 
-### **2. Pexels**
-- Free stock photos at [pexels.com](https://pexels.com)
-- Right-click → "Copy image address"
-- High-quality gaming images available
+### **Setup Cloudinary (Required for Auto-Upload)**
 
-### **3. Unsplash**
-- Free photos at [unsplash.com](https://unsplash.com)
-- Download → Upload to Imgur → Copy URL
+1. **Create Account**: Sign up at [cloudinary.com](https://cloudinary.com)
+2. **Get Credentials**: Copy your Cloud Name from the dashboard
+3. **Create Upload Preset**:
+   - Go to Settings → Upload
+   - Add upload preset named "gaming_community"
+   - Set to "Unsigned" mode
+4. **Update Code**: Replace "YOUR_CLOUD_NAME" in `src/components/AdminPage.tsx`
 
-### **4. Cloudinary**
-- Free tier at [cloudinary.com](https://cloudinary.com)
-- 25GB storage, 25GB bandwidth/month
-- Advanced image optimization
+### **Phone Screenshot Testimonials**
+- Upload **phone resolution screenshots** (9:16 aspect ratio)
+- Displays as realistic phone frames with scrolling animation
+- Perfect for showing customer chat screenshots, reviews, or social media posts
+- Automatic optimization for web display
+
+### **Manual URL Option (Fallback)**
+If automatic upload isn't set up, you can still use manual URLs from:
+- **Imgur**: Upload at imgur.com (right-click → copy image address)
+- **Pexels**: Free stock photos at pexels.com
+- **Unsplash**: Free photos at unsplash.com
+- **Any CDN**: Direct image URLs
 
 ## 📊 Database Structure
 
@@ -155,7 +165,7 @@ Since we're using external image hosting, here are the best free options:
 - `time` (Text)
 - `message` (Text)
 - `reply` (Text)
-- `avatar` (Text URL)
+- `avatar` (Text URL - Phone Screenshot)
 - `created_at` (Timestamp)
 - `updated_at` (Timestamp)
 
@@ -170,8 +180,9 @@ Since we're using external image hosting, here are the best free options:
 ## 🚀 Features
 
 - ✅ **Dynamic Data Loading**: All content from Supabase
-- ✅ **Admin Panel**: Full CRUD operations
-- ✅ **External Image Hosting**: No storage costs
+- ✅ **Admin Panel**: Full CRUD operations with automatic image upload
+- ✅ **Phone Screenshot Display**: Realistic phone frames for testimonials
+- ✅ **Cloudinary Integration**: Automatic image uploads and optimization
 - ✅ **Real-time Updates**: Automatic data refresh
 - ✅ **Responsive Design**: Works on all devices
 - ✅ **Loading States**: Better user experience
@@ -180,18 +191,18 @@ Since we're using external image hosting, here are the best free options:
 ## 📱 Admin Features
 
 1. **Testimonials Management**
-   - Add/Edit/Delete testimonials
-   - External avatar URLs
-   - Real-time preview
+   - Upload phone screenshots directly
+   - Automatic Cloudinary integration
+   - Real-time preview and phone frame display
 
 2. **Games Management**
-   - Add/Edit/Delete games
+   - Upload game images with drag & drop
    - Platform selection (PS4/PS5)
    - Type selection (Permanent/Rent)
-   - External image URLs
+   - Automatic image optimization
 
 3. **Subscriptions Management**
-   - Add/Edit/Delete subscriptions
+   - Upload subscription images
    - Multiple platform support
    - Pricing management
 
@@ -210,13 +221,19 @@ npm run build
 
 ## 💰 Cost Optimization
 
-Supabase free tier includes:
+### Supabase Free Tier:
 - **Database**: 500MB storage
 - **API Requests**: 50,000 per month
 - **Bandwidth**: 2GB per month
 - **Authentication**: Unlimited users
 
-Perfect for 75 daily users! 🎯
+### Cloudinary Free Tier:
+- **Storage**: 25GB
+- **Bandwidth**: 25GB per month
+- **Transformations**: 25,000 per month
+- **Auto-optimization**: Included
+
+**Perfect for 1000+ daily users!** 🎯
 
 ## 🌐 Deployment Options
 
@@ -238,9 +255,11 @@ Perfect for 75 daily users! 🎯
 ## 📝 Next Steps
 
 1. **Update Supabase credentials** in `src/config/supabase.ts`
-2. **Create database tables** using the SQL commands above
-3. **Test admin panel** with external image URLs
-4. **Deploy to your preferred hosting platform**
-5. **Add your domain** to Supabase allowed origins
+2. **Set up Cloudinary** for automatic image uploads
+3. **Create database tables** using the SQL commands above
+4. **Test admin panel** with automatic image upload
+5. **Upload phone screenshots** for testimonials
+6. **Deploy to your preferred hosting platform**
+7. **Add your domain** to Supabase allowed origins
 
-Your gaming community website is now ready with a powerful backend! 🎮✨
+Your gaming community website is now ready with **automatic image uploads** and **phone screenshot testimonials**! 🎮✨

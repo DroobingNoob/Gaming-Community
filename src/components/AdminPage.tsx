@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, Save, X, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Save, X, ExternalLink, Upload, Image } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { 
   gamesService, 
@@ -20,11 +20,72 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   // Supabase data hooks
   const { games, refetch: refetchGames } = useGames();
   const { subscriptions, refetch: refetchSubscriptions } = useSubscriptions();
   const { testimonials, refetch: refetchTestimonials } = useTestimonials();
+
+  // Cloudinary upload function
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'gaming_community'); // You'll need to create this preset
+    
+    try {
+      const response = await fetch(
+        'https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload', // Replace with your cloud name
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      throw new Error('Failed to upload image to Cloudinary');
+    }
+  };
+
+  // Handle file upload
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image size should be less than 10MB');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      toast.info('Uploading image to Cloudinary...');
+      
+      const imageUrl = await uploadToCloudinary(file);
+      
+      setFormData({ ...formData, [fieldName]: imageUrl });
+      toast.success('Image uploaded successfully!');
+    } catch (error) {
+      toast.error('Failed to upload image. Please try again.');
+      console.error(error);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSaveItem = async () => {
     try {
@@ -128,9 +189,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
         >
           <div className="text-center">
-            <Edit className="w-12 h-12 mx-auto mb-4" />
+            <Image className="w-12 h-12 mx-auto mb-4" />
             <h3 className="text-xl font-bold mb-2">Update Testimonials</h3>
-            <p className="text-sm opacity-90">Manage customer testimonials and reviews</p>
+            <p className="text-sm opacity-90">Upload phone screenshots of customer reviews</p>
           </div>
         </button>
         
@@ -225,39 +286,60 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Image URL Input */}
+            {/* Image Upload Section */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {isTestimonial ? 'Avatar URL' : 'Image URL'}
+                {isTestimonial ? 'Phone Screenshot Upload' : 'Game Image Upload'}
               </label>
-              <div className="space-y-3">
-                <input
-                  type="url"
-                  value={formData.image || formData.avatar || ''}
-                  onChange={(e) => setFormData({ ...formData, [isTestimonial ? 'avatar' : 'image']: e.target.value })}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                  placeholder="https://example.com/image.jpg"
-                />
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start space-x-2">
-                    <ExternalLink className="w-5 h-5 text-blue-500 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-blue-800 mb-2">Free Image Hosting Options:</h4>
-                      <ul className="text-sm text-blue-700 space-y-1">
-                        <li>• <strong>Imgur:</strong> Upload at imgur.com (right-click → copy image address)</li>
-                        <li>• <strong>Pexels:</strong> Use stock photos from pexels.com</li>
-                        <li>• <strong>Unsplash:</strong> Free photos from unsplash.com</li>
-                        <li>• <strong>Cloudinary:</strong> Free tier at cloudinary.com</li>
-                      </ul>
-                    </div>
-                  </div>
+              
+              {/* File Upload Option */}
+              <div className="space-y-4">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-cyan-400 transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload(e, isTestimonial ? 'avatar' : 'image')}
+                    className="hidden"
+                    id="file-upload"
+                    disabled={uploading}
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className={`cursor-pointer flex flex-col items-center space-y-2 ${uploading ? 'opacity-50' : ''}`}
+                  >
+                    <Upload className="w-8 h-8 text-gray-400" />
+                    <span className="text-sm text-gray-600">
+                      {uploading ? 'Uploading...' : `Click to upload ${isTestimonial ? 'phone screenshot' : 'game image'}`}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {isTestimonial ? 'Phone resolution (9:16 aspect ratio recommended)' : 'Square format recommended (1:1 aspect ratio)'}
+                    </span>
+                  </label>
                 </div>
+
+                {/* Manual URL Input (Fallback) */}
+                <div className="relative">
+                  <span className="text-xs text-gray-500 mb-2 block">Or paste image URL manually:</span>
+                  <input
+                    type="url"
+                    value={formData.image || formData.avatar || ''}
+                    onChange={(e) => setFormData({ ...formData, [isTestimonial ? 'avatar' : 'image']: e.target.value })}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    placeholder="https://res.cloudinary.com/your-cloud-name/image/upload/..."
+                  />
+                </div>
+
+                {/* Image Preview */}
                 {(formData.image || formData.avatar) && (
                   <div className="relative">
                     <img 
                       src={formData.image || formData.avatar} 
                       alt="Preview" 
-                      className="w-full max-w-xs h-48 object-cover rounded-lg border"
+                      className={`mx-auto rounded-lg border shadow-lg ${
+                        isTestimonial 
+                          ? 'w-48 h-auto max-h-96' // Phone screenshot dimensions
+                          : 'w-full max-w-xs h-48 object-cover' // Game image dimensions
+                      }`}
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                         toast.error('Invalid image URL');
@@ -265,6 +347,22 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     />
                   </div>
                 )}
+
+                {/* Cloudinary Setup Instructions */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start space-x-2">
+                    <ExternalLink className="w-5 h-5 text-blue-500 mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-blue-800 mb-2">Cloudinary Setup Required:</h4>
+                      <ol className="text-sm text-blue-700 space-y-1 list-decimal list-inside">
+                        <li>Create account at <a href="https://cloudinary.com" target="_blank" rel="noopener noreferrer" className="underline">cloudinary.com</a></li>
+                        <li>Replace "YOUR_CLOUD_NAME" in the code with your actual cloud name</li>
+                        <li>Create an unsigned upload preset named "gaming_community"</li>
+                        <li>Enable unsigned uploads in your Cloudinary settings</li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -272,7 +370,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             {isTestimonial ? (
               <>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Customer Name</label>
                   <input
                     type="text"
                     value={formData.name || ''}
@@ -292,23 +390,23 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Customer Message</label>
                   <textarea
                     value={formData.message || ''}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     rows={3}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                    placeholder="Customer message"
+                    placeholder="Customer testimonial message"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Reply</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Your Reply</label>
                   <textarea
                     value={formData.reply || ''}
                     onChange={(e) => setFormData({ ...formData, reply: e.target.value })}
                     rows={2}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                    placeholder="Your reply"
+                    placeholder="Your reply to the customer"
                   />
                 </div>
               </>
@@ -456,11 +554,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           <div className="flex space-x-4 mt-6">
             <button
               onClick={handleSaveItem}
-              disabled={loading}
+              disabled={loading || uploading}
               className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 disabled:opacity-50"
             >
               <Save className="w-5 h-5" />
-              <span>{loading ? 'Saving...' : 'Save'}</span>
+              <span>{loading ? 'Saving...' : uploading ? 'Uploading...' : 'Save'}</span>
             </button>
             <button
               onClick={() => {
@@ -501,7 +599,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               <div className="flex items-center space-x-4">
                 {activeSection === 'testimonials' ? (
                   <>
-                    <img src={item.avatar} alt={item.name} className="w-12 h-12 rounded-full object-cover" />
+                    <img src={item.avatar} alt={item.name} className="w-12 h-20 rounded-lg object-cover" />
                     <div>
                       <h3 className="font-bold text-gray-800">{item.name}</h3>
                       <p className="text-gray-600 text-sm">{item.message.substring(0, 50)}...</p>

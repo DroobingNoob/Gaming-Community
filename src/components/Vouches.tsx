@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Check, CheckCheck } from 'lucide-react';
 import { useTestimonials } from '../hooks/useSupabaseData';
 
 const Vouches: React.FC = () => {
@@ -21,10 +20,10 @@ const Vouches: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-              What Our Customers Say
+              Customer Screenshots
             </h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Real conversations from our satisfied gaming community
+              Real phone screenshots from our satisfied gaming community
             </p>
           </div>
           <div className="text-center py-12">
@@ -42,10 +41,10 @@ const Vouches: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-              What Our Customers Say
+              Customer Screenshots
             </h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Real conversations from our satisfied gaming community
+              Real phone screenshots from our satisfied gaming community
             </p>
           </div>
           <div className="text-center py-12">
@@ -61,75 +60,77 @@ const Vouches: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-            What Our Customers Say
+            Customer Screenshots
           </h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Real conversations from our satisfied gaming community
+            Real phone screenshots from our satisfied gaming community
           </p>
         </div>
 
-        {/* Continuous Scrolling Testimonials */}
-        <div className="relative max-w-6xl mx-auto">
+        {/* Continuous Scrolling Phone Screenshots */}
+        <div className="relative max-w-7xl mx-auto">
           <div className="flex space-x-6 animate-scroll">
             {/* Duplicate testimonials for seamless loop */}
             {[...testimonials, ...testimonials].map((vouch, index) => (
               <div
                 key={`${vouch.id}-${index}`}
-                className="flex-shrink-0 w-96"
+                className="flex-shrink-0"
               >
-                {/* WhatsApp Chat Interface */}
-                <div className="bg-gradient-to-b from-green-500 to-green-600 rounded-t-2xl p-4">
-                  <div className="flex items-center space-x-3">
-                    <img
-                      src={vouch.avatar}
-                      alt={vouch.name}
-                      className="w-10 h-10 rounded-full border-2 border-white"
-                    />
-                    <div className="text-white">
-                      <div className="font-semibold">{vouch.name}</div>
-                      <div className="text-xs opacity-90">online</div>
+                {/* Phone Screenshot Display */}
+                <div className="relative bg-gradient-to-b from-gray-900 to-gray-800 rounded-3xl p-2 shadow-2xl transform hover:scale-105 transition-all duration-300">
+                  {/* Phone Frame */}
+                  <div className="bg-black rounded-2xl p-1">
+                    {/* Screenshot Image */}
+                    <div className="relative overflow-hidden rounded-xl">
+                      <img
+                        src={vouch.avatar}
+                        alt={`${vouch.name} testimonial screenshot`}
+                        className="w-64 h-auto max-h-96 object-cover rounded-xl"
+                        style={{ aspectRatio: '9/16' }} // Phone aspect ratio
+                      />
+                      
+                      {/* Overlay with customer info */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                        <div className="text-white">
+                          <div className="font-semibold text-sm">{vouch.name}</div>
+                          <div className="text-xs opacity-90">{vouch.time}</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
+                  
+                  {/* Phone Details */}
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gray-600 rounded-full"></div>
                 </div>
 
-                {/* Chat Messages */}
-                <div className="bg-gray-100 p-6 rounded-b-2xl min-h-[200px] relative" 
-                     style={{backgroundImage: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"chat-bg\" x=\"0\" y=\"0\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><circle cx=\"10\" cy=\"10\" r=\"1\" fill=\"%23e5e7eb\" opacity=\"0.3\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23chat-bg)\"/></svg>')"}}>
-                  
-                  {/* Customer Message */}
-                  <div className="flex justify-end mb-4">
-                    <div className="max-w-xs">
-                      <div className="bg-green-500 text-white rounded-2xl rounded-br-md px-4 py-3 shadow-md">
-                        <p className="text-sm">{vouch.message}</p>
-                      </div>
-                      <div className="flex items-center justify-end mt-1 space-x-1">
-                        <span className="text-xs text-gray-500">{vouch.time}</span>
-                        <CheckCheck className="w-4 h-4 text-green-500" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* GameStore Reply */}
-                  <div className="flex justify-start">
-                    <div className="max-w-xs">
-                      <div className="bg-white rounded-2xl rounded-bl-md px-4 py-3 shadow-md border">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <div className="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">GS</span>
-                          </div>
-                          <span className="text-xs font-semibold text-cyan-600">GameStore</span>
-                        </div>
-                        <p className="text-sm text-gray-700">{vouch.reply}</p>
-                      </div>
-                      <div className="flex items-center mt-1 space-x-1">
-                        <span className="text-xs text-gray-500">Just now</span>
-                        <Check className="w-4 h-4 text-gray-400" />
-                      </div>
+                {/* Customer Message Below Phone */}
+                <div className="mt-6 max-w-64 text-center">
+                  <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-4 shadow-lg border border-cyan-100">
+                    <p className="text-gray-700 text-sm leading-relaxed mb-3">
+                      "{vouch.message}"
+                    </p>
+                    <div className="text-xs text-gray-500 border-t border-gray-200 pt-2">
+                      <strong>Our Reply:</strong> {vouch.reply}
                     </div>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center mt-12">
+          <div className="bg-gradient-to-r from-cyan-50 to-orange-50 rounded-2xl p-8 max-w-2xl mx-auto border border-cyan-100">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">
+              Join Thousands of Happy Gamers! 🎮
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Share your gaming experience and become part of our community showcase
+            </p>
+            <button className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
+              Share Your Screenshot
+            </button>
           </div>
         </div>
       </div>
@@ -145,7 +146,7 @@ const Vouches: React.FC = () => {
         }
         
         .animate-scroll {
-          animation: scroll 20s linear infinite;
+          animation: scroll 25s linear infinite;
         }
         
         .animate-scroll:hover {
