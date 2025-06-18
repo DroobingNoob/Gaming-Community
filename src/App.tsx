@@ -241,7 +241,7 @@ function App() {
         
         <TermsPage onBackToHome={handleBackToHome} />
 
-        <Footer />
+        <Footer onNavigation={handleNavigation} />
 
         <LoginModal
           isOpen={isLoginModalOpen}
@@ -277,7 +277,7 @@ function App() {
         
         <RefundPolicyPage onBackToHome={handleBackToHome} />
 
-        <Footer />
+        <Footer onNavigation={handleNavigation} />
 
         <LoginModal
           isOpen={isLoginModalOpen}
@@ -356,7 +356,7 @@ function App() {
           onGameClick={handleGameClick}
         />
 
-        <Footer />
+        <Footer onNavigation={handleNavigation} />
 
         <LoginModal
           isOpen={isLoginModalOpen}
@@ -395,7 +395,7 @@ function App() {
           onBackToHome={handleBackToHome}
         />
 
-        <Footer />
+        <Footer onNavigation={handleNavigation} />
 
         <LoginModal
           isOpen={isLoginModalOpen}
@@ -434,7 +434,7 @@ function App() {
           onBackToHome={handleBackToHome}
         />
 
-        <Footer />
+        <Footer onNavigation={handleNavigation} />
 
         <LoginModal
           isOpen={isLoginModalOpen}
@@ -479,7 +479,7 @@ function App() {
         </div>
       </main>
 
-      <Footer />
+      <Footer onNavigation={handleNavigation} />
 
       <LoginModal
         isOpen={isLoginModalOpen}
