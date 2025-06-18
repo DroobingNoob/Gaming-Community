@@ -67,7 +67,7 @@ const CustomerScreenshots: React.FC = () => {
       <div className="text-center mt-8 sm:mt-12">
         <div className="bg-gradient-to-r from-cyan-50 to-orange-50 rounded-2xl p-6 sm:p-8 max-w-2xl mx-auto border border-cyan-100">
           <h4 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">
-            Join Thousands of Happy Gamers! 🎮
+            Join Thousands of Happy Gamers!🎮
           </h4>
           <p className="text-gray-600 text-sm sm:text-base">
             Experience instant delivery and premium gaming at unbeatable prices
