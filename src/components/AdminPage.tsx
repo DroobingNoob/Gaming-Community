@@ -35,7 +35,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     
     try {
       const response = await fetch(
-        'https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload', // Replace with your cloud name
+        'https://api.cloudinary.com/v1_1/dcodirzsc/image/upload', // Replace with your cloud name
         {
           method: 'POST',
           body: formData,
