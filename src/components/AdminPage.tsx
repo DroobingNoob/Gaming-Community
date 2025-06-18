@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, Save, X, Upload, Image, Sparkles, Database, Settings } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Save, X, Upload, Image as ImageIcon, Sparkles, Database, Settings } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { 
   gamesService, 
@@ -268,7 +268,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-200">
           <div className="flex items-center space-x-4">
             <div className="bg-gradient-to-r from-purple-400 to-indigo-500 p-3 rounded-xl">
-              <Image className="w-6 h-6 text-white" />
+              <ImageIcon className="w-6 h-6 text-white" />
             </div>
             <div>
               <h3 className="text-2xl font-bold text-gray-800">{testimonials.length}</h3>
@@ -286,7 +286,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         >
           <div className="text-center">
             <div className="bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-600 p-6 rounded-2xl mx-auto w-fit mb-6 transition-all duration-300">
-              <Image className="w-12 h-12 text-white" />
+              <ImageIcon className="w-12 h-12 text-white" />
             </div>
             <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-cyan-600 transition-colors">
               Upload Screenshots
