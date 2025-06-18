@@ -94,11 +94,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       if (activeSection === 'testimonials') {
         if (crudOperation === 'create') {
           await testimonialsService.add(formData);
-          toast.success('Testimonial added successfully!');
+          toast.success('Screenshot added successfully!');
           refetchTestimonials();
         } else if (crudOperation === 'update' && selectedItem) {
           await testimonialsService.update(selectedItem.id, formData);
-          toast.success('Testimonial updated successfully!');
+          toast.success('Screenshot updated successfully!');
           refetchTestimonials();
         }
       } else if (activeSection === 'stock') {
@@ -156,7 +156,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       
       if (activeSection === 'testimonials') {
         await testimonialsService.delete(id);
-        toast.success('Testimonial deleted successfully!');
+        toast.success('Screenshot deleted successfully!');
         refetchTestimonials();
       } else if (activeSection === 'stock') {
         if (stockType === 'games') {
@@ -190,8 +190,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         >
           <div className="text-center">
             <Image className="w-12 h-12 mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-2">Update Testimonials</h3>
-            <p className="text-sm opacity-90">Upload phone screenshots of customer reviews</p>
+            <h3 className="text-xl font-bold mb-2">Upload Screenshots</h3>
+            <p className="text-sm opacity-90">Upload customer phone screenshots</p>
           </div>
         </button>
         
@@ -236,7 +236,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const renderCrudOperations = () => (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Choose Operation for {activeSection === 'testimonials' ? 'Testimonials' : stockType === 'games' ? 'Games' : 'Subscriptions'}
+        Choose Operation for {activeSection === 'testimonials' ? 'Screenshots' : stockType === 'games' ? 'Games' : 'Subscriptions'}
       </h2>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -281,13 +281,13 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     return (
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {crudOperation === 'create' ? 'Add New' : 'Edit'} {isTestimonial ? 'Testimonial' : stockType === 'games' ? 'Game' : 'Subscription'}
+          {crudOperation === 'create' ? 'Add New' : 'Edit'} {isTestimonial ? 'Screenshot' : stockType === 'games' ? 'Game' : 'Subscription'}
         </h2>
         
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Image Upload Section */}
-            <div className="md:col-span-2">
+            <div className={isTestimonial ? "md:col-span-2" : "md:col-span-2"}>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 {isTestimonial ? 'Phone Screenshot Upload' : 'Game Image Upload'}
               </label>
@@ -298,7 +298,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => handleFileUpload(e, isTestimonial ? 'avatar' : 'image')}
+                    onChange={(e) => handleFileUpload(e, isTestimonial ? 'image' : 'image')}
                     className="hidden"
                     id="file-upload"
                     disabled={uploading}
@@ -322,18 +322,18 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   <span className="text-xs text-gray-500 mb-2 block">Or paste image URL manually:</span>
                   <input
                     type="url"
-                    value={formData.image || formData.avatar || ''}
-                    onChange={(e) => setFormData({ ...formData, [isTestimonial ? 'avatar' : 'image']: e.target.value })}
+                    value={formData.image || ''}
+                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
                     placeholder="https://res.cloudinary.com/your-cloud-name/image/upload/..."
                   />
                 </div>
 
                 {/* Image Preview */}
-                {(formData.image || formData.avatar) && (
+                {formData.image && (
                   <div className="relative">
                     <img 
-                      src={formData.image || formData.avatar} 
+                      src={formData.image} 
                       alt="Preview" 
                       className={`mx-auto rounded-lg border shadow-lg ${
                         isTestimonial 
@@ -367,50 +367,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             </div>
 
             {/* Form fields based on type */}
-            {isTestimonial ? (
-              <>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Customer Name</label>
-                  <input
-                    type="text"
-                    value={formData.name || ''}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                    placeholder="Enter customer name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Time</label>
-                  <input
-                    type="text"
-                    value={formData.time || ''}
-                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                    placeholder="e.g., Today 2:45 PM"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Customer Message</label>
-                  <textarea
-                    value={formData.message || ''}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    rows={3}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                    placeholder="Customer testimonial message"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Your Reply</label>
-                  <textarea
-                    value={formData.reply || ''}
-                    onChange={(e) => setFormData({ ...formData, reply: e.target.value })}
-                    rows={2}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                    placeholder="Your reply to the customer"
-                  />
-                </div>
-              </>
-            ) : (
+            {!isTestimonial && (
               <>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Title</label>
@@ -590,7 +547,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     return (
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {activeSection === 'testimonials' ? 'Testimonials' : stockType === 'games' ? 'Games' : 'Subscriptions'} List
+          {activeSection === 'testimonials' ? 'Screenshots' : stockType === 'games' ? 'Games' : 'Subscriptions'} List
         </h2>
         
         <div className="grid grid-cols-1 gap-4">
@@ -599,10 +556,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               <div className="flex items-center space-x-4">
                 {activeSection === 'testimonials' ? (
                   <>
-                    <img src={item.avatar} alt={item.name} className="w-12 h-20 rounded-lg object-cover" />
+                    <img src={item.image} alt="Screenshot" className="w-12 h-20 rounded-lg object-cover" />
                     <div>
-                      <h3 className="font-bold text-gray-800">{item.name}</h3>
-                      <p className="text-gray-600 text-sm">{item.message.substring(0, 50)}...</p>
+                      <h3 className="font-bold text-gray-800">Screenshot #{item.id?.slice(-6)}</h3>
+                      <p className="text-gray-600 text-sm">Uploaded {new Date(item.created_at).toLocaleDateString()}</p>
                     </div>
                   </>
                 ) : (

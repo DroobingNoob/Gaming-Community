@@ -45,14 +45,10 @@ CREATE TABLE games (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create testimonials table
+-- Create testimonials table (simplified for phone screenshots)
 CREATE TABLE testimonials (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
-  time TEXT NOT NULL,
-  message TEXT NOT NULL,
-  reply TEXT NOT NULL,
-  avatar TEXT NOT NULL,
+  image TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -101,10 +97,10 @@ INSERT INTO games (title, image, original_price, sale_price, platform, discount,
 ('Grand Theft Auto V Premium Edition', 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400', 59.99, 19.99, ARRAY['PS5'], 67, 'Experience the award-winning Grand Theft Auto V with enhanced graphics and performance on PlayStation 5.', ARRAY['Enhanced graphics', 'Complete story', 'Online multiplayer'], ARRAY['PlayStation 5 console required', '50 GB storage'], ARRAY['Permanent'], 'game'),
 ('Xbox Game Pass Ultimate (3 Months)', 'https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400', 44.99, 29.99, ARRAY['Xbox'], 33, 'Get unlimited access to hundreds of high-quality games with Xbox Game Pass Ultimate.', ARRAY['Access to 100+ games', 'Day-one releases included', 'Xbox Live Gold membership'], ARRAY['Xbox console or Windows PC', 'Internet connection required'], ARRAY['Permanent'], 'subscription');
 
--- Insert sample testimonials (with phone screenshot URLs)
-INSERT INTO testimonials (name, time, message, reply, avatar) VALUES
-('Alex StreamKing', 'Today 2:45 PM', 'Just got GTA V Premium Edition! Instant delivery as promised. You guys are amazing! 🎮', 'Thank you Alex! Enjoy your gaming session! 🚀', 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=300&h=600'),
-('Sarah GameQueen', 'Yesterday 11:30 PM', 'Had an issue at 2 AM and support resolved it within minutes! Customer service is incredible 👏', 'We''re always here to help! Thanks for choosing GameStore! 💙', 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=300&h=600');
+-- Insert sample testimonials (phone screenshots)
+INSERT INTO testimonials (image) VALUES
+('https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=300&h=600'),
+('https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=300&h=600');
 ```
 
 ## 🖼️ Image Hosting with Cloudinary
@@ -159,13 +155,9 @@ If automatic upload isn't set up, you can still use manual URLs from:
 - `created_at` (Timestamp)
 - `updated_at` (Timestamp)
 
-### Testimonials Table
+### Testimonials Table (Simplified)
 - `id` (UUID, Primary Key)
-- `name` (Text)
-- `time` (Text)
-- `message` (Text)
-- `reply` (Text)
-- `avatar` (Text URL - Phone Screenshot)
+- `image` (Text URL - Phone Screenshot)
 - `created_at` (Timestamp)
 - `updated_at` (Timestamp)
 

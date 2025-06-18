@@ -26,11 +26,7 @@ export interface Game {
 
 export interface Testimonial {
   id?: string;
-  name: string;
-  time: string;
-  message: string;
-  reply: string;
-  avatar: string;
+  image: string; // Phone screenshot URL
   created_at?: string;
   updated_at?: string;
 }

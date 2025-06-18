@@ -83,36 +83,16 @@ const Vouches: React.FC = () => {
                     {/* Screenshot Image */}
                     <div className="relative overflow-hidden rounded-xl">
                       <img
-                        src={vouch.avatar}
-                        alt={`${vouch.name} testimonial screenshot`}
+                        src={vouch.image}
+                        alt="Customer testimonial screenshot"
                         className="w-64 h-auto max-h-96 object-cover rounded-xl"
                         style={{ aspectRatio: '9/16' }} // Phone aspect ratio
                       />
-                      
-                      {/* Overlay with customer info */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                        <div className="text-white">
-                          <div className="font-semibold text-sm">{vouch.name}</div>
-                          <div className="text-xs opacity-90">{vouch.time}</div>
-                        </div>
-                      </div>
                     </div>
                   </div>
                   
                   {/* Phone Details */}
                   <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gray-600 rounded-full"></div>
-                </div>
-
-                {/* Customer Message Below Phone */}
-                <div className="mt-6 max-w-64 text-center">
-                  <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-4 shadow-lg border border-cyan-100">
-                    <p className="text-gray-700 text-sm leading-relaxed mb-3">
-                      "{vouch.message}"
-                    </p>
-                    <div className="text-xs text-gray-500 border-t border-gray-200 pt-2">
-                      <strong>Our Reply:</strong> {vouch.reply}
-                    </div>
-                  </div>
                 </div>
               </div>
             ))}
