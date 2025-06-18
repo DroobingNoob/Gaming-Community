@@ -17,7 +17,7 @@ import SubscriptionsPage from './components/SubscriptionsPage';
 import AdminPage from './components/AdminPage';
 import TermsPage from './components/TermsPage';
 import RefundPolicyPage from './components/RefundPolicyPage';
-import { Game } from './config/supabase';
+import { Game, supabase } from './config/supabase';
 
 interface CartItem {
   id: string;
@@ -35,9 +35,49 @@ function App() {
   const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames' | 'subscriptions' | 'admin' | 'terms' | 'refund'>('home');
   const [selectedProduct, setSelectedProduct] = useState<Game | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(true); // Set to true for demo - in real app check user role
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [wishlistItems, setWishlistItems] = useState<string[]>([]);
+
+  // Check authentication status on app load
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setUser(session.user);
+        setIsLoggedIn(true);
+        // Check if user is admin (you can customize this logic)
+        setIsAdmin(session.user.email === 'admin@example.com' || session.user.user_metadata?.role === 'admin');
+      }
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session) {
+        setUser(session.user);
+        setIsLoggedIn(true);
+        // Check if user is admin (you can customize this logic)
+        setIsAdmin(session.user.email === 'admin@example.com' || session.user.user_metadata?.role === 'admin');
+        
+        if (event === 'SIGNED_IN') {
+          toast.success('Successfully signed in!');
+        }
+      } else {
+        setUser(null);
+        setIsLoggedIn(false);
+        setIsAdmin(false);
+        
+        if (event === 'SIGNED_OUT') {
+          toast.success('Successfully signed out!');
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const handleViewAllGames = () => {
@@ -60,7 +100,20 @@ function App() {
   }, []);
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
+    // This will be handled by the auth state change listener
+    setIsLoginModalOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast.error('Error signing out: ' + error.message);
+      }
+    } catch (error) {
+      toast.error('An error occurred during sign out');
+      console.error('Logout error:', error);
+    }
   };
 
   const handleCartClick = () => {
@@ -192,6 +245,11 @@ function App() {
   const handleNavigation = (section: string) => {
     if (section === 'admin' && isAdmin) {
       handleViewAdmin();
+      return;
+    }
+
+    if (section === 'logout' && isLoggedIn) {
+      handleLogout();
       return;
     }
 
