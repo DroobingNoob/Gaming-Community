@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Shield, FileText, Clock, Users } from 'lucide-react';
+import { ArrowLeft, Clock, Shield, FileText, AlertTriangle, Users, Gamepad2 } from 'lucide-react';
 
 interface TermsPageProps {
   onBackToHome: () => void;
@@ -39,197 +39,203 @@ const TermsPage: React.FC<TermsPageProps> = ({ onBackToHome }) => {
         {/* Content */}
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20 space-y-8">
           
-          {/* Section 1 */}
+          {/* Rental Terms Section */}
           <section>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-2 rounded-lg">
-                <Users className="w-5 h-5 text-white" />
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="bg-gradient-to-r from-orange-400 to-red-500 p-3 rounded-lg">
+                <Clock className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">1. Acceptance of Terms</h2>
+              <h2 className="text-3xl font-bold text-gray-800">Rental Terms & Conditions</h2>
             </div>
-            <div className="text-gray-600 leading-relaxed space-y-4">
-              <p>
-                By accessing and using Gaming Community's services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
-              </p>
-              <p>
-                These terms apply to all visitors, users, and others who access or use our gaming platform and digital game distribution services.
-              </p>
-            </div>
-          </section>
 
-          {/* Section 2 */}
-          <section>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="bg-gradient-to-r from-orange-400 to-red-500 p-2 rounded-lg">
-                <Shield className="w-5 h-5 text-white" />
+            {/* Rental Duration */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-2 rounded-lg">
+                  <span className="text-white font-bold text-sm">1</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Rental Duration</h3>
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">2. Digital Game Licenses</h2>
-            </div>
-            <div className="text-gray-600 leading-relaxed space-y-4">
-              <p>
-                All digital games sold through Gaming Community are legitimate licenses obtained from authorized distributors. When you purchase a game, you receive:
-              </p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>A valid digital license key for the specified platform (PS4/PS5)</li>
-                <li>Instant delivery within 5 minutes of payment confirmation</li>
-                <li>24/7 customer support for any activation issues</li>
-                <li>Lifetime warranty on all game keys</li>
-              </ul>
-              <p>
-                Game keys are region-specific and intended for use in India. International usage may be restricted based on publisher policies.
-              </p>
-            </div>
-          </section>
-
-          {/* Section 3 */}
-          <section>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="bg-gradient-to-r from-purple-400 to-indigo-500 p-2 rounded-lg">
-                <Clock className="w-5 h-5 text-white" />
+              <div className="text-gray-600 leading-relaxed space-y-3 ml-12">
+                <p>• All rentals are valid for <strong>30 days</strong> from the activation date.</p>
+                <p>• If you wish to extend your rental, you must inform us at least <strong>7 days before the expiry date</strong>.</p>
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">3. Payment & Pricing</h2>
             </div>
-            <div className="text-gray-600 leading-relaxed space-y-4">
-              <p>
-                All prices are listed in Indian Rupees (₹) and include applicable taxes. We accept various payment methods including:
-              </p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>UPI payments (Google Pay, PhonePe, Paytm)</li>
-                <li>Bank transfers (NEFT/RTGS/IMPS)</li>
-                <li>Digital wallets</li>
-                <li>Credit/Debit cards</li>
-              </ul>
-              <p>
-                Prices may change without notice. However, orders placed before price changes will be honored at the original price.
-              </p>
+
+            {/* Account Usage & Restrictions */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-2 rounded-lg">
+                  <span className="text-white font-bold text-sm">2</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Account Usage & Restrictions</h3>
+              </div>
+              <div className="text-gray-600 leading-relaxed space-y-3 ml-12">
+                <p>• Do not change any login credentials or settings of the rental account.</p>
+                <p>• The account is strictly for playing the rented game only. Any unauthorized activity will lead to access being <strong>revoked immediately without refund</strong>.</p>
+              </div>
+            </div>
+
+            {/* Early Game Completion */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-2 rounded-lg">
+                  <span className="text-white font-bold text-sm">3</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Early Game Completion</h3>
+              </div>
+              <div className="text-gray-600 leading-relaxed space-y-3 ml-12">
+                <p>• If you finish the game before the 30-day period, you can inform us to end the rental early.</p>
+                <p>• Early return may qualify you for a <strong>special discount on your next rental</strong>.</p>
+              </div>
+            </div>
+
+            {/* Account Return Process */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-2 rounded-lg">
+                  <span className="text-white font-bold text-sm">4</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Account Return Process</h3>
+              </div>
+              <div className="text-gray-600 leading-relaxed space-y-3 ml-12">
+                <p>After your rental ends, you must send a <strong>video proof</strong> showing:</p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>The account has been logged out, and</li>
+                  <li>The account has been deleted from your console.</li>
+                </ul>
+                <p>This step is <strong>mandatory for processing future rentals</strong>.</p>
+              </div>
+            </div>
+
+            {/* Secure Communication */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-2 rounded-lg">
+                  <span className="text-white font-bold text-sm">5</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Secure Communication</h3>
+              </div>
+              <div className="text-gray-600 leading-relaxed space-y-3 ml-12">
+                <p>• Always notify us when you stop playing or complete your game.</p>
+                <p>• This helps us ensure seamless service and maintain your eligibility for future deals.</p>
+              </div>
+            </div>
+
+            {/* Game Exchange Policy */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-2 rounded-lg">
+                  <span className="text-white font-bold text-sm">6</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Game Exchange Policy</h3>
+              </div>
+              <div className="text-gray-600 leading-relaxed space-y-3 ml-12">
+                <p>• Game swaps are <strong>not allowed</strong> during an active rental.</p>
+                <p>• If you want to switch to another game, request early completion and avail a discount on your next game.</p>
+              </div>
             </div>
           </section>
 
-          {/* Section 4 */}
+          {/* Permanent Game Purchase Terms */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">4. Account Responsibilities</h2>
-            <div className="text-gray-600 leading-relaxed space-y-4">
-              <p>
-                Users are responsible for:
-              </p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Providing accurate contact information for order delivery</li>
-                <li>Securing their gaming platform accounts</li>
-                <li>Not sharing or reselling purchased game keys</li>
-                <li>Reporting any issues within 24 hours of purchase</li>
-              </ul>
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-3 rounded-lg">
+                <Gamepad2 className="w-6 h-6 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold text-gray-800">Permanent Game Purchase Terms</h2>
+            </div>
+
+            {/* Warranty Coverage */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-2 rounded-lg">
+                  <span className="text-white font-bold text-sm">1</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Warranty Coverage</h3>
+              </div>
+              <div className="text-gray-600 leading-relaxed space-y-3 ml-12">
+                <p>• All permanent games come with a <strong>6-month warranty</strong>.</p>
+                <p>• If you face any lock/access issues during this time, we will provide support, and if necessary, offer a replacement or fix.</p>
+              </div>
+            </div>
+
+            {/* Single-Device License */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-2 rounded-lg">
+                  <span className="text-white font-bold text-sm">2</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Single-Device License</h3>
+              </div>
+              <div className="text-gray-600 leading-relaxed space-y-3 ml-12">
+                <p>• Games are licensed for <strong>one device only</strong>.</p>
+                <p>• Account sharing, re-login on a second device, or unauthorized transfer will <strong>void the warranty</strong>.</p>
+              </div>
+            </div>
+
+            {/* Platform Limitation */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-2 rounded-lg">
+                  <span className="text-white font-bold text-sm">3</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Platform Limitation</h3>
+              </div>
+              <div className="text-gray-600 leading-relaxed space-y-3 ml-12">
+                <p>• The game is tied to the platform you chose (PS4 or PS5).</p>
+                <p>• Switching platforms (e.g., PS4 to PS5) is <strong>not permitted</strong>, and licenses cannot be transferred.</p>
+              </div>
+            </div>
+
+            {/* Device Stability */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-2 rounded-lg">
+                  <span className="text-white font-bold text-sm">4</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Device Stability</h3>
+              </div>
+              <div className="text-gray-600 leading-relaxed space-y-3 ml-12">
+                <p>• Do not delete or alter the game/account files from your console.</p>
+                <p>• If the account is removed before the warranty ends, <strong>support and warranty coverage become void</strong>.</p>
+              </div>
             </div>
           </section>
 
-          {/* Section 5 */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">5. Delivery & Activation</h2>
-            <div className="text-gray-600 leading-relaxed space-y-4">
-              <p>
-                Digital game keys are delivered via:
-              </p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>WhatsApp message to your registered number</li>
-                <li>Email to your provided email address</li>
-                <li>Direct message through our customer support</li>
-              </ul>
-              <p>
-                Delivery typically occurs within 5 minutes of payment confirmation. During peak hours or holidays, delivery may take up to 2 hours.
-              </p>
+          {/* Important Notices */}
+          <section className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200">
+            <div className="flex items-center space-x-3 mb-4">
+              <AlertTriangle className="w-6 h-6 text-orange-500" />
+              <h2 className="text-2xl font-bold text-gray-800">Important Notices</h2>
+            </div>
+            <div className="text-gray-700 space-y-3">
+              <p>• We provide <strong>legal, verified game accounts</strong> with secure, one-time setup and full guidance.</p>
+              <p>• By using our service, you agree to follow all the rules outlined above.</p>
+              <p>• These terms are in place to protect both the buyer and seller, and ensure a fair gaming experience.</p>
             </div>
           </section>
 
-          {/* Section 6 */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">6. Prohibited Activities</h2>
-            <div className="text-gray-600 leading-relaxed space-y-4">
-              <p>
-                The following activities are strictly prohibited:
-              </p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Attempting to resell or redistribute purchased game keys</li>
-                <li>Using fraudulent payment methods</li>
-                <li>Creating multiple accounts to abuse promotional offers</li>
-                <li>Attempting to reverse engineer or hack our systems</li>
-                <li>Harassing our customer support staff</li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Section 7 */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">7. Limitation of Liability</h2>
-            <div className="text-gray-600 leading-relaxed space-y-4">
-              <p>
-                Gaming Community shall not be liable for:
-              </p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Issues arising from platform-specific restrictions</li>
-                <li>Changes in game availability by publishers</li>
-                <li>Technical issues with gaming platforms</li>
-                <li>Loss of game progress or saved data</li>
-              </ul>
-              <p>
-                Our maximum liability is limited to the purchase price of the affected game.
-              </p>
-            </div>
-          </section>
-
-          {/* Section 8 */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">8. Privacy & Data Protection</h2>
-            <div className="text-gray-600 leading-relaxed space-y-4">
-              <p>
-                We collect and process personal information in accordance with Indian data protection laws. Your information is used solely for:
-              </p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Processing and delivering your orders</li>
-                <li>Providing customer support</li>
-                <li>Sending important service updates</li>
-                <li>Improving our services</li>
-              </ul>
-              <p>
-                We do not sell or share your personal information with third parties for marketing purposes.
-              </p>
-            </div>
-          </section>
-
-          {/* Section 9 */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">9. Modifications to Terms</h2>
-            <div className="text-gray-600 leading-relaxed space-y-4">
-              <p>
-                Gaming Community reserves the right to modify these terms at any time. Changes will be effective immediately upon posting on our website. Continued use of our services after changes constitutes acceptance of the new terms.
-              </p>
-              <p>
-                We will notify users of significant changes via email or WhatsApp when possible.
-              </p>
-            </div>
-          </section>
-
-          {/* Section 10 */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">10. Contact Information</h2>
-            <div className="text-gray-600 leading-relaxed space-y-4">
+          {/* Contact Section */}
+          <section className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-200">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Contact Information</h2>
+            <div className="text-gray-700 space-y-3">
               <p>
                 For questions about these terms or our services, contact us:
               </p>
-              <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl p-6 border border-cyan-200">
-                <ul className="space-y-3">
-                  <li className="flex items-center space-x-3">
-                    <span className="font-semibold">WhatsApp:</span>
-                    <span>+91 92665 14434</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <span className="font-semibold">Email:</span>
-                    <span>psgamingcommunity@outlook.com</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <span className="font-semibold">Support Hours:</span>
-                    <span>24/7 Available</span>
-                  </li>
-                </ul>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center space-x-3">
+                  <span className="font-semibold">WhatsApp:</span>
+                  <span>+91 92665 14434</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <span className="font-semibold">Email:</span>
+                  <span>psgamingcommunity@outlook.com</span>
+                </div>
               </div>
+              <p className="text-sm text-gray-600 mt-4">
+                Support Hours: 24/7 Available
+              </p>
             </div>
           </section>
 
