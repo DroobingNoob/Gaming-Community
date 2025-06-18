@@ -105,12 +105,7 @@ const Vouches: React.FC = () => {
             <h3 className="text-xl font-bold text-gray-800 mb-4">
               Join Thousands of Happy Gamers! 🎮
             </h3>
-            <p className="text-gray-600 mb-6">
-              Share your gaming experience and become part of our community showcase
-            </p>
-            <button className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
-              Share Your Screenshot
-            </button>
+            
           </div>
         </div>
       </div>
