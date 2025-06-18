@@ -222,6 +222,18 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     }
   };
 
+  const handleEditItem = (item: any) => {
+    setSelectedItem(item);
+    // Properly format the form data for editing
+    const editFormData = {
+      ...item,
+      features: Array.isArray(item.features) ? item.features.join('\n') : item.features || '',
+      system_requirements: Array.isArray(item.system_requirements) ? item.system_requirements.join('\n') : item.system_requirements || ''
+    };
+    setFormData(editFormData);
+    setCrudOperation('update');
+  };
+
   const renderMainMenu = () => (
     <div className="space-y-8">
       {/* Header */}
@@ -620,7 +632,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Features (one per line)</label>
                   <textarea
-                    value={Array.isArray(formData.features) ? formData.features.join('\n') : formData.features || ''}
+                    value={formData.features || ''}
                     onChange={(e) => setFormData({ ...formData, features: e.target.value })}
                     rows={4}
                     className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
@@ -632,7 +644,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-3">System Requirements (one per line)</label>
                   <textarea
-                    value={Array.isArray(formData.system_requirements) ? formData.system_requirements.join('\n') : formData.system_requirements || ''}
+                    value={formData.system_requirements || ''}
                     onChange={(e) => setFormData({ ...formData, system_requirements: e.target.value })}
                     rows={4}
                     className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
@@ -713,11 +725,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               
               <div className="flex space-x-3">
                 <button
-                  onClick={() => {
-                    setSelectedItem(item);
-                    setFormData(item);
-                    setCrudOperation('update');
-                  }}
+                  onClick={() => handleEditItem(item)}
                   className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white p-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   <Edit className="w-5 h-5" />

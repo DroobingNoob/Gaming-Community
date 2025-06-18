@@ -40,6 +40,7 @@ export const gamesService = {
   // Add new game
   async add(game: Omit<Game, 'id' | 'created_at' | 'updated_at'>): Promise<string> {
     try {
+      // Insert without authentication check - let RLS handle it
       const { data, error } = await supabase
         .from('games')
         .insert([{
@@ -49,7 +50,10 @@ export const gamesService = {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       return data.id;
     } catch (error) {
       console.error('Error adding game:', error);
@@ -68,7 +72,10 @@ export const gamesService = {
         })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
     } catch (error) {
       console.error('Error updating game:', error);
       throw error;
@@ -83,7 +90,10 @@ export const gamesService = {
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
     } catch (error) {
       console.error('Error deleting game:', error);
       throw error;
@@ -122,7 +132,10 @@ export const subscriptionsService = {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       return data.id;
     } catch (error) {
       console.error('Error adding subscription:', error);
@@ -141,7 +154,10 @@ export const subscriptionsService = {
         })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
     } catch (error) {
       console.error('Error updating subscription:', error);
       throw error;
@@ -156,7 +172,10 @@ export const subscriptionsService = {
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
     } catch (error) {
       console.error('Error deleting subscription:', error);
       throw error;
@@ -191,7 +210,10 @@ export const testimonialsService = {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       return data.id;
     } catch (error) {
       console.error('Error adding testimonial:', error);
@@ -210,7 +232,10 @@ export const testimonialsService = {
         })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
     } catch (error) {
       console.error('Error updating testimonial:', error);
       throw error;
@@ -225,7 +250,10 @@ export const testimonialsService = {
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
     } catch (error) {
       console.error('Error deleting testimonial:', error);
       throw error;
