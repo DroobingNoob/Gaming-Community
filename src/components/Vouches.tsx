@@ -105,7 +105,7 @@ const Vouches: React.FC = () => {
             <h3 className="text-xl font-bold text-gray-800 mb-4">
               Join Thousands of Happy Gamers! 🎮
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-2">
               Game Smarter, Save Bigger
             </p>
           </div>
