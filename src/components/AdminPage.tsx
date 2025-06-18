@@ -32,6 +32,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', 'gaming_community'); // You'll need to create this preset
+    formData.append('quality', 'auto:best'); // Cloudinary auto quality optimization
+    formData.append('fetch_format', 'auto'); // Auto format selection
     
     try {
       const response = await fetch(
@@ -54,7 +56,84 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     }
   };
 
-  // Handle file upload with cropping for product cards
+  // Enhanced image processing function
+  const processImage = (file: File, isTestimonial: boolean): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        try {
+          if (isTestimonial) {
+            // For testimonials (phone screenshots), maintain original aspect ratio but optimize quality
+            const maxWidth = 600;
+            const maxHeight = 1200;
+            
+            let { width, height } = img;
+            
+            // Scale down if too large while maintaining aspect ratio
+            if (width > maxWidth || height > maxHeight) {
+              const ratio = Math.min(maxWidth / width, maxHeight / height);
+              width *= ratio;
+              height *= ratio;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Use high-quality rendering
+            ctx!.imageSmoothingEnabled = true;
+            ctx!.imageSmoothingQuality = 'high';
+            
+            // Draw the image
+            ctx!.drawImage(img, 0, 0, width, height);
+          } else {
+            // For game images, create perfect square with high quality
+            const targetSize = 600; // Increased from 400 for better quality
+            canvas.width = targetSize;
+            canvas.height = targetSize;
+            
+            // Use high-quality rendering
+            ctx!.imageSmoothingEnabled = true;
+            ctx!.imageSmoothingQuality = 'high';
+            
+            // Calculate crop dimensions to maintain aspect ratio
+            const minDimension = Math.min(img.width, img.height);
+            const cropX = (img.width - minDimension) / 2;
+            const cropY = (img.height - minDimension) / 2;
+            
+            // Draw cropped and resized image with high quality
+            ctx!.drawImage(
+              img,
+              cropX, cropY, minDimension, minDimension, // Source crop
+              0, 0, targetSize, targetSize // Destination size
+            );
+          }
+          
+          // Convert canvas to blob with high quality
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const processedFile = new File([blob], file.name, { 
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              });
+              resolve(processedFile);
+            } else {
+              reject(new Error('Failed to process image'));
+            }
+          }, 'image/jpeg', 0.95); // High quality JPEG (95%)
+        } catch (error) {
+          reject(error);
+        }
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // Handle file upload with enhanced processing
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -65,65 +144,32 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       return;
     }
 
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image size should be less than 10MB');
+    // Validate file size (max 20MB for better quality support)
+    if (file.size > 20 * 1024 * 1024) {
+      toast.error('Image size should be less than 20MB');
       return;
     }
 
     try {
       setUploading(true);
-      toast.info('Processing and uploading image...');
+      toast.info('Processing and optimizing image...');
       
-      // Create canvas for cropping to square aspect ratio
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const img = new Image();
+      const isTestimonial = activeSection === 'testimonials';
       
-      img.onload = async () => {
-        // Set canvas size to square (400x400 for product cards)
-        const size = 400;
-        canvas.width = size;
-        canvas.height = size;
-        
-        // Calculate crop dimensions to maintain aspect ratio
-        const minDimension = Math.min(img.width, img.height);
-        const cropX = (img.width - minDimension) / 2;
-        const cropY = (img.height - minDimension) / 2;
-        
-        // Draw cropped and resized image
-        ctx?.drawImage(
-          img,
-          cropX, cropY, minDimension, minDimension, // Source crop
-          0, 0, size, size // Destination size
-        );
-        
-        // Convert canvas to blob
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            try {
-              // Create file from blob
-              const croppedFile = new File([blob], file.name, { type: 'image/jpeg' });
-              
-              // Upload to Cloudinary
-              const imageUrl = await uploadToCloudinary(croppedFile);
-              
-              setFormData({ ...formData, [fieldName]: imageUrl });
-              toast.success('Image processed and uploaded successfully!');
-            } catch (error) {
-              toast.error('Failed to upload processed image. Please try again.');
-              console.error(error);
-            } finally {
-              setUploading(false);
-            }
-          }
-        }, 'image/jpeg', 0.9);
-      };
+      // Process the image for optimal quality
+      const processedFile = await processImage(file, isTestimonial);
       
-      img.src = URL.createObjectURL(file);
+      toast.info('Uploading to Cloudinary...');
+      
+      // Upload to Cloudinary
+      const imageUrl = await uploadToCloudinary(processedFile);
+      
+      setFormData({ ...formData, [fieldName]: imageUrl });
+      toast.success('Image uploaded successfully with optimal quality!');
     } catch (error) {
-      toast.error('Failed to process image. Please try again.');
+      toast.error('Failed to process and upload image. Please try again.');
       console.error(error);
+    } finally {
       setUploading(false);
     }
   };
@@ -247,7 +293,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           </h2>
         </div>
         <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-          Manage your gaming community content with ease. Upload images, add games, and update testimonials.
+          Manage your gaming community content with ease. Upload high-quality images, add games, and update testimonials.
         </p>
       </div>
       
@@ -304,7 +350,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               Upload Screenshots
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Upload customer phone screenshots and testimonials. Drag & drop images with automatic Cloudinary integration.
+              Upload customer phone screenshots with automatic optimization. High-quality processing with Cloudinary integration.
             </p>
             <div className="mt-6 inline-flex items-center space-x-2 text-cyan-600 font-medium">
               <span>Manage Screenshots</span>
@@ -325,7 +371,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               Manage Stock
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Manage games and subscription inventory. Add new products, update pricing, and organize your catalog.
+              Manage games and subscription inventory with high-quality image processing. Auto-cropping and optimization included.
             </p>
             <div className="mt-6 inline-flex items-center space-x-2 text-orange-600 font-medium">
               <span>Manage Inventory</span>
@@ -430,7 +476,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             {/* Image Upload Section */}
             <div className={isTestimonial ? "md:col-span-2" : "md:col-span-2"}>
               <label className="block text-lg font-semibold text-gray-700 mb-4">
-                {isTestimonial ? 'Phone Screenshot Upload' : 'Game Image Upload (Auto-cropped to square)'}
+                {isTestimonial ? 'Phone Screenshot Upload (High Quality)' : 'Game Image Upload (Auto-cropped to 600x600px)'}
               </label>
               
               {/* File Upload Option */}
@@ -456,8 +502,14 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                         {uploading ? 'Processing & Uploading...' : `Click to upload ${isTestimonial ? 'phone screenshot' : 'game image'}`}
                       </span>
                       <span className="text-sm text-gray-500">
-                        {isTestimonial ? 'Phone resolution (9:16 aspect ratio recommended)' : 'Will be auto-cropped to square format (400x400px)'}
+                        {isTestimonial 
+                          ? 'Phone resolution optimized automatically (max 600x1200px)' 
+                          : 'Will be auto-cropped to square format (600x600px) with high quality'
+                        }
                       </span>
+                      <div className="mt-2 text-xs text-gray-400">
+                        Supports: JPG, PNG, WebP • Max size: 20MB • Auto-optimized for web
+                      </div>
                     </div>
                   </label>
                 </div>
@@ -490,6 +542,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                         toast.error('Invalid image URL');
                       }}
                     />
+                    <div className="mt-2 text-center text-sm text-gray-500">
+                      {isTestimonial ? 'Phone Screenshot Preview' : 'Game Image Preview (600x600px when uploaded)'}
+                    </div>
                   </div>
                 )}
 
@@ -500,13 +555,15 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                       <Upload className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-blue-800 mb-3">Cloudinary Setup Required:</h4>
-                      <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
-                        <li>Create account at <a href="https://cloudinary.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">cloudinary.com</a></li>
-                        <li>Replace "dcodirzsc" in the code with your actual cloud name</li>
-                        <li>Create an unsigned upload preset named "gaming_community"</li>
-                        <li>Enable unsigned uploads in your Cloudinary settings</li>
-                      </ol>
+                      <h4 className="font-semibold text-blue-800 mb-3">High-Quality Upload Features:</h4>
+                      <ul className="text-sm text-blue-700 space-y-2 list-disc list-inside">
+                        <li>Automatic image optimization and compression</li>
+                        <li>High-quality JPEG output (95% quality)</li>
+                        <li>Smart cropping for game images (perfect squares)</li>
+                        <li>Aspect ratio preservation for phone screenshots</li>
+                        <li>WebP format support for modern browsers</li>
+                        <li>Global CDN delivery for fast loading</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
@@ -662,7 +719,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-3 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <Save className="w-5 h-5" />
-              <span>{loading ? 'Saving...' : uploading ? 'Uploading...' : 'Save'}</span>
+              <span>{loading ? 'Saving...' : uploading ? 'Processing...' : 'Save'}</span>
             </button>
             <button
               onClick={() => {
