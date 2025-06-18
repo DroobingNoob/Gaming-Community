@@ -11,7 +11,7 @@ interface SubscriptionsPageProps {
 const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBackToHome }) => {
   const { subscriptions, loading, error } = useSubscriptions();
   const [searchQuery, setSearchQuery] = useState('');
-  const [priceRange, setPriceRange] = useState([0, 300]);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [sortBy, setSortBy] = useState('name-asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -163,13 +163,13 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
               {/* Price Range */}
               <div className="mb-4 sm:mb-6">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Price Range: ${priceRange[0]} - ${priceRange[1]}
+                  Price Range: ₹{priceRange[0]} - ₹{priceRange[1]}
                 </label>
                 <div className="space-y-2">
                   <input
                     type="range"
                     min="0"
-                    max="300"
+                    max="10000"
                     value={priceRange[0]}
                     onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
                     className="w-full"
@@ -177,7 +177,7 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
                   <input
                     type="range"
                     min="0"
-                    max="300"
+                    max="10000"
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
                     className="w-full"
@@ -245,11 +245,11 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
                       </h3>
                       <div className="flex items-center space-x-1 sm:space-x-2 mb-2 sm:mb-3">
                         <span className="text-sm sm:text-lg font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                          ${subscription.sale_price}
+                          ₹{subscription.sale_price}
                         </span>
                         {subscription.original_price > subscription.sale_price && (
                           <span className="text-xs sm:text-sm text-gray-500 line-through">
-                            ${subscription.original_price}
+                            ₹{subscription.original_price}
                           </span>
                         )}
                       </div>
@@ -288,11 +288,11 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
                           <div className="text-left sm:text-right">
                             <div className="flex items-center space-x-2 mb-2 sm:mb-3">
                               <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                                ${subscription.sale_price}
+                                ₹{subscription.sale_price}
                               </span>
                               {subscription.original_price > subscription.sale_price && (
                                 <span className="text-sm sm:text-lg text-gray-500 line-through">
-                                  ${subscription.original_price}
+                                  ₹{subscription.original_price}
                                 </span>
                               )}
                             </div>

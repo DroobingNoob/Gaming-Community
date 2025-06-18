@@ -1,15 +1,30 @@
 import React from 'react';
 import { Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  onNavigation?: (section: string) => void;
+}
+
+const Footer: React.FC<FooterProps> = ({ onNavigation }) => {
   const quickLinks = [
     { name: 'About Us', href: '#about' },
-    { name: 'Contact', href: '#contact' },
-    { name: 'Privacy Policy', href: '#privacy' },
-    { name: 'Terms & Conditions', href: '#terms' },
-    { name: 'Cancellation & Refund Policy', href: '#refund' },
-    { name: 'Shipping & Delivery Policy', href: '#shipping' }
+    { name: 'Contact', action: 'contact' },
+    { name: 'Terms & Conditions', action: 'terms' },
+    { name: 'Cancellation & Refund Policy', action: 'refund' }
   ];
+
+  const handleLinkClick = (link: any) => {
+    if (link.action && onNavigation) {
+      onNavigation(link.action);
+    }
+  };
+
+  const handleWhatsAppClick = () => {
+    const phoneNumber = '9266514434';
+    const message = 'Hi! I need help with my gaming purchase.';
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   return (
     <footer className="bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 text-white relative overflow-hidden">
@@ -22,7 +37,7 @@ const Footer: React.FC = () => {
       
       <div className="container mx-auto px-3 sm:px-4 py-8 sm:py-12 md:py-16 relative">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
           
           {/* Brand Section */}
           <div className="lg:col-span-2">
@@ -43,12 +58,15 @@ const Footer: React.FC = () => {
             
             {/* Contact Info */}
             <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-              <div className="flex items-center space-x-3 text-gray-300 hover:text-cyan-400 transition-colors">
+              <button 
+                onClick={handleWhatsAppClick}
+                className="flex items-center space-x-3 text-gray-300 hover:text-cyan-400 transition-colors w-full text-left"
+              >
                 <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-1.5 sm:p-2 rounded-lg">
                   <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
                 <span className="text-sm sm:text-base">+91 92665 14434</span>
-              </div>
+              </button>
               <div className="flex items-center space-x-3 text-gray-300 hover:text-cyan-400 transition-colors">
                 <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-1.5 sm:p-2 rounded-lg">
                   <Mail className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
@@ -88,30 +106,14 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-white bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Quick Links</h3>
             <div className="space-y-2 sm:space-y-3">
-              {quickLinks.slice(0, 3).map((link) => (
-                <a
+              {quickLinks.map((link) => (
+                <button
                   key={link.name}
-                  href={link.href}
-                  className="block text-gray-300 hover:text-cyan-400 transition-all duration-300 hover:translate-x-2 transform hover:bg-gray-800/30 p-2 rounded-lg text-sm sm:text-base"
+                  onClick={() => handleLinkClick(link)}
+                  className="block w-full text-left text-gray-300 hover:text-cyan-400 transition-all duration-300 hover:translate-x-2 transform hover:bg-gray-800/30 p-2 rounded-lg text-sm sm:text-base"
                 >
                   {link.name}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Policies */}
-          <div>
-            <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-white bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Policies</h3>
-            <div className="space-y-2 sm:space-y-3">
-              {quickLinks.slice(3).map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="block text-gray-300 hover:text-orange-400 transition-all duration-300 hover:translate-x-2 transform hover:bg-gray-800/30 p-2 rounded-lg text-sm sm:text-base"
-                >
-                  {link.name}
-                </a>
+                </button>
               ))}
             </div>
           </div>

@@ -15,6 +15,8 @@ import ProductPage from './components/ProductPage';
 import AllGamesPage from './components/AllGamesPage';
 import SubscriptionsPage from './components/SubscriptionsPage';
 import AdminPage from './components/AdminPage';
+import TermsPage from './components/TermsPage';
+import RefundPolicyPage from './components/RefundPolicyPage';
 import { Game } from './config/supabase';
 
 interface CartItem {
@@ -30,11 +32,12 @@ interface CartItem {
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames' | 'subscriptions' | 'admin'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames' | 'subscriptions' | 'admin' | 'terms' | 'refund'>('home');
   const [selectedProduct, setSelectedProduct] = useState<Game | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(true); // Set to true for demo - in real app check user role
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [wishlistItems, setWishlistItems] = useState<string[]>([]);
 
   useEffect(() => {
     const handleViewAllGames = () => {
@@ -92,10 +95,14 @@ function App() {
   };
 
   const handleAddToCart = (product: Game, platform: string, type: string, price: number) => {
+    if (!isLoggedIn) {
+      toast.error('Please login to add items to cart');
+      setIsLoginModalOpen(true);
+      return;
+    }
+
     const itemId = `${product.id}-${platform}-${type}`;
-    const existingItem = cartItems.find(item => 
-      item.id === itemId
-    );
+    const existingItem = cartItems.find(item => item.id === itemId);
     
     if (existingItem) {
       setCartItems(items =>
@@ -118,7 +125,6 @@ function App() {
       setCartItems(items => [...items, newCartItem]);
     }
     
-    // Show success toast
     toast.success(`${product.title} added to cart!`, {
       position: "top-right",
       autoClose: 3000,
@@ -127,6 +133,41 @@ function App() {
       pauseOnHover: true,
       draggable: true,
     });
+  };
+
+  const handleBuyNow = (product: Game, platform: string, type: string, price: number) => {
+    if (!isLoggedIn) {
+      toast.error('Please login to purchase');
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    // Add to cart first
+    handleAddToCart(product, platform, type, price);
+    
+    // Open WhatsApp for purchase
+    const phoneNumber = '9266514434';
+    const message = `Hi! I want to buy ${product.title} for ${platform} (${type}) - ₹${price}. Please help me complete the purchase.`;
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    
+    toast.success('Redirecting to WhatsApp for purchase completion!');
+  };
+
+  const handleToggleWishlist = (productId: string) => {
+    if (!isLoggedIn) {
+      toast.error('Please login to add items to wishlist');
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    if (wishlistItems.includes(productId)) {
+      setWishlistItems(items => items.filter(id => id !== productId));
+      toast.success('Removed from wishlist');
+    } else {
+      setWishlistItems(items => [...items, productId]);
+      toast.success('Added to wishlist');
+    }
   };
 
   const handleUpdateQuantity = (id: string, quantity: number) => {
@@ -153,6 +194,27 @@ function App() {
       handleViewAdmin();
       return;
     }
+
+    if (section === 'contact') {
+      // Open WhatsApp for contact
+      const phoneNumber = '9266514434';
+      const message = 'Hi! I need help with my gaming purchase.';
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+      return;
+    }
+
+    if (section === 'terms') {
+      setCurrentView('terms');
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    if (section === 'refund') {
+      setCurrentView('refund');
+      window.scrollTo(0, 0);
+      return;
+    }
     
     if (currentView !== 'home') {
       setCurrentView('home');
@@ -164,6 +226,78 @@ function App() {
       scrollToSection(section);
     }
   };
+
+  if (currentView === 'terms') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+        <Header
+          onLoginClick={() => setIsLoginModalOpen(true)}
+          onCartClick={handleCartClick}
+          isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
+          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+          onNavigation={handleNavigation}
+        />
+        
+        <TermsPage onBackToHome={handleBackToHome} />
+
+        <Footer />
+
+        <LoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          onLogin={handleLogin}
+        />
+
+        <CartModal
+          isOpen={isCartModalOpen}
+          onClose={() => setIsCartModalOpen(false)}
+          cartItems={cartItems}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+        />
+
+        <WhatsAppButton />
+        <ToastContainer />
+      </div>
+    );
+  }
+
+  if (currentView === 'refund') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+        <Header
+          onLoginClick={() => setIsLoginModalOpen(true)}
+          onCartClick={handleCartClick}
+          isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
+          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+          onNavigation={handleNavigation}
+        />
+        
+        <RefundPolicyPage onBackToHome={handleBackToHome} />
+
+        <Footer />
+
+        <LoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          onLogin={handleLogin}
+        />
+
+        <CartModal
+          isOpen={isCartModalOpen}
+          onClose={() => setIsCartModalOpen(false)}
+          cartItems={cartItems}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+        />
+
+        <WhatsAppButton />
+        <ToastContainer />
+      </div>
+    );
+  }
 
   if (currentView === 'admin') {
     return (
@@ -214,6 +348,10 @@ function App() {
         <ProductPage
           product={selectedProduct}
           onAddToCart={handleAddToCart}
+          onBuyNow={handleBuyNow}
+          onToggleWishlist={handleToggleWishlist}
+          isInWishlist={wishlistItems.includes(selectedProduct.id || '')}
+          isLoggedIn={isLoggedIn}
           onBackToHome={handleBackToHome}
           onGameClick={handleGameClick}
         />

@@ -1,26 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, Clock, Headphones, Share2, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Shield, Clock, Headphones, Share2, ChevronDown, ChevronUp, Heart, ShoppingCart } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Game } from '../config/supabase';
+import { useGames, useSubscriptions } from '../hooks/useSupabaseData';
+import CustomerScreenshots from './CustomerScreenshots';
 
 interface ProductPageProps {
   product: Game;
   onAddToCart: (product: Game, platform: string, type: string, price: number) => void;
+  onBuyNow: (product: Game, platform: string, type: string, price: number) => void;
+  onToggleWishlist: (productId: string) => void;
+  isInWishlist: boolean;
+  isLoggedIn: boolean;
   onBackToHome: () => void;
   onGameClick: (game: Game) => void;
 }
 
-const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackToHome, onGameClick }) => {
+const ProductPage: React.FC<ProductPageProps> = ({ 
+  product, 
+  onAddToCart, 
+  onBuyNow, 
+  onToggleWishlist, 
+  isInWishlist, 
+  isLoggedIn, 
+  onBackToHome, 
+  onGameClick 
+}) => {
   const [activeAccordion, setActiveAccordion] = useState<string | null>('details');
   const [isImageSticky, setIsImageSticky] = useState(true);
   const [selectedPlatform, setSelectedPlatform] = useState(product.platform[0] || 'PS5');
   const [selectedType, setSelectedType] = useState(product.type[0] || 'Permanent');
 
+  // Get related products from database
+  const { games } = useGames();
+  const { subscriptions } = useSubscriptions();
+
+  // Filter related products (same category, different from current product)
+  const relatedProducts = product.category === 'game' 
+    ? games.filter(game => game.id !== product.id).slice(0, 4)
+    : subscriptions.filter(sub => sub.id !== product.id).slice(0, 4);
+
   useEffect(() => {
     const handleScroll = () => {
-      const testimonialsSection = document.getElementById('testimonials-section');
-      if (testimonialsSection) {
-        const rect = testimonialsSection.getBoundingClientRect();
+      const screenshotsSection = document.getElementById('screenshots-section');
+      if (screenshotsSection) {
+        const rect = screenshotsSection.getBoundingClientRect();
         setIsImageSticky(rect.top > 0);
       }
     };
@@ -28,52 +52,6 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const testimonials = [
-    {
-      name: "GameMaster_Pro",
-      time: "2 hours ago",
-      message: "Just downloaded this game! Works perfectly on PS5. Thanks Gaming Community! 🎮",
-      avatar: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150"
-    },
-    {
-      name: "StreamQueen",
-      time: "1 day ago", 
-      message: "Amazing price! Got it instantly after payment. Will definitely buy more games here! ⭐⭐⭐⭐⭐",
-      avatar: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150&h=150"
-    }
-  ];
-
-  const relatedGames: Game[] = [
-    {
-      id: '2',
-      title: "Black Myth: Wukong",
-      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      sale_price: 49.99,
-      original_price: 69.99,
-      platform: ["PS5"],
-      discount: 29,
-      description: "Embark on an epic journey as the legendary Monkey King in this action RPG inspired by the classic Chinese novel Journey to the West.",
-      features: ["Epic single-player adventure", "Stunning next-gen graphics", "Challenging boss battles"],
-      system_requirements: ["PlayStation 5 console required", "45 GB available storage space"],
-      type: ["Permanent"],
-      category: 'game'
-    },
-    {
-      id: '5',
-      title: "Spider-Man 2",
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=400",
-      sale_price: 39.99,
-      original_price: 69.99,
-      platform: ["PS5"],
-      discount: 43,
-      description: "Swing through New York City as both Peter Parker and Miles Morales in this spectacular superhero adventure.",
-      features: ["Play as both Spider-Men", "Enhanced web-swinging", "New York City open world"],
-      system_requirements: ["PlayStation 5 console required", "48 GB available storage space"],
-      type: ["Permanent"],
-      category: 'game'
-    }
-  ];
 
   const faqs = [
     {
@@ -121,6 +99,11 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
   const handleAddToCart = () => {
     const price = calculatePrice();
     onAddToCart(product, selectedPlatform, selectedType, price);
+  };
+
+  const handleBuyNow = () => {
+    const price = calculatePrice();
+    onBuyNow(product, selectedPlatform, selectedType, price);
   };
 
   return (
@@ -206,11 +189,11 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                 {/* Pricing */}
                 <div className="flex items-center space-x-4 mb-8">
                   <span className="text-5xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                    ${calculatePrice().toFixed(2)}
+                    ₹{calculatePrice().toFixed(2)}
                   </span>
                   {selectedType === 'Rent' && (
                     <span className="text-2xl text-gray-500 line-through">
-                      ${product.sale_price}
+                      ₹{product.sale_price}
                     </span>
                   )}
                   <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-full text-lg font-bold shadow-lg">
@@ -222,20 +205,33 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
                 <div className="space-y-4 mb-8">
                   <button
                     onClick={handleAddToCart}
-                    className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-4 rounded-xl font-bold text-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                    className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-4 rounded-xl font-bold text-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
                   >
-                    Add to Cart
+                    <ShoppingCart className="w-6 h-6" />
+                    <span>Add to Cart</span>
                   </button>
-                  <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-4 rounded-xl font-bold text-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                  <button 
+                    onClick={handleBuyNow}
+                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-4 rounded-xl font-bold text-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  >
                     Buy Now
                   </button>
-                  <button
-                    onClick={handleShare}
-                    className="w-full border-2 border-cyan-400 text-cyan-600 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-blue-500 hover:text-white py-4 rounded-xl font-bold text-xl transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
-                  >
-                    <Share2 className="w-5 h-5" />
-                    <span>Share</span>
-                  </button>
+                  <div className="flex space-x-4">
+                    <button
+                      onClick={() => onToggleWishlist(product.id || '')}
+                      className={`flex-1 border-2 ${isInWishlist ? 'border-red-400 bg-red-50 text-red-600' : 'border-cyan-400 text-cyan-600'} hover:bg-gradient-to-r hover:from-cyan-400 hover:to-blue-500 hover:text-white py-4 rounded-xl font-bold text-xl transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl`}
+                    >
+                      <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+                      <span>{isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}</span>
+                    </button>
+                    <button
+                      onClick={handleShare}
+                      className="flex-1 border-2 border-gray-400 text-gray-600 hover:bg-gradient-to-r hover:from-gray-400 hover:to-gray-500 hover:text-white py-4 rounded-xl font-bold text-xl transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                    >
+                      <Share2 className="w-5 h-5" />
+                      <span>Share</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Trust Labels */}
@@ -426,11 +422,11 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
               {/* Pricing */}
               <div className="flex items-center space-x-3 sm:space-x-4 mb-6">
                 <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                  ${calculatePrice().toFixed(2)}
+                  ₹{calculatePrice().toFixed(2)}
                 </span>
                 {selectedType === 'Rent' && (
                   <span className="text-xl sm:text-2xl text-gray-500 line-through">
-                    ${product.sale_price}
+                    ₹{product.sale_price}
                   </span>
                 )}
                 <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
@@ -442,20 +438,33 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
               <div className="space-y-3 mb-6 sm:mb-8">
                 <button
                   onClick={handleAddToCart}
-                  className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
                 >
-                  Add to Cart
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>Add to Cart</span>
                 </button>
-                <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                <button 
+                  onClick={handleBuyNow}
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
                   Buy Now
                 </button>
-                <button
-                  onClick={handleShare}
-                  className="w-full border-2 border-cyan-400 text-cyan-600 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-blue-500 hover:text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
-                >
-                  <Share2 className="w-5 h-5" />
-                  <span>Share</span>
-                </button>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => onToggleWishlist(product.id || '')}
+                    className={`flex-1 border-2 ${isInWishlist ? 'border-red-400 bg-red-50 text-red-600' : 'border-cyan-400 text-cyan-600'} hover:bg-gradient-to-r hover:from-cyan-400 hover:to-blue-500 hover:text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl`}
+                  >
+                    <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
+                    <span>{isInWishlist ? 'Wishlisted' : 'Wishlist'}</span>
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    className="flex-1 border-2 border-gray-400 text-gray-600 hover:bg-gradient-to-r hover:from-gray-400 hover:to-gray-500 hover:text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    <span>Share</span>
+                  </button>
+                </div>
               </div>
 
               {/* Trust Labels */}
@@ -552,59 +561,41 @@ const ProductPage: React.FC<ProductPageProps> = ({ product, onAddToCart, onBackT
           </div>
         </div>
 
-        {/* Testimonials Section */}
-        <div id="testimonials-section" className="mb-8 sm:mb-12">
-          <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">Customer Reviews</h3>
-          <div className="space-y-3 sm:space-y-4">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-white/20">
-                <div className="flex items-start space-x-3 sm:space-x-4">
-                  <img
-                    src={testimonial.avatar}
-                    alt={testimonial.name}
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className="font-bold text-gray-800 text-sm sm:text-base">{testimonial.name}</span>
-                      <span className="text-gray-500 text-xs sm:text-sm">{testimonial.time}</span>
-                    </div>
-                    <p className="text-gray-600 text-sm sm:text-base">{testimonial.message}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Customer Screenshots Section */}
+        <div id="screenshots-section" className="mb-8 sm:mb-12">
+          <CustomerScreenshots />
         </div>
 
         {/* You May Also Like */}
-        <div className="mb-8 sm:mb-12">
-          <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">You May Also Like</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-            {relatedGames.map((game) => (
-              <div 
-                key={game.id} 
-                className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 sm:hover:-translate-y-2"
-                onClick={() => onGameClick(game)}
-              >
-                <img
-                  src={game.image}
-                  alt={game.title}
-                  className="w-full aspect-square object-cover"
-                />
-                <div className="p-3 sm:p-4">
-                  <h4 className="font-bold text-gray-800 text-xs sm:text-sm mb-2 line-clamp-2">
-                    {game.title}
-                  </h4>
-                  <div className="flex items-center space-x-1 sm:space-x-2">
-                    <span className="text-orange-500 font-bold text-sm sm:text-base">${game.sale_price}</span>
-                    <span className="text-gray-500 line-through text-xs sm:text-sm">${game.original_price}</span>
+        {relatedProducts.length > 0 && (
+          <div className="mb-8 sm:mb-12">
+            <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">You May Also Like</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+              {relatedProducts.map((item) => (
+                <div 
+                  key={item.id} 
+                  className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 sm:hover:-translate-y-2"
+                  onClick={() => onGameClick(item)}
+                >
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full aspect-square object-cover"
+                  />
+                  <div className="p-3 sm:p-4">
+                    <h4 className="font-bold text-gray-800 text-xs sm:text-sm mb-2 line-clamp-2">
+                      {item.title}
+                    </h4>
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <span className="text-orange-500 font-bold text-sm sm:text-base">₹{item.sale_price}</span>
+                      <span className="text-gray-500 line-through text-xs sm:text-sm">₹{item.original_price}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

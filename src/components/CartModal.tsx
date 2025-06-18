@@ -2,7 +2,7 @@ import React from 'react';
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
 
 interface CartItem {
-  id: number;
+  id: string;
   title: string;
   price: number;
   quantity: number;
@@ -15,8 +15,8 @@ interface CartModalProps {
   isOpen: boolean;
   onClose: () => void;
   cartItems: CartItem[];
-  onUpdateQuantity: (id: number, quantity: number) => void;
-  onRemoveItem: (id: number) => void;
+  onUpdateQuantity: (id: string, quantity: number) => void;
+  onRemoveItem: (id: string) => void;
 }
 
 const CartModal: React.FC<CartModalProps> = ({ 
@@ -29,6 +29,16 @@ const CartModal: React.FC<CartModalProps> = ({
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  const handleCheckout = () => {
+    const phoneNumber = '9266514434';
+    const itemsList = cartItems.map(item => 
+      `${item.title} (${item.platform}, ${item.type}) - ₹${item.price} x ${item.quantity}`
+    ).join('\n');
+    const message = `Hi! I want to purchase these games:\n\n${itemsList}\n\nTotal: ₹${total.toFixed(2)}\n\nPlease help me complete the purchase.`;
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -59,7 +69,7 @@ const CartModal: React.FC<CartModalProps> = ({
           ) : (
             <div className="space-y-4">
               {cartItems.map((item) => (
-                <div key={`${item.id}-${item.platform}-${item.type}`} className="flex items-center space-x-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-4 shadow-lg border border-white/20">
+                <div key={item.id} className="flex items-center space-x-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-4 shadow-lg border border-white/20">
                   <img
                     src={item.image}
                     alt={item.title}
@@ -72,7 +82,7 @@ const CartModal: React.FC<CartModalProps> = ({
                       <span className="bg-cyan-400 text-white px-2 py-1 rounded text-xs">{item.platform}</span>
                       <span className="bg-orange-500 text-white px-2 py-1 rounded text-xs">{item.type}</span>
                     </div>
-                    <p className="text-cyan-600 font-bold">${item.price}</p>
+                    <p className="text-cyan-600 font-bold">₹{item.price}</p>
                   </div>
 
                   <div className="flex items-center space-x-2">
@@ -110,9 +120,12 @@ const CartModal: React.FC<CartModalProps> = ({
           <div className="border-t border-gray-200 p-6 bg-gradient-to-r from-gray-50 to-blue-50">
             <div className="flex justify-between items-center mb-4">
               <span className="text-xl font-bold text-gray-800">Total:</span>
-              <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">${total.toFixed(2)}</span>
+              <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">₹{total.toFixed(2)}</span>
             </div>
-            <button className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-bold text-lg transition-colors shadow-lg hover:shadow-xl transform hover:scale-105">
+            <button 
+              onClick={handleCheckout}
+              className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-bold text-lg transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
               Proceed to Checkout
             </button>
           </div>
