@@ -60,10 +60,11 @@ function App() {
         setUser(session.user);
         setIsLoggedIn(true);
         // Check if user is admin (you can customize this logic)
-        setIsAdmin(session.user.email === 'admin@example.com' || session.user.user_metadata?.role === 'admin');
+        setIsAdmin(session.user.email === 'communitygamiing1@gmail.com' || session.user.user_metadata?.role === 'admin');
         
         if (event === 'SIGNED_IN') {
           toast.success('Successfully signed in!');
+          setIsLoginModalOpen(false);
         }
       } else {
         setUser(null);
