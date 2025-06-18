@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingCart, User, Menu, X, Shield } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, Shield, LogOut } from 'lucide-react';
 import { useGames, useSubscriptions } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
 
@@ -10,9 +10,10 @@ interface HeaderProps {
   isAdmin?: boolean;
   cartItemCount: number;
   onNavigation: (section: string) => void;
+  user?: any;
 }
 
-const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, isAdmin, cartItemCount, onNavigation }) => {
+const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, isAdmin, cartItemCount, onNavigation, user }) => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -126,13 +127,31 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
 
                 {/* Auth & Cart */}
                 <div className="flex items-center space-x-4 flex-1 justify-end">
-                  <button
-                    onClick={onLoginClick}
-                    className="flex items-center space-x-2 px-4 py-2 text-cyan-600 hover:text-orange-500 transition-colors"
-                  >
-                    <User className="w-4 h-4" />
-                    <span>{isLoggedIn ? 'Account' : 'Login'}</span>
-                  </button>
+                  {isLoggedIn ? (
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 rounded-full border border-green-200">
+                        <User className="w-4 h-4 text-green-600" />
+                        <span className="text-green-700 font-medium text-sm">
+                          {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => onNavigation('logout')}
+                        className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:text-red-700 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={onLoginClick}
+                      className="flex items-center space-x-2 px-4 py-2 text-cyan-600 hover:text-orange-500 transition-colors"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>Login</span>
+                    </button>
+                  )}
                   
                   <button
                     onClick={onCartClick}
@@ -220,12 +239,34 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                       </button>
                     ))}
                   </nav>
-                  <button
-                    onClick={onLoginClick}
-                    className="mt-4 w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg"
-                  >
-                    {isLoggedIn ? 'Account' : 'Login with Google'}
-                  </button>
+                  
+                  {isLoggedIn ? (
+                    <div className="mt-4 space-y-2">
+                      <div className="py-3 px-2 text-green-600 bg-green-50 rounded-lg">
+                        Welcome, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}!
+                      </div>
+                      <button
+                        onClick={() => {
+                          onNavigation('logout');
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full text-left py-3 px-2 text-red-600 hover:text-red-700 transition-colors hover:bg-red-50 rounded-lg flex items-center space-x-2"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        onLoginClick();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="mt-4 w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg"
+                    >
+                      Login with Google
+                    </button>
+                  )}
                 </div>
               )}
             </div>

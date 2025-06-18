@@ -56,6 +56,8 @@ function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session);
+      
       if (session) {
         setUser(session.user);
         setIsLoggedIn(true);
@@ -296,6 +298,7 @@ function App() {
           isAdmin={isAdmin}
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onNavigation={handleNavigation}
+          user={user}
         />
         
         <TermsPage onBackToHome={handleBackToHome} />
@@ -332,6 +335,7 @@ function App() {
           isAdmin={isAdmin}
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onNavigation={handleNavigation}
+          user={user}
         />
         
         <RefundPolicyPage onBackToHome={handleBackToHome} />
@@ -368,6 +372,7 @@ function App() {
           isAdmin={isAdmin}
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onNavigation={handleNavigation}
+          user={user}
         />
         
         <AdminPage onBackToHome={handleBackToHome} />
@@ -402,6 +407,7 @@ function App() {
           isAdmin={isAdmin}
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onNavigation={handleNavigation}
+          user={user}
         />
         
         <ProductPage
@@ -447,6 +453,7 @@ function App() {
           isAdmin={isAdmin}
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onNavigation={handleNavigation}
+          user={user}
         />
         
         <AllGamesPage
@@ -486,6 +493,7 @@ function App() {
           isAdmin={isAdmin}
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onNavigation={handleNavigation}
+          user={user}
         />
         
         <SubscriptionsPage
@@ -524,6 +532,7 @@ function App() {
         isAdmin={isAdmin}
         cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
         onNavigation={handleNavigation}
+        user={user}
       />
       
       <main>
