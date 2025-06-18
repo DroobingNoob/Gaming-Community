@@ -54,7 +54,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     }
   };
 
-  // Handle file upload
+  // Handle file upload with cropping for product cards
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -73,16 +73,57 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
     try {
       setUploading(true);
-      toast.info('Uploading image to Cloudinary...');
+      toast.info('Processing and uploading image...');
       
-      const imageUrl = await uploadToCloudinary(file);
+      // Create canvas for cropping to square aspect ratio
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
       
-      setFormData({ ...formData, [fieldName]: imageUrl });
-      toast.success('Image uploaded successfully!');
+      img.onload = async () => {
+        // Set canvas size to square (400x400 for product cards)
+        const size = 400;
+        canvas.width = size;
+        canvas.height = size;
+        
+        // Calculate crop dimensions to maintain aspect ratio
+        const minDimension = Math.min(img.width, img.height);
+        const cropX = (img.width - minDimension) / 2;
+        const cropY = (img.height - minDimension) / 2;
+        
+        // Draw cropped and resized image
+        ctx?.drawImage(
+          img,
+          cropX, cropY, minDimension, minDimension, // Source crop
+          0, 0, size, size // Destination size
+        );
+        
+        // Convert canvas to blob
+        canvas.toBlob(async (blob) => {
+          if (blob) {
+            try {
+              // Create file from blob
+              const croppedFile = new File([blob], file.name, { type: 'image/jpeg' });
+              
+              // Upload to Cloudinary
+              const imageUrl = await uploadToCloudinary(croppedFile);
+              
+              setFormData({ ...formData, [fieldName]: imageUrl });
+              toast.success('Image processed and uploaded successfully!');
+            } catch (error) {
+              toast.error('Failed to upload processed image. Please try again.');
+              console.error(error);
+            } finally {
+              setUploading(false);
+            }
+          }
+        }, 'image/jpeg', 0.9);
+      };
+      
+      img.src = URL.createObjectURL(file);
     } catch (error) {
-      toast.error('Failed to upload image. Please try again.');
+      toast.error('Failed to process image. Please try again.');
       console.error(error);
-    } finally {
       setUploading(false);
     }
   };
@@ -151,6 +192,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   };
 
   const handleDeleteItem = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this item?')) {
+      return;
+    }
+
     try {
       setLoading(true);
       
@@ -265,7 +310,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               <Plus className="w-12 h-12 text-white" />
             </div>
             <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-orange-600 transition-colors">
-              Update Stock
+              Manage Stock
             </h3>
             <p className="text-gray-600 leading-relaxed">
               Manage games and subscription inventory. Add new products, update pricing, and organize your catalog.
@@ -328,7 +373,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         <p className="text-gray-600 text-lg">Select what you want to do</p>
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
         <div 
           onClick={() => setCrudOperation('create')}
           className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
@@ -349,31 +394,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             <div className="bg-gradient-to-r from-blue-500 to-cyan-500 group-hover:from-blue-600 group-hover:to-cyan-600 p-3 rounded-xl mx-auto w-fit mb-3 transition-all duration-300">
               <Edit className="w-6 h-6 text-white" />
             </div>
-            <span className="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors">View All</span>
-          </div>
-        </div>
-        
-        <div 
-          onClick={() => setCrudOperation('update')}
-          className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-        >
-          <div className="text-center">
-            <div className="bg-gradient-to-r from-yellow-500 to-orange-500 group-hover:from-yellow-600 group-hover:to-orange-600 p-3 rounded-xl mx-auto w-fit mb-3 transition-all duration-300">
-              <Edit className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-sm font-medium text-gray-800 group-hover:text-yellow-600 transition-colors">Edit</span>
-          </div>
-        </div>
-        
-        <div 
-          onClick={() => setCrudOperation('delete')}
-          className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-        >
-          <div className="text-center">
-            <div className="bg-gradient-to-r from-red-500 to-pink-500 group-hover:from-red-600 group-hover:to-pink-600 p-3 rounded-xl mx-auto w-fit mb-3 transition-all duration-300">
-              <Trash2 className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-sm font-medium text-gray-800 group-hover:text-red-600 transition-colors">Delete</span>
+            <span className="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors">View & Edit All</span>
           </div>
         </div>
       </div>
@@ -397,7 +418,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             {/* Image Upload Section */}
             <div className={isTestimonial ? "md:col-span-2" : "md:col-span-2"}>
               <label className="block text-lg font-semibold text-gray-700 mb-4">
-                {isTestimonial ? 'Phone Screenshot Upload' : 'Game Image Upload'}
+                {isTestimonial ? 'Phone Screenshot Upload' : 'Game Image Upload (Auto-cropped to square)'}
               </label>
               
               {/* File Upload Option */}
@@ -420,10 +441,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     </div>
                     <div className="text-center">
                       <span className="text-lg font-medium text-gray-700 block mb-2">
-                        {uploading ? 'Uploading...' : `Click to upload ${isTestimonial ? 'phone screenshot' : 'game image'}`}
+                        {uploading ? 'Processing & Uploading...' : `Click to upload ${isTestimonial ? 'phone screenshot' : 'game image'}`}
                       </span>
                       <span className="text-sm text-gray-500">
-                        {isTestimonial ? 'Phone resolution (9:16 aspect ratio recommended)' : 'Square format recommended (1:1 aspect ratio)'}
+                        {isTestimonial ? 'Phone resolution (9:16 aspect ratio recommended)' : 'Will be auto-cropped to square format (400x400px)'}
                       </span>
                     </div>
                   </label>
@@ -450,7 +471,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                       className={`mx-auto rounded-2xl border shadow-xl ${
                         isTestimonial 
                           ? 'w-48 h-auto max-h-96' // Phone screenshot dimensions
-                          : 'w-full max-w-xs h-48 object-cover' // Game image dimensions
+                          : 'w-64 h-64 object-cover' // Square game image dimensions
                       }`}
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
@@ -470,7 +491,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                       <h4 className="font-semibold text-blue-800 mb-3">Cloudinary Setup Required:</h4>
                       <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
                         <li>Create account at <a href="https://cloudinary.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">cloudinary.com</a></li>
-                        <li>Replace "YOUR_CLOUD_NAME" in the code with your actual cloud name</li>
+                        <li>Replace "dcodirzsc" in the code with your actual cloud name</li>
                         <li>Create an unsigned upload preset named "gaming_community"</li>
                         <li>Enable unsigned uploads in your Cloudinary settings</li>
                       </ol>
@@ -546,7 +567,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
                 {/* Pricing */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Original Price ($)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Original Price (₹)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -558,7 +579,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Sale Price ($)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Sale Price (₹)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -571,7 +592,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
                 {formData.type?.includes('Rent') && (
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Rent Price ($)</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Rent Price (₹)</label>
                     <input
                       type="number"
                       step="0.01"
@@ -684,7 +705,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     <img src={item.image} alt={item.title} className="w-20 h-20 rounded-xl object-cover shadow-lg" />
                     <div>
                       <h3 className="font-bold text-gray-800 text-lg">{item.title}</h3>
-                      <p className="text-gray-600">${item.sale_price} - {item.platform?.join(', ')}</p>
+                      <p className="text-gray-600">₹{item.sale_price} - {item.platform?.join(', ')}</p>
                     </div>
                   </>
                 )}

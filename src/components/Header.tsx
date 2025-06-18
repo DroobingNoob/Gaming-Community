@@ -84,6 +84,12 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
   const handleNavClick = (itemId: string) => {
     if (itemId === 'home') {
       onNavigation('home');
+    } else if (itemId === 'contact') {
+      // Open WhatsApp for contact
+      const phoneNumber = '9266514434';
+      const message = 'Hi! I need help with my gaming purchase.';
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
     } else {
       onNavigation(itemId);
     }
@@ -263,7 +269,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                         <div className="flex-1">
                           <div className="font-medium text-gray-800">{item.title}</div>
                           <div className="text-sm text-gray-500">
-                            ${item.sale_price} • {item.platform.join(', ')}
+                            ₹{item.sale_price} • {item.platform.join(', ')}
                           </div>
                         </div>
                       </button>
