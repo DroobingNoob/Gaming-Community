@@ -8,6 +8,7 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ onNavigation }) => {
   const quickLinks = [
     { name: 'About Us', href: '#about' },
+    { name: 'FAQ', action: 'faq' },
     { name: 'Contact', action: 'contact' },
     { name: 'Terms & Conditions', action: 'terms' },
     { name: 'Cancellation & Refund Policy', action: 'refund' }

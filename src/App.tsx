@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/Header';
@@ -18,6 +18,7 @@ import SubscriptionsPage from './components/SubscriptionsPage';
 import AdminPage from './components/AdminPage';
 import TermsPage from './components/TermsPage';
 import RefundPolicyPage from './components/RefundPolicyPage';
+import FAQPage from './components/FAQPage';
 import { Game, supabase } from './config/supabase';
 
 interface CartItem {
@@ -34,13 +35,17 @@ function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames' | 'subscriptions' | 'admin' | 'terms' | 'refund'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames' | 'subscriptions' | 'admin' | 'terms' | 'refund' | 'faq'>('home');
   const [selectedProduct, setSelectedProduct] = useState<Game | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [wishlistItems, setWishlistItems] = useState<string[]>([]);
+  
+  // Track if we've already shown login toast to prevent duplicates
+  const hasShownLoginToast = useRef(false);
+  const hasShownLogoutToast = useRef(false);
 
   // Check authentication status on app load
   useEffect(() => {
@@ -66,17 +71,27 @@ function App() {
         // Check if user is admin (you can customize this logic)
         setIsAdmin(session.user.email === 'communitygamiing1@gmail.com' || session.user.user_metadata?.role === 'admin');
         
-        if (event === 'SIGNED_IN') {
+        if (event === 'SIGNED_IN' && !hasShownLoginToast.current) {
           toast.success('Successfully signed in!');
           setIsLoginModalOpen(false);
+          hasShownLoginToast.current = true;
+          // Reset after a delay to allow future logins
+          setTimeout(() => {
+            hasShownLoginToast.current = false;
+          }, 5000);
         }
       } else {
         setUser(null);
         setIsLoggedIn(false);
         setIsAdmin(false);
         
-        if (event === 'SIGNED_OUT') {
+        if (event === 'SIGNED_OUT' && !hasShownLogoutToast.current) {
           toast.success('Successfully signed out!');
+          hasShownLogoutToast.current = true;
+          // Reset after a delay to allow future logouts
+          setTimeout(() => {
+            hasShownLogoutToast.current = false;
+          }, 5000);
         }
       }
     });
@@ -292,6 +307,12 @@ function App() {
       window.scrollTo(0, 0);
       return;
     }
+
+    if (section === 'faq') {
+      setCurrentView('faq');
+      window.scrollTo(0, 0);
+      return;
+    }
     
     if (currentView !== 'home') {
       setCurrentView('home');
@@ -303,6 +324,51 @@ function App() {
       scrollToSection(section);
     }
   };
+
+  if (currentView === 'faq') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+        <Header
+          onLoginClick={() => setIsLoginModalOpen(true)}
+          onCartClick={handleCartClick}
+          isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
+          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+          onNavigation={handleNavigation}
+          user={user}
+        />
+        
+        <FAQPage onBackToHome={handleBackToHome} />
+
+        <Footer onNavigation={handleNavigation} />
+
+        <LoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          onLogin={handleLogin}
+        />
+
+        <CartModal
+          isOpen={isCartModalOpen}
+          onClose={() => setIsCartModalOpen(false)}
+          cartItems={cartItems}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+          onCheckout={handleCheckout}
+        />
+
+        <CheckoutModal
+          isOpen={isCheckoutModalOpen}
+          onClose={() => setIsCheckoutModalOpen(false)}
+          cartItems={cartItems}
+          onOrderComplete={handleOrderComplete}
+        />
+
+        <WhatsAppButton />
+        <ToastContainer />
+      </div>
+    );
+  }
 
   if (currentView === 'terms') {
     return (
