@@ -11,6 +11,8 @@ export interface OrderItem {
 export interface OrderData {
   orderCode: string;
   timestamp: string;
+  customerName: string;
+  customerMobile: string;
   items: OrderItem[];
   totalAmount: number;
   status: string;
@@ -92,8 +94,8 @@ function addOrderToSheet(orderData) {
     
     // If this is the first row, add headers
     if (sheet.getLastRow() === 0) {
-      sheet.getRange(1, 1, 1, 8).setValues([[
-        'Order Code', 'Date/Time', 'Items', 'Total Amount', 'Status', 'Customer Info', 'Platform', 'Type'
+      sheet.getRange(1, 1, 1, 10).setValues([[
+        'Order Code', 'Date/Time', 'Customer Name', 'Customer Mobile', 'Items', 'Total Amount', 'Status', 'Customer Info', 'Platform', 'Type'
       ]]);
     }
     
@@ -109,6 +111,8 @@ function addOrderToSheet(orderData) {
     const newRow = [
       orderData.orderCode,
       new Date(orderData.timestamp),
+      orderData.customerName,
+      orderData.customerMobile,
       itemsText,
       orderData.totalAmount,
       orderData.status,
@@ -132,8 +136,8 @@ function updateOrderStatus(orderCode, status) {
     
     for (let i = 1; i < data.length; i++) {
       if (data[i][0] === orderCode) {
-        sheet.getRange(i + 1, 5).setValue(status);
-        sheet.getRange(i + 1, 6).setValue(`Status updated: ${new Date().toLocaleString()}`);
+        sheet.getRange(i + 1, 7).setValue(status);
+        sheet.getRange(i + 1, 8).setValue(`Status updated: ${new Date().toLocaleString()}`);
         break;
       }
     }

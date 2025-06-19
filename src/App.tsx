@@ -182,12 +182,6 @@ function App() {
   };
 
   const handleAddToCart = (product: Game, platform: string, type: string, price: number) => {
-    if (!isLoggedIn) {
-      toast.error('Please login to add items to cart');
-      setIsLoginModalOpen(true);
-      return;
-    }
-
     const itemId = `${product.id}-${platform}-${type}`;
     const existingItem = cartItems.find(item => item.id === itemId);
     
@@ -223,12 +217,6 @@ function App() {
   };
 
   const handleBuyNow = (product: Game, platform: string, type: string, price: number) => {
-    if (!isLoggedIn) {
-      toast.error('Please login to purchase');
-      setIsLoginModalOpen(true);
-      return;
-    }
-
     // Add to cart first
     handleAddToCart(product, platform, type, price);
     

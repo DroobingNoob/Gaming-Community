@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, Copy, Check, QrCode, Smartphone, MessageCircle, Download, FileSpreadsheet } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Copy, Check, QrCode, Smartphone, MessageCircle, Download, FileSpreadsheet, User, Phone } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 interface CartItem {
@@ -29,6 +29,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderCode, setOrderCode] = useState('');
   const [copiedOrderCode, setCopiedOrderCode] = useState(false);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  
+  // Customer details
+  const [customerName, setCustomerName] = useState('');
+  const [customerMobile, setCustomerMobile] = useState('');
 
   if (!isOpen) return null;
 
@@ -57,6 +61,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       const orderData = {
         orderCode: code,
         timestamp: new Date().toISOString(),
+        customerName: customerName,
+        customerMobile: customerMobile,
         items: cartItems.map(item => ({
           title: item.title,
           platform: item.platform,
@@ -97,6 +103,24 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   const handleProceedToPayment = async () => {
+    // Validate customer details
+    if (!customerName.trim()) {
+      toast.error('Please enter your name');
+      return;
+    }
+    
+    if (!customerMobile.trim()) {
+      toast.error('Please enter your mobile number');
+      return;
+    }
+    
+    // Validate mobile number (basic validation)
+    const mobileRegex = /^[6-9]\d{9}$/;
+    if (!mobileRegex.test(customerMobile.trim())) {
+      toast.error('Please enter a valid 10-digit mobile number');
+      return;
+    }
+
     const code = generateOrderCode();
     setOrderCode(code);
     setCurrentStep('payment');
@@ -116,6 +140,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const handleWhatsAppContact = () => {
     const phoneNumber = '9266514434';
     const message = `Hi! I want to send payment screenshot for Order Code: ${orderCode}
+
+Customer Details:
+Name: ${customerName}
+Mobile: ${customerMobile}
 
 Order Details:
 ${cartItems.map(item => 
@@ -137,6 +165,8 @@ I have made the payment via UPI. Please find the screenshot attached.`;
       onClose();
       setCurrentStep('summary');
       setOrderCode('');
+      setCustomerName('');
+      setCustomerMobile('');
     }, 3000);
   };
 
@@ -146,7 +176,53 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
           Order Summary
         </h2>
-        <p className="text-gray-600">Review your order before proceeding to payment</p>
+        <p className="text-gray-600">Review your order and enter your details</p>
+      </div>
+
+      {/* Customer Details Form */}
+      <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200">
+        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
+          <User className="w-5 h-5 text-cyan-600" />
+          <span>Customer Details</span>
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Full Name <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Mobile Number <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="tel"
+                value={customerMobile}
+                onChange={(e) => setCustomerMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                placeholder="Enter 10-digit mobile number"
+                maxLength={10}
+                required
+              />
+            </div>
+          </div>
+        </div>
+        <p className="text-sm text-gray-600 mt-3">
+          <span className="text-red-500">*</span> Required fields. This information will be used for order tracking and delivery.
+        </p>
       </div>
 
       {/* Order Items */}
@@ -194,7 +270,7 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         </button>
         <button
           onClick={handleProceedToPayment}
-          disabled={isSubmittingOrder}
+          disabled={isSubmittingOrder || !customerName.trim() || !customerMobile.trim()}
           className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
         >
           {isSubmittingOrder ? (
@@ -220,6 +296,21 @@ I have made the payment via UPI. Please find the screenshot attached.`;
           Complete Your Payment
         </h2>
         <p className="text-gray-600">Scan the QR code to pay via UPI</p>
+      </div>
+
+      {/* Customer Details Display */}
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-200">
+        <h3 className="font-bold text-green-800 mb-3">Customer Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-green-700">
+          <div className="flex items-center space-x-2">
+            <User className="w-4 h-4" />
+            <span><strong>Name:</strong> {customerName}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Phone className="w-4 h-4" />
+            <span><strong>Mobile:</strong> {customerMobile}</span>
+          </div>
+        </div>
       </div>
 
       {/* Order Code Display */}
