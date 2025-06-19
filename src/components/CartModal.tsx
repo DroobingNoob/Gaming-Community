@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Plus, Minus, Trash2 } from 'lucide-react';
+import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
 
 interface CartItem {
   id: string;
@@ -17,6 +17,7 @@ interface CartModalProps {
   cartItems: CartItem[];
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemoveItem: (id: string) => void;
+  onCheckout: () => void;
 }
 
 const CartModal: React.FC<CartModalProps> = ({ 
@@ -24,28 +25,26 @@ const CartModal: React.FC<CartModalProps> = ({
   onClose, 
   cartItems, 
   onUpdateQuantity, 
-  onRemoveItem 
+  onRemoveItem,
+  onCheckout
 }) => {
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-  const handleCheckout = () => {
-    const phoneNumber = '9266514434';
-    const itemsList = cartItems.map(item => 
-      `${item.title} (${item.platform}, ${item.type}) - ₹${item.price} x ${item.quantity}`
-    ).join('\n');
-    const message = `Hi! I want to purchase these games:\n\n${itemsList}\n\nTotal: ₹${total.toFixed(2)}\n\nPlease help me complete the purchase.`;
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col shadow-2xl border border-white/20">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Shopping Cart</h2>
+          <div className="flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-2 rounded-full">
+              <ShoppingBag className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+              Shopping Cart
+            </h2>
+          </div>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
@@ -58,6 +57,9 @@ const CartModal: React.FC<CartModalProps> = ({
         <div className="flex-1 overflow-y-auto p-6">
           {cartItems.length === 0 ? (
             <div className="text-center py-12">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ShoppingBag className="w-12 h-12 text-gray-400" />
+              </div>
               <p className="text-gray-500 text-lg mb-4">Your cart is empty</p>
               <button
                 onClick={onClose}
@@ -69,46 +71,48 @@ const CartModal: React.FC<CartModalProps> = ({
           ) : (
             <div className="space-y-4">
               {cartItems.map((item) => (
-                <div key={item.id} className="flex items-center space-x-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-4 shadow-lg border border-white/20">
+                <div key={item.id} className="flex items-center space-x-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300">
                   <img
                     src={item.image}
                     alt={item.title}
-                    className="w-16 aspect-square object-cover rounded-lg"
+                    className="w-16 aspect-square object-cover rounded-lg shadow-md"
                   />
                   
                   <div className="flex-1">
-                    <h3 className="font-bold text-gray-800">{item.title}</h3>
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
-                      <span className="bg-cyan-400 text-white px-2 py-1 rounded text-xs">{item.platform}</span>
-                      <span className="bg-orange-500 text-white px-2 py-1 rounded text-xs">{item.type}</span>
+                    <h3 className="font-bold text-gray-800 mb-1">{item.title}</h3>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
+                      <span className="bg-cyan-400 text-white px-2 py-1 rounded text-xs font-medium">{item.platform}</span>
+                      <span className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-medium">{item.type}</span>
                     </div>
-                    <p className="text-cyan-600 font-bold">₹{item.price}</p>
+                    <p className="text-cyan-600 font-bold text-lg">₹{item.price}</p>
                   </div>
 
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2 bg-white rounded-lg border border-gray-200 shadow-sm">
+                      <button
+                        onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                        className="text-gray-500 hover:text-cyan-600 transition-colors p-2 rounded-l-lg hover:bg-gray-50"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="font-medium px-3 py-2 min-w-[3rem] text-center border-x border-gray-200">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                        className="text-gray-500 hover:text-cyan-600 transition-colors p-2 rounded-r-lg hover:bg-gray-50"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+
                     <button
-                      onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                      className="text-gray-500 hover:text-cyan-600 transition-colors p-1 rounded-full hover:bg-white"
+                      onClick={() => onRemoveItem(item.id)}
+                      className="text-red-500 hover:text-red-700 transition-colors p-2 rounded-full hover:bg-red-50"
                     >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="font-medium px-3 py-1 bg-white rounded border min-w-[3rem] text-center">
-                      {item.quantity}
-                    </span>
-                    <button
-                      onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                      className="text-gray-500 hover:text-cyan-600 transition-colors p-1 rounded-full hover:bg-white"
-                    >
-                      <Plus className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-
-                  <button
-                    onClick={() => onRemoveItem(item.id)}
-                    className="text-red-500 hover:text-red-700 transition-colors p-2 rounded-full hover:bg-red-50"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
                 </div>
               ))}
             </div>
@@ -123,10 +127,11 @@ const CartModal: React.FC<CartModalProps> = ({
               <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">₹{total.toFixed(2)}</span>
             </div>
             <button 
-              onClick={handleCheckout}
-              className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-bold text-lg transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
+              onClick={onCheckout}
+              className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
             >
-              Proceed to Checkout
+              <ShoppingBag className="w-5 h-5" />
+              <span>Proceed to Checkout</span>
             </button>
           </div>
         )}

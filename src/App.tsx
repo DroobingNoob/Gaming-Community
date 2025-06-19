@@ -10,6 +10,7 @@ import Categories from './components/Categories';
 import Footer from './components/Footer';
 import LoginModal from './components/LoginModal';
 import CartModal from './components/CartModal';
+import CheckoutModal from './components/CheckoutModal';
 import WhatsAppButton from './components/WhatsAppButton';
 import ProductPage from './components/ProductPage';
 import AllGamesPage from './components/AllGamesPage';
@@ -32,6 +33,7 @@ interface CartItem {
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames' | 'subscriptions' | 'admin' | 'terms' | 'refund'>('home');
   const [selectedProduct, setSelectedProduct] = useState<Game | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -123,6 +125,21 @@ function App() {
     setIsCartModalOpen(true);
   };
 
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      toast.error('Your cart is empty');
+      return;
+    }
+    setIsCartModalOpen(false);
+    setIsCheckoutModalOpen(true);
+  };
+
+  const handleOrderComplete = () => {
+    // Clear cart after successful order
+    setCartItems([]);
+    toast.success('Order placed successfully! You will receive your games within 15 minutes.');
+  };
+
   const handleGameClick = (game: Game) => {
     setSelectedProduct(game);
     setCurrentView('product');
@@ -201,13 +218,12 @@ function App() {
     // Add to cart first
     handleAddToCart(product, platform, type, price);
     
-    // Open WhatsApp for purchase
-    const phoneNumber = '9266514434';
-    const message = `Hi! I want to buy ${product.title} for ${platform} (${type}) - ₹${price}. Please help me complete the purchase.`;
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    // Open checkout modal
+    setTimeout(() => {
+      setIsCheckoutModalOpen(true);
+    }, 500);
     
-    toast.success('Redirecting to WhatsApp for purchase completion!');
+    toast.success('Redirecting to checkout!');
   };
 
   const handleToggleWishlist = (productId: string) => {
@@ -317,6 +333,14 @@ function App() {
           cartItems={cartItems}
           onUpdateQuantity={handleUpdateQuantity}
           onRemoveItem={handleRemoveItem}
+          onCheckout={handleCheckout}
+        />
+
+        <CheckoutModal
+          isOpen={isCheckoutModalOpen}
+          onClose={() => setIsCheckoutModalOpen(false)}
+          cartItems={cartItems}
+          onOrderComplete={handleOrderComplete}
         />
 
         <WhatsAppButton />
@@ -354,6 +378,14 @@ function App() {
           cartItems={cartItems}
           onUpdateQuantity={handleUpdateQuantity}
           onRemoveItem={handleRemoveItem}
+          onCheckout={handleCheckout}
+        />
+
+        <CheckoutModal
+          isOpen={isCheckoutModalOpen}
+          onClose={() => setIsCheckoutModalOpen(false)}
+          cartItems={cartItems}
+          onOrderComplete={handleOrderComplete}
         />
 
         <WhatsAppButton />
@@ -389,6 +421,14 @@ function App() {
           cartItems={cartItems}
           onUpdateQuantity={handleUpdateQuantity}
           onRemoveItem={handleRemoveItem}
+          onCheckout={handleCheckout}
+        />
+
+        <CheckoutModal
+          isOpen={isCheckoutModalOpen}
+          onClose={() => setIsCheckoutModalOpen(false)}
+          cartItems={cartItems}
+          onOrderComplete={handleOrderComplete}
         />
 
         <WhatsAppButton />
@@ -435,6 +475,14 @@ function App() {
           cartItems={cartItems}
           onUpdateQuantity={handleUpdateQuantity}
           onRemoveItem={handleRemoveItem}
+          onCheckout={handleCheckout}
+        />
+
+        <CheckoutModal
+          isOpen={isCheckoutModalOpen}
+          onClose={() => setIsCheckoutModalOpen(false)}
+          cartItems={cartItems}
+          onOrderComplete={handleOrderComplete}
         />
 
         <WhatsAppButton />
@@ -475,6 +523,14 @@ function App() {
           cartItems={cartItems}
           onUpdateQuantity={handleUpdateQuantity}
           onRemoveItem={handleRemoveItem}
+          onCheckout={handleCheckout}
+        />
+
+        <CheckoutModal
+          isOpen={isCheckoutModalOpen}
+          onClose={() => setIsCheckoutModalOpen(false)}
+          cartItems={cartItems}
+          onOrderComplete={handleOrderComplete}
         />
 
         <WhatsAppButton />
@@ -515,6 +571,14 @@ function App() {
           cartItems={cartItems}
           onUpdateQuantity={handleUpdateQuantity}
           onRemoveItem={handleRemoveItem}
+          onCheckout={handleCheckout}
+        />
+
+        <CheckoutModal
+          isOpen={isCheckoutModalOpen}
+          onClose={() => setIsCheckoutModalOpen(false)}
+          cartItems={cartItems}
+          onOrderComplete={handleOrderComplete}
         />
 
         <WhatsAppButton />
@@ -561,6 +625,14 @@ function App() {
         cartItems={cartItems}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
+        onCheckout={handleCheckout}
+      />
+
+      <CheckoutModal
+        isOpen={isCheckoutModalOpen}
+        onClose={() => setIsCheckoutModalOpen(false)}
+        cartItems={cartItems}
+        onOrderComplete={handleOrderComplete}
       />
 
       <WhatsAppButton />
