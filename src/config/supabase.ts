@@ -12,12 +12,17 @@ export interface Game {
   image: string;
   original_price: number;
   sale_price: number;
-  rent_price?: number;
+  // Rental pricing
+  rent_1_month?: number;
+  rent_2_months?: number;
+  rent_3_months?: number;
+  rent_6_months?: number;
+  // Permanent pricing
+  permanent_offline_price?: number;
+  permanent_online_price?: number;
   platform: string[];
   discount: number;
   description: string;
-  features: string[];
-  system_requirements: string[];
   type: string[];
   category: 'game' | 'subscription';
   show_in_bestsellers?: boolean;

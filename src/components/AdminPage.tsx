@@ -196,9 +196,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         
         let itemData: any = {
           ...formData,
-          discount,
-          features: Array.isArray(formData.features) ? formData.features : formData.features?.split('\n').filter((f: string) => f.trim()) || [],
-          system_requirements: Array.isArray(formData.system_requirements) ? formData.system_requirements : formData.system_requirements?.split('\n').filter((r: string) => r.trim()) || []
+          discount
         };
 
         if (stockType === 'games') {
@@ -209,11 +207,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             type: Array.isArray(formData.type) ? formData.type : [formData.type],
             show_in_bestsellers: formData.show_in_bestsellers || false
           };
-
-          // Reset sale_price if not permanent
-          if (!formData.type?.includes('Permanent')) {
-            itemData.sale_price = 0;
-          }
 
           if (crudOperation === 'create') {
             await gamesService.add(itemData);
@@ -289,13 +282,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
   const handleEditItem = (item: any) => {
     setSelectedItem(item);
-    // Properly format the form data for editing
-    const editFormData = {
-      ...item,
-      features: Array.isArray(item.features) ? item.features.join('\n') : item.features || '',
-      system_requirements: Array.isArray(item.system_requirements) ? item.system_requirements.join('\n') : item.system_requirements || ''
-    };
-    setFormData(editFormData);
+    setFormData(item);
     setCrudOperation('update');
   };
 
@@ -636,7 +623,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
                     <div className="space-y-3">
-                      {['Permanent', 'Rent'].map((type) => (
+                      {['Rent', 'Permanent Offline', 'Permanent Offline + Online'].map((type) => (
                         <label key={type} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                           <input
                             type="checkbox"
@@ -676,47 +663,121 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   </div>
                 )}
 
-                {/* Pricing */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Original Price (₹)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.original_price || ''}
-                    onChange={(e) => setFormData({ ...formData, original_price: parseFloat(e.target.value) })}
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                    placeholder="0.00"
-                  />
+                {/* Pricing Section */}
+                <div className="md:col-span-2">
+                  <h3 className="text-lg font-bold text-gray-800 mb-4">Pricing</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Original Price */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-3">Original Price (₹)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={formData.original_price || ''}
+                        onChange={(e) => setFormData({ ...formData, original_price: parseFloat(e.target.value) })}
+                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                        placeholder="0.00"
+                      />
+                    </div>
+
+                    {/* Sale Price */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-3">Sale Price (₹)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={formData.sale_price || ''}
+                        onChange={(e) => setFormData({ ...formData, sale_price: parseFloat(e.target.value) })}
+                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                        placeholder="0.00"
+                      />
+                    </div>
+
+                    {/* Rental Prices - Only show if Rent type is selected for games */}
+                    {!isSubscription && formData.type?.includes('Rent') && (
+                      <>
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-3">1 Month Rent (₹)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={formData.rent_1_month || ''}
+                            onChange={(e) => setFormData({ ...formData, rent_1_month: parseFloat(e.target.value) })}
+                            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                            placeholder="0.00"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-3">2 Months Rent (₹)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={formData.rent_2_months || ''}
+                            onChange={(e) => setFormData({ ...formData, rent_2_months: parseFloat(e.target.value) })}
+                            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                            placeholder="0.00"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-3">3 Months Rent (₹)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={formData.rent_3_months || ''}
+                            onChange={(e) => setFormData({ ...formData, rent_3_months: parseFloat(e.target.value) })}
+                            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                            placeholder="0.00"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-3">6 Months Rent (₹)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={formData.rent_6_months || ''}
+                            onChange={(e) => setFormData({ ...formData, rent_6_months: parseFloat(e.target.value) })}
+                            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                            placeholder="0.00"
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    {/* Permanent Offline Price - Only show if Permanent Offline type is selected for games */}
+                    {!isSubscription && formData.type?.includes('Permanent Offline') && (
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">Permanent Offline Price (₹)</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={formData.permanent_offline_price || ''}
+                          onChange={(e) => setFormData({ ...formData, permanent_offline_price: parseFloat(e.target.value) })}
+                          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                          placeholder="0.00"
+                        />
+                      </div>
+                    )}
+
+                    {/* Permanent Offline + Online Price - Only show if Permanent Offline + Online type is selected for games */}
+                    {!isSubscription && formData.type?.includes('Permanent Offline + Online') && (
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">Permanent Offline + Online Price (₹)</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={formData.permanent_online_price || ''}
+                          onChange={(e) => setFormData({ ...formData, permanent_online_price: parseFloat(e.target.value) })}
+                          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                          placeholder="0.00"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
-
-                {/* Sale Price - Only show if Permanent type is selected for games, always show for subscriptions */}
-                {(isSubscription || formData.type?.includes('Permanent')) && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Sale Price (₹)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formData.sale_price || ''}
-                      onChange={(e) => setFormData({ ...formData, sale_price: parseFloat(e.target.value) })}
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                      placeholder="0.00"
-                    />
-                  </div>
-                )}
-
-                {formData.type?.includes('Rent') && !isSubscription && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Rent Price (₹)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formData.rent_price || ''}
-                      onChange={(e) => setFormData({ ...formData, rent_price: parseFloat(e.target.value) })}
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                      placeholder="0.00"
-                    />
-                  </div>
-                )}
 
                 {/* Description */}
                 <div className="md:col-span-2">
@@ -727,30 +788,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     rows={4}
                     className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                     placeholder="Enter description"
-                  />
-                </div>
-
-                {/* Features */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Features (one per line)</label>
-                  <textarea
-                    value={formData.features || ''}
-                    onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                    rows={4}
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                    placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
-                  />
-                </div>
-
-                {/* System Requirements */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">System Requirements (one per line)</label>
-                  <textarea
-                    value={formData.system_requirements || ''}
-                    onChange={(e) => setFormData({ ...formData, system_requirements: e.target.value })}
-                    rows={4}
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                    placeholder="Requirement 1&#10;Requirement 2&#10;Requirement 3"
                   />
                 </div>
               </>

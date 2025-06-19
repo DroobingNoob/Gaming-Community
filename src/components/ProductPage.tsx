@@ -29,7 +29,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [activeAccordion, setActiveAccordion] = useState<string | null>('details');
   const [isImageSticky, setIsImageSticky] = useState(true);
   const [selectedPlatform, setSelectedPlatform] = useState(product.platform[0] || 'PS5');
-  const [selectedType, setSelectedType] = useState(product.type[0] || 'Permanent');
+  const [selectedType, setSelectedType] = useState(product.type[0] || 'Rent');
+  const [selectedRentDuration, setSelectedRentDuration] = useState<'1_month' | '2_months' | '3_months' | '6_months'>('1_month');
 
   // Get related products from database
   const { games } = useGames();
@@ -105,21 +106,66 @@ const ProductPage: React.FC<ProductPageProps> = ({
   };
 
   const calculatePrice = () => {
-    let basePrice = product.sale_price;
     if (selectedType === 'Rent') {
-      basePrice = basePrice * 0.3; // 30% of full price for rent
+      const rentPrices = {
+        '1_month': product.rent_1_month || 0,
+        '2_months': product.rent_2_months || 0,
+        '3_months': product.rent_3_months || 0,
+        '6_months': product.rent_6_months || 0
+      };
+      return rentPrices[selectedRentDuration];
+    } else if (selectedType === 'Permanent Offline') {
+      return product.permanent_offline_price || product.sale_price;
+    } else if (selectedType === 'Permanent Offline + Online') {
+      return product.permanent_online_price || product.sale_price;
     }
-    return basePrice;
+    return product.sale_price;
+  };
+
+  const getTypeDescription = () => {
+    if (selectedType === 'Rent') {
+      return `You can rent the game for the following durations:
+
+1 Month
+2 Months
+3 Months
+6 Months
+
+You have to connect your console to the internet after renting the game.
+
+After the selected rental period ends, you must return the game.
+
+Continued use after the rental period may result in access restrictions or being blocked from future rentals.`;
+    } else if (selectedType === 'Permanent Offline') {
+      return `This version allows you to play the game permanently, but only in offline mode.
+
+Once the game is installed, you must keep your console disconnected from the internet.
+
+If your console connects to the internet, there is an 80% chance the game will get locked and become unplayable.
+
+This option is best suited for single-player games or customers who prefer offline gaming.`;
+    } else if (selectedType === 'Permanent Offline + Online') {
+      return `This version allows you to play the game both online and offline without restrictions.
+
+You can connect your console to the internet anytime without worrying about the game being locked.
+
+If you want to delete the game and reinstall it, you are free to do so in this plan.
+
+Suitable for multiplayer games, online features, and users who want full flexibility.`;
+    }
+    return '';
   };
 
   const handleAddToCart = () => {
     const price = calculatePrice();
-    onAddToCart(product, selectedPlatform, selectedType, price);
+    const typeWithDuration = selectedType === 'Rent' ? `${selectedType} (${selectedRentDuration.replace('_', ' ')})` : selectedType;
+    onAddToCart(product, selectedPlatform, typeWithDuration, price);
   };
 
   const handleBuyNow = () => {
     const price = calculatePrice();
-    onBuyNow(product, selectedPlatform, selectedType, price);
+    const typeWithDuration = selectedType === 'Rent' ? `${selectedType} (${selectedRentDuration.replace('_', ' ')})` : selectedType;
+    onBuyNow(product, selectedPlatform, typeWithDuration, price);
   };
 
   return (
@@ -183,23 +229,59 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 </div>
 
                 {/* Type Selection */}
-                <div className="mb-8">
+                <div className="mb-6">
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
-                  <div className="flex space-x-3">
+                  <div className="space-y-3">
                     {product.type.map((type) => (
                       <button
                         key={type}
                         onClick={() => setSelectedType(type)}
-                        className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+                        className={`w-full px-6 py-3 rounded-xl font-medium transition-all duration-300 text-left ${
                           selectedType === type
                             ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
-                        {type === 'Rent' ? 'Rent (30 Days)' : type}
+                        {type}
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Rent Duration Selection - Only show if Rent is selected */}
+                {selectedType === 'Rent' && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Rental Duration</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { key: '1_month', label: '1 Month', price: product.rent_1_month },
+                        { key: '2_months', label: '2 Months', price: product.rent_2_months },
+                        { key: '3_months', label: '3 Months', price: product.rent_3_months },
+                        { key: '6_months', label: '6 Months', price: product.rent_6_months }
+                      ].map((duration) => (
+                        <button
+                          key={duration.key}
+                          onClick={() => setSelectedRentDuration(duration.key as any)}
+                          className={`px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
+                            selectedRentDuration === duration.key
+                              ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          <div className="text-sm">{duration.label}</div>
+                          <div className="text-xs opacity-75">₹{duration.price || 0}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Type Description */}
+                <div className="mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-200">
+                  <h4 className="font-bold text-blue-800 mb-3">About This Option</h4>
+                  <p className="text-blue-700 text-sm leading-relaxed whitespace-pre-line">
+                    {getTypeDescription()}
+                  </p>
                 </div>
 
                 {/* Pricing */}
@@ -207,14 +289,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
                   <span className="text-5xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
                     ₹{calculatePrice().toFixed(2)}
                   </span>
-                  {selectedType === 'Rent' && (
-                    <span className="text-2xl text-gray-500 line-through">
-                      ₹{product.sale_price}
+                  {product.discount > 0 && (
+                    <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-full text-lg font-bold shadow-lg">
+                      -{product.discount}%
                     </span>
                   )}
-                  <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-full text-lg font-bold shadow-lg">
-                    -{product.discount}%
-                  </span>
                 </div>
 
                 {/* Action Buttons */}
@@ -286,15 +365,6 @@ const ProductPage: React.FC<ProductPageProps> = ({
                     {activeAccordion === 'details' && (
                       <div className="px-6 pb-6">
                         <p className="text-gray-600 leading-relaxed mb-4">{product.description}</p>
-                        <h4 className="font-bold text-gray-800 mb-3">Key Features</h4>
-                        <ul className="space-y-2">
-                          {product.features.map((feature, index) => (
-                            <li key={index} className="flex items-start space-x-2">
-                              <span className="text-cyan-400 mt-1">•</span>
-                              <span className="text-gray-600">{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
                       </div>
                     )}
                   </div>
@@ -411,21 +481,57 @@ const ProductPage: React.FC<ProductPageProps> = ({
               {/* Type Selection */}
               <div className="mb-6">
                 <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
-                <div className="flex space-x-3">
+                <div className="space-y-3">
                   {product.type.map((type) => (
                     <button
                       key={type}
                       onClick={() => setSelectedType(type)}
-                      className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                      className={`w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 text-left ${
                         selectedType === type
                           ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      {type === 'Rent' ? 'Rent (30 Days)' : type}
+                      {type}
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Rent Duration Selection - Only show if Rent is selected */}
+              {selectedType === 'Rent' && (
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Rental Duration</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { key: '1_month', label: '1 Month', price: product.rent_1_month },
+                      { key: '2_months', label: '2 Months', price: product.rent_2_months },
+                      { key: '3_months', label: '3 Months', price: product.rent_3_months },
+                      { key: '6_months', label: '6 Months', price: product.rent_6_months }
+                    ].map((duration) => (
+                      <button
+                        key={duration.key}
+                        onClick={() => setSelectedRentDuration(duration.key as any)}
+                        className={`px-3 py-2 rounded-lg font-medium transition-all duration-300 ${
+                          selectedRentDuration === duration.key
+                            ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        <div className="text-sm">{duration.label}</div>
+                        <div className="text-xs opacity-75">₹{duration.price || 0}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Type Description */}
+              <div className="mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
+                <h4 className="font-bold text-blue-800 mb-3 text-sm">About This Option</h4>
+                <p className="text-blue-700 text-xs leading-relaxed whitespace-pre-line">
+                  {getTypeDescription()}
+                </p>
               </div>
 
               {/* Pricing */}
@@ -433,14 +539,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
                   ₹{calculatePrice().toFixed(2)}
                 </span>
-                {selectedType === 'Rent' && (
-                  <span className="text-xl sm:text-2xl text-gray-500 line-through">
-                    ₹{product.sale_price}
+                {product.discount > 0 && (
+                  <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                    -{product.discount}%
                   </span>
                 )}
-                <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                  -{product.discount}%
-                </span>
               </div>
 
               {/* Action Buttons */}
@@ -519,15 +622,6 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 {activeAccordion === 'details' && (
                   <div className="space-y-4">
                     <p className="text-gray-600 leading-relaxed text-sm sm:text-base">{product.description}</p>
-                    <h4 className="text-base sm:text-lg font-bold text-gray-800 mt-6 mb-3">Key Features</h4>
-                    <ul className="space-y-2">
-                      {product.features.map((feature, index) => (
-                        <li key={index} className="flex items-start space-x-2">
-                          <span className="text-cyan-400 mt-1">•</span>
-                          <span className="text-gray-600 text-sm sm:text-base">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                 )}
 
