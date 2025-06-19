@@ -70,7 +70,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       };
 
       // REPLACE THIS URL WITH YOUR ACTUAL GOOGLE APPS SCRIPT WEB APP URL
-      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzEvQYtQDl_bqPZySGIO7KbhKZ6hoOs20qdx5SrN5iYx7MbC6YQvMLWib0cufhISidEIA/exec';
       
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
