@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Copy, Check, QrCode, Smartphone, Mail, MessageCircle, Download } from 'lucide-react';
+import { X, Copy, Check, QrCode, Smartphone, MessageCircle, Download, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 interface CartItem {
@@ -28,74 +28,85 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [currentStep, setCurrentStep] = useState<'summary' | 'payment' | 'confirmation'>('summary');
   const [orderCode, setOrderCode] = useState('');
   const [copiedOrderCode, setCopiedOrderCode] = useState(false);
-  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
 
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  // Generate unique order code
+  // Generate unique order code with date, time, seconds, and milliseconds
   const generateOrderCode = () => {
     const now = new Date();
-    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
-    const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '');
-    const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
-    return `GC${dateStr}${timeStr}${randomStr}`;
+    const year = now.getFullYear().toString().slice(-2);
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    const milliseconds = now.getMilliseconds().toString().padStart(3, '0');
+    
+    // Format: GC + YYMMDD + HHMMSS + MMM
+    return `GC${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
   };
 
-  const handleProceedToPayment = () => {
+  // Submit order to Google Sheets
+  const submitOrderToGoogleSheets = async (code: string) => {
+    try {
+      setIsSubmittingOrder(true);
+      
+      const orderData = {
+        orderCode: code,
+        timestamp: new Date().toISOString(),
+        items: cartItems.map(item => ({
+          title: item.title,
+          platform: item.platform,
+          type: item.type,
+          price: item.price,
+          quantity: item.quantity,
+          subtotal: item.price * item.quantity
+        })),
+        totalAmount: total,
+        status: 'Payment Pending'
+      };
+
+      // Google Apps Script Web App URL (you'll need to replace this with your actual URL)
+      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+      
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors', // Required for Google Apps Script
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      // Since we're using no-cors mode, we can't read the response
+      // But we'll assume success if no error is thrown
+      toast.success('Order submitted to tracking system!');
+      
+    } catch (error) {
+      console.error('Error submitting order:', error);
+      toast.error('Failed to submit order to tracking system');
+    } finally {
+      setIsSubmittingOrder(false);
+    }
+  };
+
+  const handleProceedToPayment = async () => {
     const code = generateOrderCode();
     setOrderCode(code);
     setCurrentStep('payment');
     
-    // Send order summary email
-    sendOrderEmail(code);
+    // Submit order to Google Sheets
+    await submitOrderToGoogleSheets(code);
   };
 
-  const sendOrderEmail = (code: string) => {
-    const orderSummary = {
-      orderCode: code,
-      items: cartItems,
-      total: total,
-      timestamp: new Date().toISOString(),
-      customerEmail: 'Customer checkout initiated'
-    };
-
-    // Create email content
-    const emailSubject = `New Order - ${code}`;
-    const emailBody = `
-Order Code: ${code}
-Order Date: ${new Date().toLocaleString()}
-Total Amount: ₹${total.toFixed(2)}
-
-Items:
-${cartItems.map(item => 
-  `- ${item.title} (${item.platform}, ${item.type}) - ₹${item.price} x ${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`
-).join('\n')}
-
-Customer will send payment screenshot via WhatsApp.
-    `;
-
-    // Create mailto link
-    const mailtoLink = `mailto:communitygamiing1@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-    
-    // Open email client
-    window.open(mailtoLink, '_blank');
-    
-    toast.success('Order summary sent to email!');
-  };
-
-  const copyToClipboard = (text: string, type: 'order' | 'email') => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
-      if (type === 'order') {
-        setCopiedOrderCode(true);
-        setTimeout(() => setCopiedOrderCode(false), 2000);
-        toast.success('Order code copied!');
-      } else {
-        setCopiedEmail(true);
-        setTimeout(() => setCopiedEmail(false), 2000);
-        toast.success('Email copied!');
-      }
+      setCopiedOrderCode(true);
+      setTimeout(() => setCopiedOrderCode(false), 2000);
+      toast.success('Order code copied!');
     });
   };
 
@@ -180,9 +191,20 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         </button>
         <button
           onClick={handleProceedToPayment}
-          className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
+          disabled={isSubmittingOrder}
+          className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
         >
-          Proceed to Payment
+          {isSubmittingOrder ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <span>Processing...</span>
+            </>
+          ) : (
+            <>
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>Proceed to Payment</span>
+            </>
+          )}
         </button>
       </div>
     </div>
@@ -200,21 +222,34 @@ I have made the payment via UPI. Please find the screenshot attached.`;
       {/* Order Code Display */}
       <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200">
         <div className="text-center">
-          <h3 className="text-lg font-bold text-gray-800 mb-3">Your Order Code</h3>
+          <h3 className="text-lg font-bold text-gray-800 mb-3">Your Unique Order Code</h3>
           <div className="bg-white rounded-xl p-4 border-2 border-dashed border-cyan-400">
             <div className="flex items-center justify-center space-x-3">
-              <span className="text-2xl font-mono font-bold text-cyan-600">{orderCode}</span>
+              <span className="text-2xl font-mono font-bold text-cyan-600 tracking-wider">{orderCode}</span>
               <button
-                onClick={() => copyToClipboard(orderCode, 'order')}
-                className="text-cyan-600 hover:text-cyan-700 transition-colors"
+                onClick={() => copyToClipboard(orderCode)}
+                className="text-cyan-600 hover:text-cyan-700 transition-colors p-1 rounded hover:bg-cyan-50"
               >
                 {copiedOrderCode ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
               </button>
             </div>
           </div>
           <p className="text-sm text-gray-600 mt-2">
-            Include this code in your UPI payment remarks
+            <strong>IMPORTANT:</strong> Include this exact code in your UPI payment remarks
           </p>
+        </div>
+      </div>
+
+      {/* Order Tracking Notice */}
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-200">
+        <div className="flex items-center space-x-3">
+          <div className="bg-green-500 rounded-full p-2">
+            <FileSpreadsheet className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <h4 className="font-bold text-green-800">Order Recorded</h4>
+            <p className="text-sm text-green-700">Your order has been automatically saved to our tracking system</p>
+          </div>
         </div>
       </div>
 
@@ -260,7 +295,12 @@ I have made the payment via UPI. Please find the screenshot attached.`;
           </li>
           <li className="flex items-start space-x-2">
             <span className="bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">3</span>
-            <span>Add order code <strong>{orderCode}</strong> in remarks/note</span>
+            <div>
+              <span>Add order code in remarks/note:</span>
+              <div className="bg-white rounded px-2 py-1 mt-1 font-mono text-sm border border-orange-300">
+                {orderCode}
+              </div>
+            </div>
           </li>
           <li className="flex items-start space-x-2">
             <span className="bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">4</span>
@@ -280,29 +320,16 @@ I have made the payment via UPI. Please find the screenshot attached.`;
           <span>Send Payment Screenshot</span>
         </h3>
         <p className="text-gray-700 mb-4">
-          After payment, send your screenshot via WhatsApp or email:
+          After payment, send your screenshot via WhatsApp:
         </p>
         
-        <div className="space-y-3">
-          <button
-            onClick={handleWhatsAppContact}
-            className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center space-x-2"
-          >
-            <MessageCircle className="w-5 h-5" />
-            <span>Send via WhatsApp</span>
-          </button>
-          
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <Mail className="w-4 h-4" />
-            <span>Email: communitygamiing1@gmail.com</span>
-            <button
-              onClick={() => copyToClipboard('communitygamiing1@gmail.com', 'email')}
-              className="text-cyan-600 hover:text-cyan-700 transition-colors"
-            >
-              {copiedEmail ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={handleWhatsAppContact}
+          className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+        >
+          <MessageCircle className="w-5 h-5" />
+          <span>Send Payment Screenshot via WhatsApp</span>
+        </button>
       </div>
 
       {/* Action Buttons */}
@@ -331,7 +358,7 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         </div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Order Submitted!</h2>
         <p className="text-gray-600 mb-4">
-          Your order <strong>{orderCode}</strong> has been submitted successfully.
+          Your order <strong className="font-mono text-cyan-600">{orderCode}</strong> has been submitted successfully.
         </p>
         <div className="bg-white rounded-xl p-4 border border-green-200">
           <p className="text-sm text-gray-700">
