@@ -69,7 +69,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         status: 'Payment Pending'
       };
 
-      // Google Apps Script Web App URL (you'll need to replace this with your actual URL)
+      // REPLACE THIS URL WITH YOUR ACTUAL GOOGLE APPS SCRIPT WEB APP URL
       const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
       
       const response = await fetch(GOOGLE_SCRIPT_URL, {
@@ -78,7 +78,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(orderData)
+        body: JSON.stringify({
+          action: 'addOrder',
+          data: orderData
+        })
       });
 
       // Since we're using no-cors mode, we can't read the response
