@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, Clock, Headphones, Share2, ChevronDown, ChevronUp, Heart, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Shield, Clock, Headphones, Share2, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Game } from '../config/supabase';
 import { useGames, useSubscriptions } from '../hooks/useSupabaseData';
@@ -55,16 +55,32 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
   const faqs = [
     {
-      question: "How do I download the game after purchase?",
-      answer: "After successful payment, you'll receive an email with download instructions and your game key within 5 minutes."
+      question: "What is the difference between rental and permanent purchase?",
+      answer: "Rental: You get access to the game for 30 days. You must return the account after the rental period ends.\n\nPermanent Purchase: You get lifetime access to the game on your console (single device), with warranty and reinstallation support."
     },
     {
-      question: "Is this a legitimate game key?",
-      answer: "Yes, all our game keys are 100% legitimate and sourced directly from authorized distributors."
+      question: "How does the rental process work?",
+      answer: "1. Choose a game and confirm availability.\n2. Make payment and receive login credentials.\n3. Download and play the game for 30 days.\n4. After 30 days, return the account as per our policy."
     },
     {
-      question: "What if the game key doesn't work?",
-      answer: "We offer instant replacement for any non-working keys. Contact our 24/7 support team for immediate assistance."
+      question: "Can I play games from my personal account?",
+      answer: "Yes! All our rentals and permanent purchases are configured to work from your personal account, unless specifically stated otherwise."
+    },
+    {
+      question: "Are these accounts legal and safe?",
+      answer: "Absolutely. We provide full legal accounts with warranty. All games are safe, ban-free, and come with setup support."
+    },
+    {
+      question: "What if my game stops working or is locked?",
+      answer: "You are covered under our warranty period:\n\nRental Games: Support provided for 30 days.\nPermanent Games: Warranty available for 6 months.\n\nIn case of any issue, just contact us — we will assist or replace as needed."
+    },
+    {
+      question: "Do you offer refunds?",
+      answer: "No. All sales are final. Once the game/account is delivered, no refunds are allowed. However, early completion of rental can unlock discounts on your next purchase."
+    },
+    {
+      question: "Can I use the game on multiple devices?",
+      answer: "No. All accounts are meant for single-console use only. Using it on multiple devices or sharing may void the warranty."
     }
   ];
 
@@ -218,15 +234,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
                   </button>
                   <div className="flex space-x-4">
                     <button
-                      onClick={() => onToggleWishlist(product.id || '')}
-                      className={`flex-1 border-2 ${isInWishlist ? 'border-red-400 bg-red-50 text-red-600' : 'border-cyan-400 text-cyan-600'} hover:bg-gradient-to-r hover:from-cyan-400 hover:to-blue-500 hover:text-white py-4 rounded-xl font-bold text-xl transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl`}
-                    >
-                      <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
-                      <span>{isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}</span>
-                    </button>
-                    <button
                       onClick={handleShare}
-                      className="flex-1 border-2 border-gray-400 text-gray-600 hover:bg-gradient-to-r hover:from-gray-400 hover:to-gray-500 hover:text-white py-4 rounded-xl font-bold text-xl transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                      className="w-full border-2 border-gray-400 text-gray-600 hover:bg-gradient-to-r hover:from-gray-400 hover:to-gray-500 hover:text-white py-4 rounded-xl font-bold text-xl transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                     >
                       <Share2 className="w-5 h-5" />
                       <span>Share</span>
@@ -239,8 +248,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
                   <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
                     <Shield className="w-8 h-8 text-green-500" />
                     <div>
-                      <div className="font-bold text-gray-800">Lifetime Warranty</div>
-                      <div className="text-gray-600 text-sm">100% Guaranteed</div>
+                      <div className="font-bold text-gray-800">Game Under Warranty</div>
+                      <div className="text-gray-600 text-sm">6 months coverage</div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-200">
@@ -305,13 +314,13 @@ const ProductPage: React.FC<ProductPageProps> = ({
                     </button>
                     {activeAccordion === 'additional' && (
                       <div className="px-6 pb-6">
-                        <h4 className="font-bold text-gray-800 mb-3">System Requirements</h4>
-                        <ul className="space-y-2 mb-4">
-                          {product.system_requirements.map((req, index) => (
-                            <li key={index} className="text-gray-600 text-sm">{req}</li>
-                          ))}
-                        </ul>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
+                          <h4 className="font-bold text-orange-800 mb-3">Important Notice</h4>
+                          <p className="text-orange-700 leading-relaxed">
+                            Refunds are not available after purchase; however, a replacement will be provided if the product does not function properly.
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 mt-6">
                           <div>
                             <h4 className="font-bold text-gray-800 mb-2">Platform</h4>
                             <p className="text-gray-600">{selectedPlatform}</p>
@@ -343,7 +352,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                         {faqs.map((faq, index) => (
                           <div key={index}>
                             <h5 className="font-semibold text-gray-800 mb-2">{faq.question}</h5>
-                            <p className="text-gray-600 text-sm">{faq.answer}</p>
+                            <p className="text-gray-600 text-sm whitespace-pre-line">{faq.answer}</p>
                           </div>
                         ))}
                       </div>
@@ -451,15 +460,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 </button>
                 <div className="flex space-x-3">
                   <button
-                    onClick={() => onToggleWishlist(product.id || '')}
-                    className={`flex-1 border-2 ${isInWishlist ? 'border-red-400 bg-red-50 text-red-600' : 'border-cyan-400 text-cyan-600'} hover:bg-gradient-to-r hover:from-cyan-400 hover:to-blue-500 hover:text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl`}
-                  >
-                    <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
-                    <span>{isInWishlist ? 'Wishlisted' : 'Wishlist'}</span>
-                  </button>
-                  <button
                     onClick={handleShare}
-                    className="flex-1 border-2 border-gray-400 text-gray-600 hover:bg-gradient-to-r hover:from-gray-400 hover:to-gray-500 hover:text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                    className="w-full border-2 border-gray-400 text-gray-600 hover:bg-gradient-to-r hover:from-gray-400 hover:to-gray-500 hover:text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                   >
                     <Share2 className="w-4 h-4" />
                     <span>Share</span>
@@ -472,8 +474,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
                 <div className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
                   <Shield className="w-6 h-6 text-green-500" />
                   <div>
-                    <div className="font-bold text-gray-800 text-sm">Lifetime Warranty</div>
-                    <div className="text-gray-600 text-xs">100% Guaranteed</div>
+                    <div className="font-bold text-gray-800 text-sm">Game Under Warranty</div>
+                    <div className="text-gray-600 text-xs">6 months coverage</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-200">
@@ -531,12 +533,12 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
                 {activeAccordion === 'additional' && (
                   <div className="space-y-4">
-                    <h4 className="font-bold text-gray-800 mb-3">System Requirements</h4>
-                    <ul className="space-y-2 mb-4">
-                      {product.system_requirements.map((req, index) => (
-                        <li key={index} className="text-gray-600 text-sm">{req}</li>
-                      ))}
-                    </ul>
+                    <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                      <h4 className="font-bold text-orange-800 mb-3">Important Notice</h4>
+                      <p className="text-orange-700 text-sm leading-relaxed">
+                        Refunds are not available after purchase; however, a replacement will be provided if the product does not function properly.
+                      </p>
+                    </div>
                     <div>
                       <h4 className="font-bold text-gray-800 mb-2">Platform</h4>
                       <p className="text-gray-600 mb-4">{selectedPlatform}</p>
@@ -551,7 +553,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                     {faqs.map((faq, index) => (
                       <div key={index}>
                         <h5 className="font-semibold text-gray-800 mb-2 text-sm sm:text-base">{faq.question}</h5>
-                        <p className="text-gray-600 text-sm mb-4">{faq.answer}</p>
+                        <p className="text-gray-600 text-sm mb-4 whitespace-pre-line">{faq.answer}</p>
                       </div>
                     ))}
                   </div>

@@ -41,7 +41,6 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [wishlistItems, setWishlistItems] = useState<string[]>([]);
   
   // Track if we've already shown login toast to prevent duplicates
   const hasShownLoginToast = useRef(false);
@@ -241,20 +240,9 @@ function App() {
     toast.success('Redirecting to checkout!');
   };
 
+  // Removed wishlist functionality
   const handleToggleWishlist = (productId: string) => {
-    if (!isLoggedIn) {
-      toast.error('Please login to add items to wishlist');
-      setIsLoginModalOpen(true);
-      return;
-    }
-
-    if (wishlistItems.includes(productId)) {
-      setWishlistItems(items => items.filter(id => id !== productId));
-      toast.success('Removed from wishlist');
-    } else {
-      setWishlistItems(items => [...items, productId]);
-      toast.success('Added to wishlist');
-    }
+    // This function is kept for compatibility but does nothing
   };
 
   const handleUpdateQuantity = (id: string, quantity: number) => {
@@ -521,7 +509,7 @@ function App() {
           onAddToCart={handleAddToCart}
           onBuyNow={handleBuyNow}
           onToggleWishlist={handleToggleWishlist}
-          isInWishlist={wishlistItems.includes(selectedProduct.id || '')}
+          isInWishlist={false} // Always false since wishlist is removed
           isLoggedIn={isLoggedIn}
           onBackToHome={handleBackToHome}
           onGameClick={handleGameClick}
