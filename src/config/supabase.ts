@@ -20,6 +20,7 @@ export interface Game {
   system_requirements: string[];
   type: string[];
   category: 'game' | 'subscription';
+  show_in_bestsellers?: boolean;
   created_at?: string;
   updated_at?: string;
 }

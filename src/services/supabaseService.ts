@@ -19,13 +19,14 @@ export const gamesService = {
     }
   },
 
-  // Get bestseller games (limited)
+  // Get bestseller games (only those marked as bestsellers)
   async getBestsellers(limitCount: number = 6): Promise<Game[]> {
     try {
       const { data, error } = await supabase
         .from('games')
         .select('*')
         .eq('category', 'game')
+        .eq('show_in_bestsellers', true)
         .order('created_at', { ascending: false })
         .limit(limitCount);
 

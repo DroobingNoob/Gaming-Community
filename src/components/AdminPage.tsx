@@ -194,16 +194,27 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           ? Math.round(((formData.original_price - formData.sale_price) / formData.original_price) * 100)
           : 0;
         
-        const itemData = {
+        let itemData: any = {
           ...formData,
           discount,
-          platform: Array.isArray(formData.platform) ? formData.platform : [formData.platform],
-          type: Array.isArray(formData.type) ? formData.type : [formData.type],
           features: Array.isArray(formData.features) ? formData.features : formData.features?.split('\n').filter((f: string) => f.trim()) || [],
           system_requirements: Array.isArray(formData.system_requirements) ? formData.system_requirements : formData.system_requirements?.split('\n').filter((r: string) => r.trim()) || []
         };
 
         if (stockType === 'games') {
+          // For games, handle platform and type arrays
+          itemData = {
+            ...itemData,
+            platform: Array.isArray(formData.platform) ? formData.platform : [formData.platform],
+            type: Array.isArray(formData.type) ? formData.type : [formData.type],
+            show_in_bestsellers: formData.show_in_bestsellers || false
+          };
+
+          // Reset sale_price if not permanent
+          if (!formData.type?.includes('Permanent')) {
+            itemData.sale_price = 0;
+          }
+
           if (crudOperation === 'create') {
             await gamesService.add(itemData);
             toast.success('Game added successfully!');
@@ -214,6 +225,14 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             refetchGames();
           }
         } else if (stockType === 'subscriptions') {
+          // For subscriptions, set default values and remove platform/type restrictions
+          itemData = {
+            ...itemData,
+            platform: ['Multi-Platform'], // Default platform for subscriptions
+            type: ['Permanent'], // Subscriptions are always permanent
+            show_in_bestsellers: false // Subscriptions don't appear in bestsellers
+          };
+
           if (crudOperation === 'create') {
             await subscriptionsService.add(itemData);
             toast.success('Subscription added successfully!');
@@ -461,6 +480,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
   const renderForm = () => {
     const isTestimonial = activeSection === 'testimonials';
+    const isSubscription = stockType === 'subscriptions';
     
     return (
       <div className="space-y-8">
@@ -584,55 +604,77 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   />
                 </div>
 
-                {/* Platform Selection */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
-                  <div className="space-y-3">
-                    {(stockType === 'games' ? ['PS4', 'PS5'] : ['Xbox', 'PlayStation', 'PC', 'Nintendo Switch', 'Apple']).map((platform) => (
-                      <label key={platform} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <input
-                          type="checkbox"
-                          checked={formData.platform?.includes(platform) || false}
-                          onChange={(e) => {
-                            const platforms = formData.platform || [];
-                            if (e.target.checked) {
-                              setFormData({ ...formData, platform: [...platforms, platform] });
-                            } else {
-                              setFormData({ ...formData, platform: platforms.filter((p: string) => p !== platform) });
-                            }
-                          }}
-                          className="rounded w-5 h-5 text-cyan-600"
-                        />
-                        <span className="font-medium">{platform}</span>
-                      </label>
-                    ))}
+                {/* Platform Selection - Only for Games */}
+                {!isSubscription && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
+                    <div className="space-y-3">
+                      {['PS4', 'PS5'].map((platform) => (
+                        <label key={platform} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={formData.platform?.includes(platform) || false}
+                            onChange={(e) => {
+                              const platforms = formData.platform || [];
+                              if (e.target.checked) {
+                                setFormData({ ...formData, platform: [...platforms, platform] });
+                              } else {
+                                setFormData({ ...formData, platform: platforms.filter((p: string) => p !== platform) });
+                              }
+                            }}
+                            className="rounded w-5 h-5 text-cyan-600"
+                          />
+                          <span className="font-medium">{platform}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* Type Selection */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
-                  <div className="space-y-3">
-                    {['Permanent', 'Rent'].map((type) => (
-                      <label key={type} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <input
-                          type="checkbox"
-                          checked={formData.type?.includes(type) || false}
-                          onChange={(e) => {
-                            const types = formData.type || [];
-                            if (e.target.checked) {
-                              setFormData({ ...formData, type: [...types, type] });
-                            } else {
-                              setFormData({ ...formData, type: types.filter((t: string) => t !== type) });
-                            }
-                          }}
-                          className="rounded w-5 h-5 text-orange-600"
-                        />
-                        <span className="font-medium">{type}</span>
-                      </label>
-                    ))}
+                {/* Type Selection - Only for Games */}
+                {!isSubscription && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
+                    <div className="space-y-3">
+                      {['Permanent', 'Rent'].map((type) => (
+                        <label key={type} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={formData.type?.includes(type) || false}
+                            onChange={(e) => {
+                              const types = formData.type || [];
+                              if (e.target.checked) {
+                                setFormData({ ...formData, type: [...types, type] });
+                              } else {
+                                setFormData({ ...formData, type: types.filter((t: string) => t !== type) });
+                              }
+                            }}
+                            className="rounded w-5 h-5 text-orange-600"
+                          />
+                          <span className="font-medium">{type}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
+
+                {/* Show in Bestsellers - Only for Games */}
+                {!isSubscription && (
+                  <div className="md:col-span-2">
+                    <label className="flex items-center space-x-3 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+                      <input
+                        type="checkbox"
+                        checked={formData.show_in_bestsellers || false}
+                        onChange={(e) => setFormData({ ...formData, show_in_bestsellers: e.target.checked })}
+                        className="rounded w-5 h-5 text-purple-600"
+                      />
+                      <div>
+                        <span className="font-semibold text-purple-800">Show in Bestsellers on Homepage</span>
+                        <p className="text-sm text-purple-600">Check this to display the game in the bestsellers section</p>
+                      </div>
+                    </label>
+                  </div>
+                )}
 
                 {/* Pricing */}
                 <div>
@@ -647,19 +689,22 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Sale Price (₹)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.sale_price || ''}
-                    onChange={(e) => setFormData({ ...formData, sale_price: parseFloat(e.target.value) })}
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                    placeholder="0.00"
-                  />
-                </div>
+                {/* Sale Price - Only show if Permanent type is selected for games, always show for subscriptions */}
+                {(isSubscription || formData.type?.includes('Permanent')) && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Sale Price (₹)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.sale_price || ''}
+                      onChange={(e) => setFormData({ ...formData, sale_price: parseFloat(e.target.value) })}
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                      placeholder="0.00"
+                    />
+                  </div>
+                )}
 
-                {formData.type?.includes('Rent') && (
+                {formData.type?.includes('Rent') && !isSubscription && (
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-3">Rent Price (₹)</label>
                     <input
@@ -775,6 +820,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     <div>
                       <h3 className="font-bold text-gray-800 text-lg">{item.title}</h3>
                       <p className="text-gray-600">₹{item.sale_price} - {item.platform?.join(', ')}</p>
+                      {stockType === 'games' && item.show_in_bestsellers && (
+                        <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full mt-1">
+                          Bestseller
+                        </span>
+                      )}
                     </div>
                   </>
                 )}
