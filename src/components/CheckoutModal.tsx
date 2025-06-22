@@ -76,7 +76,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       };
 
       // UPDATED GOOGLE APPS SCRIPT URL - Make sure this matches your new deployment
-      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2A6eBmjBkqH-BavLeNZT3lTsxzrx3yCJQPRT52dlXvX-X0sBcXVhC0zKS5AFH9L8R/exec';
+      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzvRUDKOTMlLZsfyXOdJuSN3CGwahuhsI1Et2Igb6tt/dev';
       
       console.log('Submitting order to:', GOOGLE_SCRIPT_URL);
       console.log('Order data:', orderData);
