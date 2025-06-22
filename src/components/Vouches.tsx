@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTestimonials } from '../hooks/useSupabaseData';
+import Loader from './Loader';
 
 const Vouches: React.FC = () => {
   const { testimonials, loading, error } = useTestimonials();
@@ -26,10 +27,7 @@ const Vouches: React.FC = () => {
               Real phone screenshots from our satisfied gaming community
             </p>
           </div>
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading testimonials...</p>
-          </div>
+          <Loader size="large" message="Loading customer testimonials..." />
         </div>
       </section>
     );

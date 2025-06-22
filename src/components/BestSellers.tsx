@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBestsellers } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
+import Loader from './Loader';
 
 interface BestSellersProps {
   onGameClick: (game: Game) => void;
@@ -27,18 +28,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
               Most popular titles loved by our gaming community
             </p>
           </div>
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden animate-pulse">
-                <div className="w-full aspect-square bg-gray-300"></div>
-                <div className="p-3 sm:p-4 md:p-6">
-                  <div className="h-4 bg-gray-300 rounded mb-2"></div>
-                  <div className="h-6 bg-gray-300 rounded mb-4"></div>
-                  <div className="h-10 bg-gray-300 rounded"></div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Loader size="large" message="Loading bestsellers..." />
         </div>
       </section>
     );

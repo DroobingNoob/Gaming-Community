@@ -8,6 +8,7 @@ import {
 } from '../services/supabaseService';
 import { Game, Testimonial } from '../config/supabase';
 import { useGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
+import Loader from './Loader';
 
 interface AdminPageProps {
   onBackToHome: () => void;
@@ -919,6 +920,18 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       <span className="font-medium">Back</span>
     </button>
   );
+
+  // Show loader while data is being fetched
+  if (games.length === 0 && subscriptions.length === 0 && testimonials.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          {renderBackButton()}
+          <Loader size="large" message="Loading admin dashboard..." fullScreen={false} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">

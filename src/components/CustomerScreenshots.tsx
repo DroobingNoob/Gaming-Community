@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTestimonials } from '../hooks/useSupabaseData';
+import Loader from './Loader';
 
 const CustomerScreenshots: React.FC = () => {
   const { testimonials, loading, error } = useTestimonials();
@@ -8,10 +9,7 @@ const CustomerScreenshots: React.FC = () => {
     return (
       <div className="py-8">
         <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">Customer Screenshots</h3>
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading screenshots...</p>
-        </div>
+        <Loader size="medium" message="Loading customer screenshots..." />
       </div>
     );
   }

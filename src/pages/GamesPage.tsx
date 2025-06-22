@@ -3,6 +3,7 @@ import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useGames } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
+import Loader from '../components/Loader';
 
 const GamesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -76,10 +77,7 @@ const GamesPage: React.FC = () => {
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Games</h1>
             </div>
           </div>
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading games...</p>
-          </div>
+          <Loader size="large" message="Loading amazing games..." fullScreen={false} />
         </div>
       </div>
     );
