@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Hero from '../components/Hero';
 import TrustIndicators from '../components/TrustIndicators';
 import Vouches from '../components/Vouches';
 import BestSellers from '../components/BestSellers';
 import Categories from '../components/Categories';
-import { useNavigate } from 'react-router-dom';
+import Loader from '../components/Loader';
 import { Game } from '../config/supabase';
 
 interface HomePageProps {
@@ -13,6 +14,16 @@ interface HomePageProps {
 
 const HomePage: React.FC<HomePageProps> = ({ onNavigation }) => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate initial loading for home page
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500); // Show loader for 1.5 seconds on initial load
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleGameClick = (game: Game) => {
     if (game.category === 'game') {
@@ -36,6 +47,10 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigation }) => {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  if (isLoading) {
+    return <Loader size="large" message="Welcome to Gaming Community!" fullScreen={true} />;
+  }
 
   return (
     <>
