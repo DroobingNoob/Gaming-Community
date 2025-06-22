@@ -19,7 +19,7 @@ export interface OrderData {
 }
 
 export class GoogleSheetsService {
-  private static readonly SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2A6eBmjBkqH-BavLeNZT3lTsxzrx3yCJQPRT52dlXvX-X0sBcXVhC0zKS5AFH9L8R/exec';
+  private static readonly SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzvRUDKOTMlLZsfyXOdJuSN3CGwahuhsI1Et2Igb6tt/dev';
  
   static async submitOrder(orderData: OrderData): Promise<boolean> {
     try {
