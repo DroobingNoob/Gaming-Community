@@ -53,7 +53,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     return `GC${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
   };
 
-  // Submit order to Google Sheets
+  // Submit order to Google Sheets with the NEW URL
   const submitOrderToGoogleSheets = async (code: string) => {
     try {
       setIsSubmittingOrder(true);
@@ -75,8 +75,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         status: 'Payment Pending'
       };
 
-      // REPLACE THIS URL WITH YOUR ACTUAL GOOGLE APPS SCRIPT WEB APP URL
-      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzEvQYtQDl_bqPZySGIO7KbhKZ6hoOs20qdx5SrN5iYx7MbC6YQvMLWib0cufhISidEIA/exec';
+      // UPDATED GOOGLE APPS SCRIPT URL - Make sure this matches your new deployment
+      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2A6eBmjBkqH-BavLeNZT3lTsxzrx3yCJQPRT52dlXvX-X0sBcXVhC0zKS5AFH9L8R/exec';
+      
+      console.log('Submitting order to:', GOOGLE_SCRIPT_URL);
+      console.log('Order data:', orderData);
       
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
@@ -342,7 +345,7 @@ I have made the payment via UPI. Please find the screenshot attached.`;
           </div>
           <div>
             <h4 className="font-bold text-green-800">Order Recorded</h4>
-            <p className="text-sm text-green-700">Your order has been automatically saved to our tracking system</p>
+            <p className="text-sm text-green-700">Your order has been automatically saved to our NEW tracking system</p>
           </div>
         </div>
       </div>
