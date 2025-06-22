@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PlayCircle, Crown } from 'lucide-react';
 
 interface CategoriesProps {
@@ -7,6 +8,8 @@ interface CategoriesProps {
 }
 
 const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscriptions }) => {
+  const navigate = useNavigate();
+
   const categories = [
     {
       id: 1,
@@ -15,7 +18,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
       description: "PS4 & PS5 exclusive titles",
       image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=300",
       gameCount: "300+",
-      onClick: onViewAllGames
+      onClick: () => navigate('/games')
     },
     {
       id: 2,
@@ -24,7 +27,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
       description: "Game Pass & PS Plus",
       image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400&h=300",
       gameCount: "10+",
-      onClick: onViewSubscriptions
+      onClick: () => navigate('/subscriptions')
     }
   ];
 

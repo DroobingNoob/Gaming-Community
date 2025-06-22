@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useBestsellers } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
 
@@ -7,10 +8,11 @@ interface BestSellersProps {
 }
 
 const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
+  const navigate = useNavigate();
   const { bestsellers, loading, error } = useBestsellers(6);
 
   const handleViewAllGames = () => {
-    window.dispatchEvent(new CustomEvent('viewAllGames'));
+    navigate('/games');
   };
 
   if (loading) {

@@ -1,24 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/Header';
-import Hero from './components/Hero';
-import TrustIndicators from './components/TrustIndicators';
-import Vouches from './components/Vouches';
-import BestSellers from './components/BestSellers';
-import Categories from './components/Categories';
 import Footer from './components/Footer';
 import LoginModal from './components/LoginModal';
 import CartModal from './components/CartModal';
 import CheckoutModal from './components/CheckoutModal';
 import WhatsAppButton from './components/WhatsAppButton';
-import ProductPage from './components/ProductPage';
-import AllGamesPage from './components/AllGamesPage';
-import SubscriptionsPage from './components/SubscriptionsPage';
-import AdminPage from './components/AdminPage';
-import TermsPage from './components/TermsPage';
-import RefundPolicyPage from './components/RefundPolicyPage';
-import FAQPage from './components/FAQPage';
+
+// Page Components
+import HomePage from './pages/HomePage';
+import GamesPage from './pages/GamesPage';
+import SubscriptionsPage from './pages/SubscriptionsPage';
+import ProductPage from './pages/ProductPage';
+import AdminPage from './pages/AdminPage';
+import TermsPage from './pages/TermsPage';
+import RefundPolicyPage from './pages/RefundPolicyPage';
+import FAQPage from './pages/FAQPage';
+
 import { Game, supabase } from './config/supabase';
 
 interface CartItem {
@@ -35,12 +35,13 @@ function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'home' | 'product' | 'allgames' | 'subscriptions' | 'admin' | 'terms' | 'refund' | 'faq'>('home');
-  const [selectedProduct, setSelectedProduct] = useState<Game | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  
+  const navigate = useNavigate();
+  const location = useLocation();
   
   // Track if we've already shown login toast to prevent duplicates
   const hasShownLoginToast = useRef(false);
@@ -98,26 +99,6 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const handleViewAllGames = () => {
-      setCurrentView('allgames');
-      window.scrollTo(0, 0);
-    };
-
-    const handleViewSubscriptions = () => {
-      setCurrentView('subscriptions');
-      window.scrollTo(0, 0);
-    };
-
-    window.addEventListener('viewAllGames', handleViewAllGames);
-    window.addEventListener('viewSubscriptions', handleViewSubscriptions);
-    
-    return () => {
-      window.removeEventListener('viewAllGames', handleViewAllGames);
-      window.removeEventListener('viewSubscriptions', handleViewSubscriptions);
-    };
-  }, []);
-
   const handleLogin = () => {
     // This will be handled by the auth state change listener
     setIsLoginModalOpen(false);
@@ -154,31 +135,75 @@ function App() {
     toast.success('Order placed successfully! You will receive your games within 15 minutes.');
   };
 
-  const handleGameClick = (game: Game) => {
-    setSelectedProduct(game);
-    setCurrentView('product');
-    window.scrollTo(0, 0);
+  const handleNavigation = (section: string) => {
+    if (section === 'admin' && isAdmin) {
+      navigate('/admin');
+      return;
+    }
+
+    if (section === 'logout' && isLoggedIn) {
+      handleLogout();
+      return;
+    }
+
+    if (section === 'contact') {
+      // Open WhatsApp for contact
+      const phoneNumber = '9266514434';
+      const message = 'Hi! I need help with my gaming purchase.';
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+      return;
+    }
+
+    if (section === 'terms') {
+      navigate('/terms');
+      return;
+    }
+
+    if (section === 'refund') {
+      navigate('/refund-policy');
+      return;
+    }
+
+    if (section === 'faq') {
+      navigate('/faq');
+      return;
+    }
+
+    if (section === 'home') {
+      navigate('/');
+      return;
+    }
+
+    if (section === 'categories') {
+      // Scroll to categories section on home page
+      if (location.pathname !== '/') {
+        navigate('/');
+        setTimeout(() => {
+          scrollToSection('categories');
+        }, 100);
+      } else {
+        scrollToSection('categories');
+      }
+      return;
+    }
+    
+    // For other sections, scroll to them if on home page
+    if (location.pathname === '/') {
+      scrollToSection(section);
+    } else {
+      navigate('/');
+      setTimeout(() => {
+        scrollToSection(section);
+      }, 100);
+    }
   };
 
-  const handleViewAllGames = () => {
-    setCurrentView('allgames');
-    window.scrollTo(0, 0);
-  };
-
-  const handleViewSubscriptions = () => {
-    setCurrentView('subscriptions');
-    window.scrollTo(0, 0);
-  };
-
-  const handleViewAdmin = () => {
-    setCurrentView('admin');
-    window.scrollTo(0, 0);
-  };
-
-  const handleBackToHome = () => {
-    setCurrentView('home');
-    setSelectedProduct(null);
-    window.scrollTo(0, 0);
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleAddToCart = (product: Game, platform: string, type: string, price: number) => {
@@ -228,11 +253,6 @@ function App() {
     toast.success('Redirecting to checkout!');
   };
 
-  // Removed wishlist functionality
-  const handleToggleWishlist = (productId: string) => {
-    // This function is kept for compatibility but does nothing
-  };
-
   const handleUpdateQuantity = (id: string, quantity: number) => {
     setCartItems(items =>
       items.map(item =>
@@ -244,390 +264,6 @@ function App() {
   const handleRemoveItem = (id: string) => {
     setCartItems(items => items.filter(item => item.id !== id));
   };
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleNavigation = (section: string) => {
-    if (section === 'admin' && isAdmin) {
-      handleViewAdmin();
-      return;
-    }
-
-    if (section === 'logout' && isLoggedIn) {
-      handleLogout();
-      return;
-    }
-
-    if (section === 'contact') {
-      // Open WhatsApp for contact
-      const phoneNumber = '9266514434';
-      const message = 'Hi! I need help with my gaming purchase.';
-      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
-      return;
-    }
-
-    if (section === 'terms') {
-      setCurrentView('terms');
-      window.scrollTo(0, 0);
-      return;
-    }
-
-    if (section === 'refund') {
-      setCurrentView('refund');
-      window.scrollTo(0, 0);
-      return;
-    }
-
-    if (section === 'faq') {
-      setCurrentView('faq');
-      window.scrollTo(0, 0);
-      return;
-    }
-    
-    if (currentView !== 'home') {
-      setCurrentView('home');
-      setSelectedProduct(null);
-      setTimeout(() => {
-        scrollToSection(section);
-      }, 100);
-    } else {
-      scrollToSection(section);
-    }
-  };
-
-  if (currentView === 'faq') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-        <Header
-          onLoginClick={() => setIsLoginModalOpen(true)}
-          onCartClick={handleCartClick}
-          isLoggedIn={isLoggedIn}
-          isAdmin={isAdmin}
-          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-          onNavigation={handleNavigation}
-          user={user}
-        />
-        
-        <FAQPage onBackToHome={handleBackToHome} />
-
-        <Footer onNavigation={handleNavigation} />
-
-        <LoginModal
-          isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
-          onLogin={handleLogin}
-        />
-
-        <CartModal
-          isOpen={isCartModalOpen}
-          onClose={() => setIsCartModalOpen(false)}
-          cartItems={cartItems}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemoveItem={handleRemoveItem}
-          onCheckout={handleCheckout}
-        />
-
-        <CheckoutModal
-          isOpen={isCheckoutModalOpen}
-          onClose={() => setIsCheckoutModalOpen(false)}
-          cartItems={cartItems}
-          onOrderComplete={handleOrderComplete}
-        />
-
-        <WhatsAppButton />
-        <ToastContainer />
-      </div>
-    );
-  }
-
-  if (currentView === 'terms') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-        <Header
-          onLoginClick={() => setIsLoginModalOpen(true)}
-          onCartClick={handleCartClick}
-          isLoggedIn={isLoggedIn}
-          isAdmin={isAdmin}
-          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-          onNavigation={handleNavigation}
-          user={user}
-        />
-        
-        <TermsPage onBackToHome={handleBackToHome} />
-
-        <Footer onNavigation={handleNavigation} />
-
-        <LoginModal
-          isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
-          onLogin={handleLogin}
-        />
-
-        <CartModal
-          isOpen={isCartModalOpen}
-          onClose={() => setIsCartModalOpen(false)}
-          cartItems={cartItems}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemoveItem={handleRemoveItem}
-          onCheckout={handleCheckout}
-        />
-
-        <CheckoutModal
-          isOpen={isCheckoutModalOpen}
-          onClose={() => setIsCheckoutModalOpen(false)}
-          cartItems={cartItems}
-          onOrderComplete={handleOrderComplete}
-        />
-
-        <WhatsAppButton />
-        <ToastContainer />
-      </div>
-    );
-  }
-
-  if (currentView === 'refund') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-        <Header
-          onLoginClick={() => setIsLoginModalOpen(true)}
-          onCartClick={handleCartClick}
-          isLoggedIn={isLoggedIn}
-          isAdmin={isAdmin}
-          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-          onNavigation={handleNavigation}
-          user={user}
-        />
-        
-        <RefundPolicyPage onBackToHome={handleBackToHome} />
-
-        <Footer onNavigation={handleNavigation} />
-
-        <LoginModal
-          isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
-          onLogin={handleLogin}
-        />
-
-        <CartModal
-          isOpen={isCartModalOpen}
-          onClose={() => setIsCartModalOpen(false)}
-          cartItems={cartItems}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemoveItem={handleRemoveItem}
-          onCheckout={handleCheckout}
-        />
-
-        <CheckoutModal
-          isOpen={isCheckoutModalOpen}
-          onClose={() => setIsCheckoutModalOpen(false)}
-          cartItems={cartItems}
-          onOrderComplete={handleOrderComplete}
-        />
-
-        <WhatsAppButton />
-        <ToastContainer />
-      </div>
-    );
-  }
-
-  if (currentView === 'admin') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-        <Header
-          onLoginClick={() => setIsLoginModalOpen(true)}
-          onCartClick={handleCartClick}
-          isLoggedIn={isLoggedIn}
-          isAdmin={isAdmin}
-          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-          onNavigation={handleNavigation}
-          user={user}
-        />
-        
-        <AdminPage onBackToHome={handleBackToHome} />
-
-        <LoginModal
-          isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
-          onLogin={handleLogin}
-        />
-
-        <CartModal
-          isOpen={isCartModalOpen}
-          onClose={() => setIsCartModalOpen(false)}
-          cartItems={cartItems}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemoveItem={handleRemoveItem}
-          onCheckout={handleCheckout}
-        />
-
-        <CheckoutModal
-          isOpen={isCheckoutModalOpen}
-          onClose={() => setIsCheckoutModalOpen(false)}
-          cartItems={cartItems}
-          onOrderComplete={handleOrderComplete}
-        />
-
-        <WhatsAppButton />
-        <ToastContainer />
-      </div>
-    );
-  }
-
-  if (currentView === 'product' && selectedProduct) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-        <Header
-          onLoginClick={() => setIsLoginModalOpen(true)}
-          onCartClick={handleCartClick}
-          isLoggedIn={isLoggedIn}
-          isAdmin={isAdmin}
-          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-          onNavigation={handleNavigation}
-          user={user}
-        />
-        
-        <ProductPage
-          product={selectedProduct}
-          onAddToCart={handleAddToCart}
-          onBuyNow={handleBuyNow}
-          onToggleWishlist={handleToggleWishlist}
-          isInWishlist={false} // Always false since wishlist is removed
-          isLoggedIn={isLoggedIn}
-          onBackToHome={handleBackToHome}
-          onGameClick={handleGameClick}
-        />
-
-        <Footer onNavigation={handleNavigation} />
-
-        <LoginModal
-          isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
-          onLogin={handleLogin}
-        />
-
-        <CartModal
-          isOpen={isCartModalOpen}
-          onClose={() => setIsCartModalOpen(false)}
-          cartItems={cartItems}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemoveItem={handleRemoveItem}
-          onCheckout={handleCheckout}
-        />
-
-        <CheckoutModal
-          isOpen={isCheckoutModalOpen}
-          onClose={() => setIsCheckoutModalOpen(false)}
-          cartItems={cartItems}
-          onOrderComplete={handleOrderComplete}
-        />
-
-        <WhatsAppButton />
-        <ToastContainer />
-      </div>
-    );
-  }
-
-  if (currentView === 'allgames') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-        <Header
-          onLoginClick={() => setIsLoginModalOpen(true)}
-          onCartClick={handleCartClick}
-          isLoggedIn={isLoggedIn}
-          isAdmin={isAdmin}
-          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-          onNavigation={handleNavigation}
-          user={user}
-        />
-        
-        <AllGamesPage
-          onGameClick={handleGameClick}
-          onBackToHome={handleBackToHome}
-        />
-
-        <Footer onNavigation={handleNavigation} />
-
-        <LoginModal
-          isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
-          onLogin={handleLogin}
-        />
-
-        <CartModal
-          isOpen={isCartModalOpen}
-          onClose={() => setIsCartModalOpen(false)}
-          cartItems={cartItems}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemoveItem={handleRemoveItem}
-          onCheckout={handleCheckout}
-        />
-
-        <CheckoutModal
-          isOpen={isCheckoutModalOpen}
-          onClose={() => setIsCheckoutModalOpen(false)}
-          cartItems={cartItems}
-          onOrderComplete={handleOrderComplete}
-        />
-
-        <WhatsAppButton />
-        <ToastContainer />
-      </div>
-    );
-  }
-
-  if (currentView === 'subscriptions') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-        <Header
-          onLoginClick={() => setIsLoginModalOpen(true)}
-          onCartClick={handleCartClick}
-          isLoggedIn={isLoggedIn}
-          isAdmin={isAdmin}
-          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-          onNavigation={handleNavigation}
-          user={user}
-        />
-        
-        <SubscriptionsPage
-          onGameClick={handleGameClick}
-          onBackToHome={handleBackToHome}
-        />
-
-        <Footer onNavigation={handleNavigation} />
-
-        <LoginModal
-          isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
-          onLogin={handleLogin}
-        />
-
-        <CartModal
-          isOpen={isCartModalOpen}
-          onClose={() => setIsCartModalOpen(false)}
-          cartItems={cartItems}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemoveItem={handleRemoveItem}
-          onCheckout={handleCheckout}
-        />
-
-        <CheckoutModal
-          isOpen={isCheckoutModalOpen}
-          onClose={() => setIsCheckoutModalOpen(false)}
-          cartItems={cartItems}
-          onOrderComplete={handleOrderComplete}
-        />
-
-        <WhatsAppButton />
-        <ToastContainer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
@@ -642,15 +278,17 @@ function App() {
       />
       
       <main>
-        <Hero onShopBestsellers={() => scrollToSection('bestsellers')} onBrowseCategories={() => scrollToSection('categories')} />
-        <TrustIndicators />
-        <Vouches />
-        <div id="bestsellers">
-          <BestSellers onGameClick={handleGameClick} />
-        </div>
-        <div id="categories">
-          <Categories onViewAllGames={handleViewAllGames} onViewSubscriptions={handleViewSubscriptions} />
-        </div>
+        <Routes>
+          <Route path="/" element={<HomePage onNavigation={handleNavigation} />} />
+          <Route path="/games" element={<GamesPage />} />
+          <Route path="/games/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
+          <Route path="/subscriptions" element={<SubscriptionsPage />} />
+          <Route path="/subscriptions/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
+          <Route path="/admin" element={isAdmin ? <AdminPage /> : <HomePage onNavigation={handleNavigation} />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/refund-policy" element={<RefundPolicyPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+        </Routes>
       </main>
 
       <Footer onNavigation={handleNavigation} />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ShoppingCart, User, Menu, X, Shield, LogOut } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useGames, useSubscriptions } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
 
@@ -14,6 +15,8 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, isAdmin, cartItemCount, onNavigation, user }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -56,16 +59,16 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
     
     // Navigate to the appropriate page based on item category
     if (item.category === 'game') {
-      onNavigation('allgames');
+      navigate(`/games/${item.id}`);
     } else {
-      onNavigation('subscriptions');
+      navigate(`/subscriptions/${item.id}`);
     }
   };
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
       // Navigate to all games page with search query
-      onNavigation('allgames');
+      navigate('/games');
       setIsSearchExpanded(false);
     }
   };
@@ -84,7 +87,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
 
   const handleNavClick = (itemId: string) => {
     if (itemId === 'home') {
-      onNavigation('home');
+      navigate('/');
     } else if (itemId === 'contact') {
       // Open WhatsApp for contact
       const phoneNumber = '9266514434';
@@ -121,7 +124,8 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
-                    className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-xl"
+                    className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-xl cursor-pointer"
+                    onClick={() => navigate('/')}
                   />
                 </div>
 
@@ -203,7 +207,8 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
-                    className="w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg"
+                    className="w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg cursor-pointer"
+                    onClick={() => navigate('/')}
                   />
                 </div>
 
