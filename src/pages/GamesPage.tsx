@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useGames } from '../hooks/useSupabaseData';
-import { Game } from '../config/supabase';
+import { Game, getGameDisplayPrice, getGameDiscountPercentage } from '../config/supabase';
 import Loader from '../components/Loader';
 
 const GamesPage: React.FC = () => {
@@ -23,7 +23,10 @@ const GamesPage: React.FC = () => {
     let filtered = games.filter(game => {
       const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesPlatform = selectedPlatform === 'all' || game.platform.includes(selectedPlatform);
-      const matchesPrice = game.sale_price >= priceRange[0] && game.sale_price <= priceRange[1];
+      
+      // For price filtering, use 1 month rent price for games
+      const displayPrice = getGameDisplayPrice(game, 'Rent', '1_month');
+      const matchesPrice = displayPrice >= priceRange[0] && displayPrice <= priceRange[1];
       
       return matchesSearch && matchesPlatform && matchesPrice;
     });
@@ -36,9 +39,13 @@ const GamesPage: React.FC = () => {
         case 'name-desc':
           return b.title.localeCompare(a.title);
         case 'price-low':
-          return a.sale_price - b.sale_price;
+          const priceA = getGameDisplayPrice(a, 'Rent', '1_month');
+          const priceB = getGameDisplayPrice(b, 'Rent', '1_month');
+          return priceA - priceB;
         case 'price-high':
-          return b.sale_price - a.sale_price;
+          const priceA2 = getGameDisplayPrice(a, 'Rent', '1_month');
+          const priceB2 = getGameDisplayPrice(b, 'Rent', '1_month');
+          return priceB2 - priceA2;
         default:
           return 0;
       }
@@ -233,93 +240,103 @@ const GamesPage: React.FC = () => {
               </div>
             ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
-                {paginatedGames.map((game) => (
-                  <div
-                    key={game.id}
-                    className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-3 cursor-pointer group"
-                    onClick={() => handleGameClick(game)}
-                  >
-                    <div className="relative overflow-hidden">
-                      <img
-                        src={game.image}
-                        alt={game.title}
-                        className="w-full aspect-square object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                      {game.discount > 0 && (
-                        <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-bold shadow-lg">
-                          -{game.discount}%
-                        </div>
-                      )}
-                      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium shadow-lg">
-                        {game.platform.join(', ')}
-                      </div>
-                    </div>
-                    <div className="p-3 sm:p-4">
-                      <h3 className="font-bold text-gray-800 text-xs sm:text-sm mb-2 line-clamp-2">
-                        {game.title}
-                      </h3>
-                      <div className="flex items-center space-x-1 sm:space-x-2 mb-2 sm:mb-3">
-                        <span className="text-sm sm:text-lg font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                          ₹{game.sale_price}
-                        </span>
-                        {game.original_price > game.sale_price && (
-                          <span className="text-xs sm:text-sm text-gray-500 line-through">
-                            ₹{game.original_price}
-                          </span>
+                {paginatedGames.map((game) => {
+                  const displayPrice = getGameDisplayPrice(game, 'Rent', '1_month');
+                  const discountPercentage = getGameDiscountPercentage(game, 'Rent', '1_month');
+
+                  return (
+                    <div
+                      key={game.id}
+                      className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-3 cursor-pointer group"
+                      onClick={() => handleGameClick(game)}
+                    >
+                      <div className="relative overflow-hidden">
+                        <img
+                          src={game.image}
+                          alt={game.title}
+                          className="w-full aspect-square object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        {discountPercentage > 0 && (
+                          <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-bold shadow-lg">
+                            -{discountPercentage}%
+                          </div>
                         )}
+                        <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium shadow-lg">
+                          {game.platform.join(', ')}
+                        </div>
                       </div>
-                      <button className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-                        Select Options
-                      </button>
+                      <div className="p-3 sm:p-4">
+                        <h3 className="font-bold text-gray-800 text-xs sm:text-sm mb-2 line-clamp-2">
+                          {game.title}
+                        </h3>
+                        <div className="flex items-center space-x-1 sm:space-x-2 mb-2 sm:mb-3">
+                          <span className="text-sm sm:text-lg font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                            ₹{displayPrice}
+                          </span>
+                          {discountPercentage > 0 && (
+                            <span className="text-xs sm:text-sm text-gray-500 line-through">
+                              ₹{game.original_price}
+                            </span>
+                          )}
+                        </div>
+                        <button className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                          Select Options
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                {paginatedGames.map((game) => (
-                  <div
-                    key={game.id}
-                    className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
-                    onClick={() => handleGameClick(game)}
-                  >
-                    <div className="flex items-center p-4 sm:p-6">
-                      <img
-                        src={game.image}
-                        alt={game.title}
-                        className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover rounded-lg mr-4 sm:mr-6"
-                      />
-                      <div className="flex-1">
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
-                          <div className="flex-1 mb-3 sm:mb-0">
-                            <h3 className="font-bold text-gray-800 text-sm sm:text-lg mb-1 sm:mb-2">{game.title}</h3>
-                            <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2 hidden sm:block">{game.description}</p>
-                            <div className="flex items-center space-x-2">
-                              <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
-                                {game.platform.join(', ')}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="text-left sm:text-right">
-                            <div className="flex items-center space-x-2 mb-2 sm:mb-3">
-                              <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                                ₹{game.sale_price}
-                              </span>
-                              {game.original_price > game.sale_price && (
-                                <span className="text-sm sm:text-lg text-gray-500 line-through">
-                                  ₹{game.original_price}
+                {paginatedGames.map((game) => {
+                  const displayPrice = getGameDisplayPrice(game, 'Rent', '1_month');
+                  const discountPercentage = getGameDiscountPercentage(game, 'Rent', '1_month');
+
+                  return (
+                    <div
+                      key={game.id}
+                      className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
+                      onClick={() => handleGameClick(game)}
+                    >
+                      <div className="flex items-center p-4 sm:p-6">
+                        <img
+                          src={game.image}
+                          alt={game.title}
+                          className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover rounded-lg mr-4 sm:mr-6"
+                        />
+                        <div className="flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+                            <div className="flex-1 mb-3 sm:mb-0">
+                              <h3 className="font-bold text-gray-800 text-sm sm:text-lg mb-1 sm:mb-2">{game.title}</h3>
+                              <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2 hidden sm:block">{game.description}</p>
+                              <div className="flex items-center space-x-2">
+                                <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
+                                  {game.platform.join(', ')}
                                 </span>
-                              )}
+                              </div>
                             </div>
-                            <button className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white py-2 px-4 sm:px-6 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-                              Select Options
-                            </button>
+                            <div className="text-left sm:text-right">
+                              <div className="flex items-center space-x-2 mb-2 sm:mb-3">
+                                <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                                  ₹{displayPrice}
+                                </span>
+                                {discountPercentage > 0 && (
+                                  <span className="text-sm sm:text-lg text-gray-500 line-through">
+                                    ₹{game.original_price}
+                                  </span>
+                                )}
+                              </div>
+                              <button className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white py-2 px-4 sm:px-6 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                Select Options
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield, Clock, Headphones, Share2, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { Game } from '../config/supabase';
+import { Game, getGameDisplayPrice, getGameDiscountPercentage } from '../config/supabase';
 import { useGames, useSubscriptions } from '../hooks/useSupabaseData';
 import CustomerScreenshots from '../components/CustomerScreenshots';
 import Loader from '../components/Loader';
@@ -149,20 +149,21 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
   };
 
   const calculatePrice = () => {
-    if (selectedType === 'Rent') {
-      const rentPrices = {
-        '1_month': product.rent_1_month || 0,
-        '2_months': product.rent_2_months || 0,
-        '3_months': product.rent_3_months || 0,
-        '6_months': product.rent_6_months || 0
-      };
-      return rentPrices[selectedRentDuration];
-    } else if (selectedType === 'Permanent Offline') {
-      return product.permanent_offline_price || product.sale_price;
-    } else if (selectedType === 'Permanent Offline + Online') {
-      return product.permanent_online_price || product.sale_price;
+    if (product.category === 'subscription') {
+      return product.sale_price; // Subscriptions keep original logic
     }
-    return product.sale_price;
+
+    // For games, use the new pricing logic
+    return getGameDisplayPrice(product, selectedType, selectedRentDuration);
+  };
+
+  const getDiscountPercentage = () => {
+    if (product.category === 'subscription') {
+      return product.discount; // Subscriptions keep original logic
+    }
+
+    // For games, calculate discount based on selected type
+    return getGameDiscountPercentage(product, selectedType, selectedRentDuration);
   };
 
   const getTypeDescription = () => {
@@ -218,6 +219,9 @@ Suitable for multiplayer games, online features, and users who want full flexibi
       navigate(`/subscriptions/${relatedProduct.id}`);
     }
   };
+
+  const currentPrice = calculatePrice();
+  const discountPercentage = getDiscountPercentage();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
@@ -338,12 +342,17 @@ Suitable for multiplayer games, online features, and users who want full flexibi
                 {/* Pricing */}
                 <div className="flex items-center space-x-3 xl:space-x-4 mb-6 xl:mb-8">
                   <span className="text-3xl xl:text-5xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                    ₹{calculatePrice().toFixed(2)}
+                    ₹{currentPrice.toFixed(2)}
                   </span>
-                  {product.discount > 0 && (
-                    <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 xl:px-4 py-1 xl:py-2 rounded-full text-sm xl:text-lg font-bold shadow-lg">
-                      -{product.discount}%
-                    </span>
+                  {discountPercentage > 0 && (
+                    <>
+                      <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 xl:px-4 py-1 xl:py-2 rounded-full text-sm xl:text-lg font-bold shadow-lg">
+                        -{discountPercentage}%
+                      </span>
+                      <span className="text-lg xl:text-2xl text-gray-500 line-through">
+                        ₹{product.original_price}
+                      </span>
+                    </>
                   )}
                 </div>
 
@@ -586,12 +595,17 @@ Suitable for multiplayer games, online features, and users who want full flexibi
               {/* Pricing */}
               <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
                 <span className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                  ₹{calculatePrice().toFixed(2)}
+                  ₹{currentPrice.toFixed(2)}
                 </span>
-                {product.discount > 0 && (
-                  <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold shadow-lg">
-                    -{product.discount}%
-                  </span>
+                {discountPercentage > 0 && (
+                  <>
+                    <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold shadow-lg">
+                      -{discountPercentage}%
+                    </span>
+                    <span className="text-sm sm:text-lg text-gray-500 line-through">
+                      ₹{product.original_price}
+                    </span>
+                  </>
                 )}
               </div>
 
@@ -718,28 +732,39 @@ Suitable for multiplayer games, online features, and users who want full flexibi
           <div className="mb-6 sm:mb-8 md:mb-12">
             <h3 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">You May Also Like</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-              {relatedProducts.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 sm:hover:-translate-y-2"
-                  onClick={() => handleRelatedProductClick(item)}
-                >
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full aspect-square object-cover"
-                  />
-                  <div className="p-2 sm:p-3 md:p-4">
-                    <h4 className="font-bold text-gray-800 text-xs sm:text-sm mb-1 sm:mb-2 line-clamp-2">
-                      {item.title}
-                    </h4>
-                    <div className="flex items-center space-x-1 sm:space-x-2">
-                      <span className="text-orange-500 font-bold text-xs sm:text-sm md:text-base">₹{item.sale_price}</span>
-                      <span className="text-gray-500 line-through text-xs">₹{item.original_price}</span>
+              {relatedProducts.map((item) => {
+                const itemDisplayPrice = item.category === 'game' 
+                  ? getGameDisplayPrice(item, 'Rent', '1_month')
+                  : item.sale_price;
+
+                return (
+                  <div 
+                    key={item.id} 
+                    className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 sm:hover:-translate-y-2"
+                    onClick={() => handleRelatedProductClick(item)}
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full aspect-square object-cover"
+                    />
+                    <div className="p-2 sm:p-3 md:p-4">
+                      <h4 className="font-bold text-gray-800 text-xs sm:text-sm mb-1 sm:mb-2 line-clamp-2">
+                        {item.title}
+                      </h4>
+                      <div className="flex items-center space-x-1 sm:space-x-2">
+                        <span className="text-orange-500 font-bold text-xs sm:text-sm md:text-base">₹{itemDisplayPrice}</span>
+                        {item.category === 'subscription' && item.original_price > item.sale_price && (
+                          <span className="text-gray-500 line-through text-xs">₹{item.original_price}</span>
+                        )}
+                        {item.category === 'game' && getGameDiscountPercentage(item, 'Rent', '1_month') > 0 && (
+                          <span className="text-gray-500 line-through text-xs">₹{item.original_price}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

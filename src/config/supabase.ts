@@ -11,7 +11,7 @@ export interface Game {
   title: string;
   image: string;
   original_price: number;
-  sale_price: number;
+  sale_price: number; // Keep for subscriptions compatibility
   // Rental pricing
   rent_1_month?: number;
   rent_2_months?: number;
@@ -36,3 +36,45 @@ export interface Testimonial {
   created_at?: string;
   updated_at?: string;
 }
+
+// Helper function to calculate discount percentage for games
+export const calculateGameDiscount = (originalPrice: number, currentPrice: number): number => {
+  if (originalPrice <= 0 || currentPrice <= 0) return 0;
+  return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+};
+
+// Helper function to get the display price for games based on selected type
+export const getGameDisplayPrice = (game: Game, selectedType: string, selectedRentDuration?: string): number => {
+  if (game.category === 'subscription') {
+    return game.sale_price; // Subscriptions keep original logic
+  }
+
+  // For games, calculate based on type
+  if (selectedType === 'Rent') {
+    const rentPrices = {
+      '1_month': game.rent_1_month || 0,
+      '2_months': game.rent_2_months || 0,
+      '3_months': game.rent_3_months || 0,
+      '6_months': game.rent_6_months || 0
+    };
+    return rentPrices[selectedRentDuration as keyof typeof rentPrices] || game.rent_1_month || 0;
+  } else if (selectedType === 'Permanent Offline') {
+    return game.permanent_offline_price || game.original_price;
+  } else if (selectedType === 'Permanent Offline + Online') {
+    return game.permanent_online_price || game.original_price;
+  }
+  
+  // Default to 1 month rent price for games
+  return game.rent_1_month || game.original_price;
+};
+
+// Helper function to get discount percentage for display
+export const getGameDiscountPercentage = (game: Game, selectedType: string, selectedRentDuration?: string): number => {
+  if (game.category === 'subscription') {
+    return game.discount; // Subscriptions keep original logic
+  }
+
+  // For games, calculate discount based on selected type vs original price
+  const currentPrice = getGameDisplayPrice(game, selectedType, selectedRentDuration);
+  return calculateGameDiscount(game.original_price, currentPrice);
+};

@@ -20,6 +20,7 @@ import RefundPolicyPage from './pages/RefundPolicyPage';
 import FAQPage from './pages/FAQPage';
 
 import { Game, supabase } from './config/supabase';
+import { CartStorageService } from './services/cartStorageService';
 
 interface CartItem {
   id: string;
@@ -47,6 +48,28 @@ function App() {
   const hasShownLoginToast = useRef(false);
   const hasShownLogoutToast = useRef(false);
 
+  // Load cart from Google Sheets when user logs in
+  const loadUserCart = async (userId: string) => {
+    try {
+      const savedCartItems = await CartStorageService.loadCartItems(userId);
+      if (savedCartItems.length > 0) {
+        setCartItems(savedCartItems);
+        toast.info(`Welcome back! Your cart has ${savedCartItems.length} items.`);
+      }
+    } catch (error) {
+      console.error('Error loading user cart:', error);
+    }
+  };
+
+  // Save cart to Google Sheets when cart changes (for logged-in users)
+  const saveUserCart = async (userId: string, items: CartItem[]) => {
+    try {
+      await CartStorageService.saveCartItems(userId, items);
+    } catch (error) {
+      console.error('Error saving user cart:', error);
+    }
+  };
+
   // Check authentication status on app load
   useEffect(() => {
     // Get initial session
@@ -56,6 +79,9 @@ function App() {
         setIsLoggedIn(true);
         // Check if user is admin (you can customize this logic)
         setIsAdmin(session.user.email === 'communitygamiing1@gmail.com' || session.user.user_metadata?.role === 'admin');
+        
+        // Load user's cart from Google Sheets
+        loadUserCart(session.user.id);
       }
     });
 
@@ -75,6 +101,10 @@ function App() {
           toast.success('Successfully signed in!');
           setIsLoginModalOpen(false);
           hasShownLoginToast.current = true;
+          
+          // Load user's cart from Google Sheets
+          loadUserCart(session.user.id);
+          
           // Reset after a delay to allow future logins
           setTimeout(() => {
             hasShownLoginToast.current = false;
@@ -84,6 +114,9 @@ function App() {
         setUser(null);
         setIsLoggedIn(false);
         setIsAdmin(false);
+        
+        // Clear cart when user logs out
+        setCartItems([]);
         
         if (event === 'SIGNED_OUT' && !hasShownLogoutToast.current) {
           toast.success('Successfully signed out!');
@@ -99,6 +132,18 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Save cart to Google Sheets whenever cart changes (for logged-in users)
+  useEffect(() => {
+    if (isLoggedIn && user && cartItems.length >= 0) {
+      // Debounce the save operation to avoid too many requests
+      const timeoutId = setTimeout(() => {
+        saveUserCart(user.id, cartItems);
+      }, 1000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [cartItems, isLoggedIn, user]);
+
   const handleLogin = () => {
     // This will be handled by the auth state change listener
     setIsLoginModalOpen(false);
@@ -106,6 +151,11 @@ function App() {
 
   const handleLogout = async () => {
     try {
+      // Clear cart from Google Sheets before logging out
+      if (user) {
+        await CartStorageService.clearCart(user.id);
+      }
+      
       const { error } = await supabase.auth.signOut();
       if (error) {
         toast.error('Error signing out: ' + error.message);
@@ -129,8 +179,11 @@ function App() {
     setIsCheckoutModalOpen(true);
   };
 
-  const handleOrderComplete = () => {
+  const handleOrderComplete = async () => {
     // Clear cart after successful order
+    if (isLoggedIn && user) {
+      await CartStorageService.clearCart(user.id);
+    }
     setCartItems([]);
     toast.success('Order placed successfully! You will receive your games within 15 minutes.');
   };
