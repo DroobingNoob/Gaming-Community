@@ -12,7 +12,7 @@ export interface CartStorageItem {
 }
 
 export class CartStorageService {
-  private static readonly SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLCNLrAB2e4OnW0ivBF7eVfV4eLYngWkLVXSr0V-CdxOgZQeDybGDBMyTRf5TIXuZJKQ/exec';
+  private static readonly SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec';
 
   // Save cart items for a user
   static async saveCartItems(userId: string, cartItems: any[]): Promise<boolean> {

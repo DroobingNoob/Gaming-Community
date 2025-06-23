@@ -75,8 +75,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         status: 'Payment Pending'
       };
 
-      // UPDATED GOOGLE APPS SCRIPT URL - Make sure this matches your new deployment
-      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4e7uAxq8xc5ocaI_mx3aXpfVGmhLjpZ-48kFgAIB9qzUlShF15-F2d80ejr5CCTz3Ew/exec';
+      // UPDATED GOOGLE APPS SCRIPT URL - Using your new webapp URL
+      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec';
       
       console.log('Submitting order to:', GOOGLE_SCRIPT_URL);
       console.log('Order data:', orderData);
@@ -345,7 +345,7 @@ I have made the payment via UPI. Please find the screenshot attached.`;
           </div>
           <div>
             <h4 className="font-bold text-green-800">Order Recorded</h4>
-            <p className="text-sm text-green-700">Your order has been automatically saved to our NEW tracking system</p>
+            <p className="text-sm text-green-700">Your order has been automatically saved to our tracking system</p>
           </div>
         </div>
       </div>
