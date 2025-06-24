@@ -321,7 +321,10 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+      {/* Flash Sale Strip - Highest z-index */}
       <FlashSaleStrip />
+      
+      {/* Header - Below flash sale strip */}
       <Header
         onLoginClick={() => setIsLoginModalOpen(true)}
         onCartClick={handleCartClick}
@@ -332,7 +335,8 @@ function App() {
         user={user}
       />
       
-      <main>
+      {/* Main content - Below header and blue strip */}
+      <main className="relative z-10">
         <Routes>
           <Route path="/" element={<HomePage onNavigation={handleNavigation} />} />
           <Route path="/games" element={<GamesPage />} />
@@ -346,8 +350,10 @@ function App() {
         </Routes>
       </main>
 
+      {/* Footer */}
       <Footer onNavigation={handleNavigation} />
 
+      {/* Modals - High z-index */}
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
@@ -370,7 +376,10 @@ function App() {
         onOrderComplete={handleOrderComplete}
       />
 
+      {/* WhatsApp Button */}
       <WhatsAppButton />
+      
+      {/* Toast Container */}
       <ToastContainer />
     </div>
   );

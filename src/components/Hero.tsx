@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Gift, Zap, Star } from 'lucide-react';
+import { Clock, Gift, Zap, Star, Trophy } from 'lucide-react';
 
 interface HeroProps {
   onShopBestsellers: () => void;
@@ -79,6 +79,28 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
         <p className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl mb-4 xs:mb-6 sm:mb-8 md:mb-10 opacity-95 leading-relaxed text-center max-w-2xl mx-auto">
           {slide.description}
         </p>
+
+        {/* Mystery Box Deal - NEW ADDITION */}
+        <div className="bg-gradient-to-r from-purple-900/80 to-indigo-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl md:rounded-3xl p-3 sm:p-4 md:p-6 lg:p-8 mb-4 sm:mb-6 md:mb-8 lg:mb-10 border-2 border-purple-400/50 shadow-2xl max-w-lg mx-auto">
+          <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-2 sm:mb-3 md:mb-4">
+            <Trophy className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-purple-400" />
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-purple-300 tracking-wider">MYSTERY BOX DEAL</span>
+          </div>
+          <div className="text-center">
+            <div className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white mb-2 sm:mb-3">
+              First 30 Orders Above ₹3000
+            </div>
+            <div className="text-xs xs:text-sm sm:text-base md:text-lg text-purple-200 mb-2 sm:mb-3">
+              Get a <span className="text-yellow-300 font-bold">FREE Mystery Game</span> (1 Month Rent)
+            </div>
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 border border-purple-300/50">
+              <div className="text-xs sm:text-sm text-purple-200 mb-1">Use Coupon Code:</div>
+              <div className="text-sm xs:text-base sm:text-lg md:text-xl font-mono font-bold text-yellow-300 tracking-wider">
+                MYSTERYBOX
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Countdown Timer */}
         <div className="bg-black/40 backdrop-blur-md rounded-xl sm:rounded-2xl md:rounded-3xl p-3 sm:p-4 md:p-6 lg:p-8 mb-4 sm:mb-6 md:mb-8 lg:mb-10 border border-white/20 shadow-2xl max-w-sm sm:max-w-md lg:max-w-lg mx-auto">
@@ -162,6 +184,13 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
       <div className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 left-2 sm:left-3 md:left-4 lg:left-6 xl:left-8">
         <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-1.5 md:py-2 lg:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold shadow-lg animate-pulse">
           🔥 FLASH SALE
+        </div>
+      </div>
+
+      {/* Mystery Box Badge */}
+      <div className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 right-2 sm:right-3 md:right-4 lg:right-6 xl:right-8">
+        <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-1.5 md:py-2 lg:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold shadow-lg animate-bounce">
+          🎁 MYSTERY BOX
         </div>
       </div>
 
