@@ -51,28 +51,84 @@ const FlashSaleStrip: React.FC = () => {
 
   return (
     <div className="sticky top-0 z-50 bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-white shadow-lg">
-      <div className="container mx-auto px-3 sm:px-4">
-        <div className="flex items-center justify-between py-2 sm:py-3">
+      <div className="container mx-auto px-2 sm:px-4">
+        {/* Mobile Layout */}
+        <div className="sm:hidden">
+          <div className="flex items-center justify-between py-2">
+            {/* Flash Icon + Text */}
+            <div className="flex items-center space-x-2 flex-1 min-w-0">
+              <div className="bg-yellow-400 p-1 rounded-full animate-pulse flex-shrink-0">
+                <Zap className="w-3 h-3 text-red-600" />
+              </div>
+              <span className="text-xs font-bold tracking-wide truncate">
+                🔥 FLASH SALE 50% OFF
+              </span>
+            </div>
+
+            {/* Countdown */}
+            <div className="flex items-center space-x-1 bg-black/20 rounded px-2 py-1 mx-2">
+              <Clock className="w-3 h-3 text-yellow-400" />
+              <div className="flex items-center space-x-0.5 text-xs font-mono font-bold">
+                <span>{formatTime(timeLeft.hours)}</span>
+                <span>:</span>
+                <span>{formatTime(timeLeft.minutes)}</span>
+                <span>:</span>
+                <span>{formatTime(timeLeft.seconds)}</span>
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setIsVisible(false)}
+              className="text-white/70 hover:text-white transition-colors p-1 flex-shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Second Row for Coupon Code on Mobile */}
+          <div className="flex items-center justify-center pb-2">
+            <div className="flex items-center space-x-2 bg-white/20 rounded-lg px-3 py-1">
+              <span className="text-xs font-semibold">Code:</span>
+              <button
+                onClick={handleCopyCoupon}
+                className="flex items-center space-x-1 hover:bg-white/10 rounded px-2 py-0.5 transition-colors"
+              >
+                <span className="text-xs font-mono font-bold text-yellow-300">
+                  GAMINGCOMMUNITY50
+                </span>
+                {copiedCoupon ? (
+                  <Check className="w-3 h-3 text-green-400" />
+                ) : (
+                  <Copy className="w-3 h-3 text-white/70" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop/Tablet Layout */}
+        <div className="hidden sm:flex items-center justify-between py-2 md:py-3">
           {/* Flash Sale Content */}
-          <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
+          <div className="flex items-center space-x-3 md:space-x-4 flex-1 min-w-0">
             {/* Flash Icon */}
             <div className="flex-shrink-0">
-              <div className="bg-yellow-400 p-1 sm:p-1.5 rounded-full animate-pulse">
-                <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
+              <div className="bg-yellow-400 p-1.5 rounded-full animate-pulse">
+                <Zap className="w-4 h-4 text-red-600" />
               </div>
             </div>
 
             {/* Flash Sale Text */}
             <div className="flex-shrink-0">
-              <span className="text-xs sm:text-sm md:text-base font-bold tracking-wide">
+              <span className="text-sm md:text-base font-bold tracking-wide">
                 🔥 FLASH SALE: 50% OFF
               </span>
             </div>
 
             {/* Countdown Timer */}
-            <div className="hidden xs:flex items-center space-x-1 sm:space-x-2 bg-black/20 rounded-lg px-2 sm:px-3 py-1">
-              <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
-              <div className="flex items-center space-x-1 text-xs sm:text-sm font-mono font-bold">
+            <div className="flex items-center space-x-2 bg-black/20 rounded-lg px-3 py-1">
+              <Clock className="w-4 h-4 text-yellow-400" />
+              <div className="flex items-center space-x-1 text-sm font-mono font-bold">
                 <span>{formatTime(timeLeft.hours)}</span>
                 <span className="animate-pulse">:</span>
                 <span>{formatTime(timeLeft.minutes)}</span>
@@ -82,15 +138,15 @@ const FlashSaleStrip: React.FC = () => {
             </div>
 
             {/* Coupon Code */}
-            <div className="flex items-center space-x-1 sm:space-x-2 bg-white/20 rounded-lg px-2 sm:px-3 py-1 min-w-0">
-              <span className="text-xs sm:text-sm font-semibold whitespace-nowrap">
+            <div className="flex items-center space-x-2 bg-white/20 rounded-lg px-3 py-1 min-w-0">
+              <span className="text-sm font-semibold whitespace-nowrap">
                 Code:
               </span>
               <button
                 onClick={handleCopyCoupon}
-                className="flex items-center space-x-1 hover:bg-white/10 rounded px-1 sm:px-2 py-0.5 transition-colors"
+                className="flex items-center space-x-1 hover:bg-white/10 rounded px-2 py-0.5 transition-colors"
               >
-                <span className="text-xs sm:text-sm font-mono font-bold text-yellow-300 truncate">
+                <span className="text-sm font-mono font-bold text-yellow-300">
                   GAMINGCOMMUNITY50
                 </span>
                 {copiedCoupon ? (
@@ -102,23 +158,12 @@ const FlashSaleStrip: React.FC = () => {
             </div>
           </div>
 
-          {/* Mobile Countdown (visible on mobile only) */}
-          <div className="xs:hidden flex items-center space-x-1 bg-black/20 rounded px-2 py-1 mr-2">
-            <div className="flex items-center space-x-1 text-xs font-mono font-bold">
-              <span>{formatTime(timeLeft.hours)}</span>
-              <span>:</span>
-              <span>{formatTime(timeLeft.minutes)}</span>
-              <span>:</span>
-              <span>{formatTime(timeLeft.seconds)}</span>
-            </div>
-          </div>
-
           {/* Close Button */}
           <button
             onClick={() => setIsVisible(false)}
             className="flex-shrink-0 text-white/70 hover:text-white transition-colors p-1"
           >
-            <X className="w-4 h-4 sm:w-5 sm:h-5" />
+            <X className="w-5 h-5" />
           </button>
         </div>
       </div>

@@ -102,7 +102,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
 
   return (
     <>
-      <header className="bg-white shadow-md relative">
+      <header className="bg-white shadow-md relative z-40">
         {!isSearchExpanded ? (
           <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
             {/* Desktop Header */}
@@ -197,13 +197,13 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
               <div className="flex items-center justify-between">
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="text-cyan-600 p-1"
+                  className="text-cyan-600 p-1 z-50 relative"
                 >
                   {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
 
-                {/* Mobile Logo - Made Much More Prominent and Centered */}
-                <div className="flex-1 flex justify-center">
+                {/* Mobile Logo - Centered and Prominent */}
+                <div className="absolute left-1/2 transform -translate-x-1/2">
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
@@ -229,49 +229,51 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
 
               {/* Mobile Menu */}
               {isMobileMenuOpen && (
-                <div className="mt-4 pb-4 border-t border-gray-200">
-                  <nav className="mt-4 space-y-2">
-                    {navItems.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => handleNavClick(item.id)}
-                        className={`block w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg flex items-center space-x-2 ${
-                          item.id === 'admin' ? 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200' : ''
-                        }`}
-                      >
-                        {item.id === 'admin' && <Shield className="w-4 h-4" />}
-                        <span>{item.name}</span>
-                      </button>
-                    ))}
-                  </nav>
-                  
-                  {isLoggedIn ? (
-                    <div className="mt-4 space-y-2">
-                      <div className="py-3 px-2 text-green-600 bg-green-50 rounded-lg">
-                        Welcome, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}!
+                <div className="absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-40">
+                  <div className="container mx-auto px-3 sm:px-4 py-4">
+                    <nav className="space-y-2">
+                      {navItems.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => handleNavClick(item.id)}
+                          className={`block w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg flex items-center space-x-2 ${
+                            item.id === 'admin' ? 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200' : ''
+                          }`}
+                        >
+                          {item.id === 'admin' && <Shield className="w-4 h-4" />}
+                          <span>{item.name}</span>
+                        </button>
+                      ))}
+                    </nav>
+                    
+                    {isLoggedIn ? (
+                      <div className="mt-4 space-y-2">
+                        <div className="py-3 px-2 text-green-600 bg-green-50 rounded-lg">
+                          Welcome, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}!
+                        </div>
+                        <button
+                          onClick={() => {
+                            onNavigation('logout');
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="w-full text-left py-3 px-2 text-red-600 hover:text-red-700 transition-colors hover:bg-red-50 rounded-lg flex items-center space-x-2"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Logout</span>
+                        </button>
                       </div>
+                    ) : (
                       <button
                         onClick={() => {
-                          onNavigation('logout');
+                          onLoginClick();
                           setIsMobileMenuOpen(false);
                         }}
-                        className="w-full text-left py-3 px-2 text-red-600 hover:text-red-700 transition-colors hover:bg-red-50 rounded-lg flex items-center space-x-2"
+                        className="mt-4 w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg"
                       >
-                        <LogOut className="w-4 h-4" />
-                        <span>Logout</span>
+                        Login with Google
                       </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        onLoginClick();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="mt-4 w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg"
-                    >
-                      Login with Google
-                    </button>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -334,8 +336,8 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
         )}
       </header>
 
-      {/* Blue Strip */}
-      <div className="bg-cyan-400 text-white py-2">
+      {/* Blue Strip - Positioned below header */}
+      <div className="bg-cyan-400 text-white py-2 relative z-30">
         <div className="container mx-auto px-3 sm:px-4 text-center">
           <p className="text-xs sm:text-sm md:text-base font-medium">
             🕹️ Trusted by Top Streamers and Gamers – Shop the Same Games They Play!
