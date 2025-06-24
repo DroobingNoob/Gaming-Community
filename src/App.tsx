@@ -321,21 +321,25 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-      {/* Flash Sale Strip - Highest z-index */}
-      <FlashSaleStrip />
+      {/* Flash Sale Strip - At the very top with highest z-index */}
+      <div className="relative z-[60]">
+        <FlashSaleStrip />
+      </div>
       
-      {/* Header - Below flash sale strip */}
-      <Header
-        onLoginClick={() => setIsLoginModalOpen(true)}
-        onCartClick={handleCartClick}
-        isLoggedIn={isLoggedIn}
-        isAdmin={isAdmin}
-        cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-        onNavigation={handleNavigation}
-        user={user}
-      />
+      {/* Header - Below flash sale strip with proper z-index */}
+      <div className="relative z-50">
+        <Header
+          onLoginClick={() => setIsLoginModalOpen(true)}
+          onCartClick={handleCartClick}
+          isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
+          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+          onNavigation={handleNavigation}
+          user={user}
+        />
+      </div>
       
-      {/* Main content - Below header and blue strip */}
+      {/* Main content - Below header with proper spacing */}
       <main className="relative z-10">
         <Routes>
           <Route path="/" element={<HomePage onNavigation={handleNavigation} />} />

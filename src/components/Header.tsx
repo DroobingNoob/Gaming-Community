@@ -102,7 +102,8 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
 
   return (
     <>
-      <header className="bg-white shadow-md relative z-50">
+      {/* Header Container - No overlapping */}
+      <header className="bg-white shadow-md">
         {!isSearchExpanded ? (
           <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
             {/* Desktop Header */}
@@ -336,8 +337,8 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
         )}
       </header>
 
-      {/* Blue Strip - Positioned below header with proper z-index */}
-      <div className="bg-cyan-400 text-white py-2 relative z-40">
+      {/* Blue Strip - Positioned below header, no overlapping */}
+      <div className="bg-cyan-400 text-white py-2">
         <div className="container mx-auto px-3 sm:px-4 text-center">
           <p className="text-xs sm:text-sm md:text-base font-medium">
             🕹️ Trusted by Top Streamers and Gamers – Shop the Same Games They Play!

@@ -50,7 +50,7 @@ const FlashSaleStrip: React.FC = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="sticky top-0 z-[60] bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-white shadow-lg">
+    <div className="bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-white shadow-lg">
       <div className="container mx-auto px-2 sm:px-4">
         {/* Mobile Layout */}
         <div className="sm:hidden">
