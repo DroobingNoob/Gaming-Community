@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Copy, Check, QrCode, Smartphone, MessageCircle, Download, FileSpreadsheet, User, Phone } from 'lucide-react';
+import { X, Copy, Check, QrCode, Smartphone, MessageCircle, Download, FileSpreadsheet, User, Phone, Tag, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 interface CartItem {
@@ -29,6 +29,9 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderCode, setOrderCode] = useState('');
   const [copiedOrderCode, setCopiedOrderCode] = useState(false);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState('');
+  const [couponInput, setCouponInput] = useState('');
+  const [couponError, setCouponError] = useState('');
   
   // Customer details
   const [customerName, setCustomerName] = useState('');
@@ -36,7 +39,21 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   if (!isOpen) return null;
 
-  const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  
+  // Coupon logic
+  const applyCouponDiscount = (amount: number, coupon: string) => {
+    if (coupon === 'GAMINGCOMMUNITY50') {
+      return amount * 0.5; // 50% off
+    }
+    if (coupon === 'MYSTERYBOX' && amount >= 3000) {
+      return amount; // No discount, but qualifies for mystery box
+    }
+    return amount;
+  };
+
+  const total = applyCouponDiscount(subtotal, appliedCoupon);
+  const discount = subtotal - total;
 
   // Generate unique order code with date, time, seconds, and milliseconds
   const generateOrderCode = () => {
@@ -71,8 +88,12 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
           quantity: item.quantity,
           subtotal: item.price * item.quantity
         })),
+        subtotalAmount: subtotal,
+        appliedCoupon: appliedCoupon,
+        discountAmount: discount,
         totalAmount: total,
-        status: 'Payment Pending'
+        status: 'Payment Pending',
+        mysteryBoxEligible: appliedCoupon === 'MYSTERYBOX' && subtotal >= 3000
       };
 
       // UPDATED GOOGLE APPS SCRIPT URL - Using your new webapp URL
@@ -103,6 +124,47 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     } finally {
       setIsSubmittingOrder(false);
     }
+  };
+
+  const handleApplyCoupon = () => {
+    setCouponError('');
+    
+    if (!couponInput.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    const coupon = couponInput.trim().toUpperCase();
+    
+    if (coupon === 'GAMINGCOMMUNITY50') {
+      if (appliedCoupon) {
+        setCouponError('A coupon is already applied');
+        return;
+      }
+      setAppliedCoupon(coupon);
+      setCouponInput('');
+      toast.success('50% discount applied!');
+    } else if (coupon === 'MYSTERYBOX') {
+      if (appliedCoupon) {
+        setCouponError('A coupon is already applied');
+        return;
+      }
+      if (subtotal < 3000) {
+        setCouponError('This coupon requires a minimum order of ₹3000');
+        return;
+      }
+      setAppliedCoupon(coupon);
+      setCouponInput('');
+      toast.success('Mystery Box coupon applied! You will receive a free mystery game.');
+    } else {
+      setCouponError('Invalid coupon code');
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon('');
+    setCouponError('');
+    toast.info('Coupon removed');
   };
 
   const handleProceedToPayment = async () => {
@@ -142,7 +204,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleWhatsAppContact = () => {
     const phoneNumber = '9266514434';
-    const message = `Hi! I want to send payment screenshot for Order Code: ${orderCode}
+    let message = `Hi! I want to send payment screenshot for Order Code: ${orderCode}
 
 Customer Details:
 Name: ${customerName}
@@ -153,7 +215,19 @@ ${cartItems.map(item =>
   `- ${item.title} (${item.platform}, ${item.type}) - ₹${item.price} x ${item.quantity}`
 ).join('\n')}
 
-Total: ₹${total.toFixed(2)}
+Subtotal: ₹${subtotal.toFixed(2)}`;
+
+    if (appliedCoupon) {
+      message += `\nCoupon Applied: ${appliedCoupon}`;
+      if (discount > 0) {
+        message += `\nDiscount: -₹${discount.toFixed(2)}`;
+      }
+      if (appliedCoupon === 'MYSTERYBOX') {
+        message += `\nMystery Box: FREE mystery game included!`;
+      }
+    }
+
+    message += `\nTotal: ₹${total.toFixed(2)}
 
 I have made the payment via UPI. Please find the screenshot attached.`;
     
@@ -170,6 +244,9 @@ I have made the payment via UPI. Please find the screenshot attached.`;
       setOrderCode('');
       setCustomerName('');
       setCustomerMobile('');
+      setAppliedCoupon('');
+      setCouponInput('');
+      setCouponError('');
     }, 3000);
   };
 
@@ -228,6 +305,70 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         </p>
       </div>
 
+      {/* Coupon Code Section */}
+      <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-200">
+        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
+          <Tag className="w-5 h-5 text-orange-600" />
+          <span>Coupon Code</span>
+        </h3>
+        
+        {!appliedCoupon ? (
+          <div className="space-y-4">
+            <div className="flex space-x-3">
+              <input
+                type="text"
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                placeholder="Enter coupon code"
+              />
+              <button
+                onClick={handleApplyCoupon}
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+              >
+                Apply
+              </button>
+            </div>
+            
+            {couponError && (
+              <div className="flex items-center space-x-2 text-red-600 text-sm">
+                <AlertCircle className="w-4 h-4" />
+                <span>{couponError}</span>
+              </div>
+            )}
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="bg-white/70 rounded-lg p-3 border border-orange-300">
+                <div className="font-bold text-orange-800 text-sm">GAMINGCOMMUNITY50</div>
+                <div className="text-orange-700 text-xs">50% off all games</div>
+              </div>
+              <div className="bg-white/70 rounded-lg p-3 border border-purple-300">
+                <div className="font-bold text-purple-800 text-sm">MYSTERYBOX</div>
+                <div className="text-purple-700 text-xs">Free mystery game (₹3000+ orders)</div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-bold text-green-800">Coupon Applied: {appliedCoupon}</div>
+                <div className="text-green-700 text-sm">
+                  {appliedCoupon === 'GAMINGCOMMUNITY50' && `50% discount: -₹${discount.toFixed(2)}`}
+                  {appliedCoupon === 'MYSTERYBOX' && 'Free mystery game included!'}
+                </div>
+              </div>
+              <button
+                onClick={handleRemoveCoupon}
+                className="text-red-600 hover:text-red-700 text-sm font-medium"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Order Items */}
       <div className="space-y-4 max-h-64 overflow-y-auto">
         {cartItems.map((item) => (
@@ -253,9 +394,28 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         ))}
       </div>
 
-      {/* Total */}
-      <div className="border-t border-gray-200 pt-4">
-        <div className="flex justify-between items-center text-xl font-bold">
+      {/* Order Summary */}
+      <div className="border-t border-gray-200 pt-4 space-y-2">
+        <div className="flex justify-between items-center text-lg">
+          <span className="text-gray-700">Subtotal:</span>
+          <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
+        </div>
+        
+        {appliedCoupon && discount > 0 && (
+          <div className="flex justify-between items-center text-green-600">
+            <span>Discount ({appliedCoupon}):</span>
+            <span className="font-semibold">-₹{discount.toFixed(2)}</span>
+          </div>
+        )}
+        
+        {appliedCoupon === 'MYSTERYBOX' && subtotal >= 3000 && (
+          <div className="flex justify-between items-center text-purple-600">
+            <span>Mystery Box:</span>
+            <span className="font-semibold">FREE</span>
+          </div>
+        )}
+        
+        <div className="flex justify-between items-center text-xl font-bold border-t pt-2">
           <span className="text-gray-800">Total Amount:</span>
           <span className="text-2xl bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
             ₹{total.toFixed(2)}
@@ -315,6 +475,20 @@ I have made the payment via UPI. Please find the screenshot attached.`;
           </div>
         </div>
       </div>
+
+      {/* Applied Coupon Display */}
+      {appliedCoupon && (
+        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-4 border border-purple-200">
+          <h3 className="font-bold text-purple-800 mb-3">Applied Coupon</h3>
+          <div className="text-purple-700">
+            <div className="font-semibold">{appliedCoupon}</div>
+            <div className="text-sm">
+              {appliedCoupon === 'GAMINGCOMMUNITY50' && `50% discount applied: -₹${discount.toFixed(2)}`}
+              {appliedCoupon === 'MYSTERYBOX' && 'You will receive a FREE mystery game!'}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Order Code Display */}
       <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200">
@@ -457,6 +631,20 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         <p className="text-gray-600 mb-4">
           Your order <strong className="font-mono text-cyan-600">{orderCode}</strong> has been submitted successfully.
         </p>
+        
+        {appliedCoupon && (
+          <div className="bg-white rounded-xl p-4 border border-green-200 mb-4">
+            <p className="text-sm text-gray-700">
+              <strong>Coupon Applied:</strong> {appliedCoupon}
+              {appliedCoupon === 'MYSTERYBOX' && subtotal >= 3000 && (
+                <span className="block text-purple-600 font-semibold mt-1">
+                  🎁 You will receive a FREE mystery game!
+                </span>
+              )}
+            </p>
+          </div>
+        )}
+        
         <div className="bg-white rounded-xl p-4 border border-green-200">
           <p className="text-sm text-gray-700">
             We'll verify your payment and deliver your games within <strong>15 minutes</strong>.

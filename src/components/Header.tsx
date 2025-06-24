@@ -124,7 +124,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
-                    className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-xl cursor-pointer"
+                    className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-36 xl:h-36 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-xl cursor-pointer"
                     onClick={() => navigate('/')}
                   />
                 </div>
@@ -207,7 +207,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
-                    className="w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg cursor-pointer"
+                    className="w-16 h-16 xs:w-18 xs:h-18 sm:w-20 sm:h-20 md:w-22 md:h-22 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg cursor-pointer"
                     onClick={() => navigate('/')}
                   />
                 </div>
@@ -315,7 +315,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                         <div className="flex-1">
                           <div className="font-medium text-gray-800">{item.title}</div>
                           <div className="text-sm text-gray-500">
-                            ₹{item.sale_price} • {item.platform.join(', ')}
+                            ₹{item.category === 'game' ? item.rent_1_month || item.original_price : item.sale_price} • {item.platform.join(', ')}
                           </div>
                         </div>
                       </button>

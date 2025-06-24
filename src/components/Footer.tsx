@@ -42,13 +42,13 @@ const Footer: React.FC<FooterProps> = ({ onNavigation }) => {
           
           {/* Brand Section */}
           <div className="lg:col-span-2">
-            <div className="flex items-center space-x-3 mb-4 sm:mb-6">
+            <div className="flex items-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
               <img 
                 src="/1000156095.jpg" 
                 alt="Gaming Community" 
-                className="w-10 h-10 sm:w-12 sm:h-12 object-contain bg-white/10 rounded-xl p-2"
+                className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 object-contain bg-white/10 rounded-xl p-2"
               />
-              <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
+              <span className="text-xl xs:text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-orange-500 bg-clip-text text-transparent">
                 Gaming Community
               </span>
             </div>
