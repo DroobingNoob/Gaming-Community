@@ -48,14 +48,15 @@ const FlashSaleStrip: React.FC = () => {
         </div>
 
         {/* Timer */}
-       <div className="flex items-center gap-1 sm:gap-2 bg-black/30 rounded-full max-sm:px-2 max-sm:py-0.5 px-3 py-1 font-mono text-sm max-sm:text-base">
-  <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-300" />
+       <div className="flex items-center gap-2 bg-black/30 rounded-full px-3 py-1 font-mono text-sm">
+  <Clock className="w-4 h-4 text-yellow-300" />
   <span>{format(timeLeft.hours)}</span>
   <span>:</span>
   <span>{format(timeLeft.minutes)}</span>
   <span>:</span>
   <span>{format(timeLeft.seconds)}</span>
 </div>
+
 
 
         {/* Coupon */}
