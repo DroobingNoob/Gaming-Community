@@ -1,5 +1,3 @@
-On PC everything is alright. But only for phone it comes in 3 rows instead of 1. can we improve on that? 
-
 import React, { useState, useEffect } from 'react';
 import { Clock, Zap, X, Copy, Check } from 'lucide-react';
 
