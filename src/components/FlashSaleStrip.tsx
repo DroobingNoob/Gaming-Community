@@ -37,18 +37,18 @@ const FlashSaleStrip: React.FC = () => {
 
   return (
     <div className="fixed top-0 left-0 w-full z-[60] bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-yellow-300 font-bold shadow-md px-4 py-2">
-      <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-6 text-xs sm:text-sm">
-        {/* Flash Sale Title */}
-        <div className="flex items-center gap-2 whitespace-nowrap">
-          <div className="bg-yellow-300 rounded-full p-1 animate-pulse">
-            <Zap className="w-3 h-3 text-red-600" />
-          </div>
-          <span className="tracking-wide font-semibold">🔥 BIGGEST GAMING SALE</span>
+      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm sm:text-base text-center sm:text-left">
+        {/* Flash Sale Text */}
+        <div className="flex items-center gap-2">
+          <Zap className="w-4 h-4 animate-pulse text-yellow-300" />
+          <span className="font-extrabold tracking-wide whitespace-nowrap">
+            🔥 FLASH SALE: 50% OFF
+          </span>
         </div>
 
         {/* Timer */}
-        <div className="flex items-center gap-1 sm:gap-2 bg-black/20 rounded px-2 py-1 font-mono text-sm">
-          <Clock className="w-3 h-3 text-yellow-300" />
+        <div className="flex items-center gap-2 bg-black/30 rounded-full px-3 py-1 font-mono text-sm">
+          <Clock className="w-4 h-4 text-yellow-300" />
           <span>{format(timeLeft.hours)}</span>
           <span>:</span>
           <span>{format(timeLeft.minutes)}</span>
@@ -56,22 +56,20 @@ const FlashSaleStrip: React.FC = () => {
           <span>{format(timeLeft.seconds)}</span>
         </div>
 
-        {/* Coupon Button */}
+        {/* Coupon */}
         <button
           onClick={handleCopyCoupon}
-          className="flex items-center gap-1 border-2 border-dashed border-yellow-300 rounded-full px-3 py-1 hover:bg-yellow-300 hover:text-red-600 transition"
+          className="flex items-center gap-2 border-2 border-dashed border-yellow-300 rounded-full px-4 py-1 hover:bg-yellow-300 hover:text-red-600 transition-colors"
         >
-          <span className="font-mono font-bold text-xs sm:text-sm">
-            GAMINGCOMMUNITY50
-          </span>
+          <span className="font-mono text-xs sm:text-sm">GAMINGCOMMUNITY50</span>
           {copiedCoupon ? (
-            <Check className="w-3 h-3 text-green-300" />
+            <Check className="w-4 h-4 text-green-400" />
           ) : (
-            <Copy className="w-3 h-3 text-yellow-300" />
+            <Copy className="w-4 h-4 text-yellow-300" />
           )}
         </button>
 
-        {/* Close Button */}
+        {/* Close */}
         <button
           onClick={() => setIsVisible(false)}
           className="text-yellow-300 hover:text-white transition"
@@ -79,8 +77,7 @@ const FlashSaleStrip: React.FC = () => {
           <X className="w-4 h-4" />
         </button>
       </div>
-
-      <div className="h-0.5 mt-2 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 animate-pulse"></div>
+      <div className="h-0.5 mt-2 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 animate-pulse" />
     </div>
   );
 };
