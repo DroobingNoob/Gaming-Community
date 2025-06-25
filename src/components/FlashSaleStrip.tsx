@@ -1,81 +1,86 @@
 import React, { useState, useEffect } from 'react';
-import { X, Percent } from 'lucide-react';
+import { Clock, Zap, X, Copy, Check } from 'lucide-react';
 
 const FlashSaleStrip: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
   const [isVisible, setIsVisible] = useState(true);
+  const [copiedCoupon, setCopiedCoupon] = useState(false);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
       const now = new Date();
-      const today = new Date();
-      today.setHours(22, 0, 0, 0);
-      if (now > today) today.setDate(today.getDate() + 1);
-      const difference = today.getTime() - now.getTime();
-
+      const target = new Date();
+      target.setHours(22, 0, 0, 0);
+      if (now > target) target.setDate(target.getDate() + 1);
+      const diff = target.getTime() - now.getTime();
       return {
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60)
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / 1000 / 60) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
       };
     };
 
-    const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
-
+    const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 1000);
     setTimeLeft(calculateTimeLeft());
     return () => clearInterval(timer);
   }, []);
 
-  const formatTime = (val: number) => val.toString().padStart(2, '0');
+  const format = (n: number) => n.toString().padStart(2, '0');
+
+  const handleCopyCoupon = () => {
+    navigator.clipboard.writeText('GAMINGCOMMUNITY50');
+    setCopiedCoupon(true);
+    setTimeout(() => setCopiedCoupon(false), 2000);
+  };
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed top-0 left-0 w-full bg-[#6C3BFF] text-yellow-300 z-50 font-bold text-center text-sm sm:text-base px-4 py-3">
-      <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 sm:gap-6">
-        {/* Main Title */}
-        <div className="text-lg sm:text-xl font-extrabold tracking-wide">
-          BIGGEST GAMING SALE
-          <div className="text-xs sm:text-sm font-semibold">Sale ends in:</div>
+    <div className="fixed top-0 left-0 w-full z-[60] bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-yellow-300 font-bold shadow-md px-4 py-2">
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-6 text-xs sm:text-sm">
+        {/* Flash Sale Title */}
+        <div className="flex items-center gap-2 whitespace-nowrap">
+          <div className="bg-yellow-300 rounded-full p-1 animate-pulse">
+            <Zap className="w-3 h-3 text-red-600" />
+          </div>
+          <span className="tracking-wide font-semibold">🔥 BIGGEST GAMING SALE</span>
         </div>
 
         {/* Timer */}
-        <div className="flex items-end gap-3 sm:gap-4 font-mono text-lg sm:text-2xl">
-          <div className="flex flex-col items-center">
-            <span>{formatTime(timeLeft.hours)}</span>
-            <span className="text-[10px] sm:text-xs font-semibold">HOURS</span>
-          </div>
-          <span className="text-xl sm:text-2xl font-bold">:</span>
-          <div className="flex flex-col items-center">
-            <span>{formatTime(timeLeft.minutes)}</span>
-            <span className="text-[10px] sm:text-xs font-semibold">MINUTES</span>
-          </div>
-          <span className="text-xl sm:text-2xl font-bold">:</span>
-          <div className="flex flex-col items-center">
-            <span>{formatTime(timeLeft.seconds)}</span>
-            <span className="text-[10px] sm:text-xs font-semibold">SECONDS</span>
-          </div>
+        <div className="flex items-center gap-1 sm:gap-2 bg-black/20 rounded px-2 py-1 font-mono text-sm">
+          <Clock className="w-3 h-3 text-yellow-300" />
+          <span>{format(timeLeft.hours)}</span>
+          <span>:</span>
+          <span>{format(timeLeft.minutes)}</span>
+          <span>:</span>
+          <span>{format(timeLeft.seconds)}</span>
         </div>
 
-        {/* Coupon */}
+        {/* Coupon Button */}
         <button
-          className="flex items-center gap-2 border-2 border-dashed border-yellow-300 rounded-full px-4 py-1 text-sm sm:text-base hover:bg-yellow-300 hover:text-[#6C3BFF] transition"
-          onClick={() => navigator.clipboard.writeText('SAVE10')}
+          onClick={handleCopyCoupon}
+          className="flex items-center gap-1 border-2 border-dashed border-yellow-300 rounded-full px-3 py-1 hover:bg-yellow-300 hover:text-red-600 transition"
         >
-          <Percent className="w-4 h-4" />
-          SAVE EXTRA 10%
+          <span className="font-mono font-bold text-xs sm:text-sm">
+            GAMINGCOMMUNITY50
+          </span>
+          {copiedCoupon ? (
+            <Check className="w-3 h-3 text-green-300" />
+          ) : (
+            <Copy className="w-3 h-3 text-yellow-300" />
+          )}
         </button>
 
         {/* Close Button */}
         <button
           onClick={() => setIsVisible(false)}
-          className="absolute right-3 top-3 text-yellow-300 hover:text-white transition"
+          className="text-yellow-300 hover:text-white transition"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
+
+      <div className="h-0.5 mt-2 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 animate-pulse"></div>
     </div>
   );
 };
