@@ -69,13 +69,7 @@ const FlashSaleStrip: React.FC = () => {
           )}
         </button>
 
-        {/* Close */}
-        <button
-          onClick={() => setIsVisible(false)}
-          className="text-yellow-300 hover:text-white transition"
-        >
-          <X className="w-4 h-4" />
-        </button>
+   
       </div>
       <div className="h-0.5 mt-2 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 animate-pulse" />
     </div>
