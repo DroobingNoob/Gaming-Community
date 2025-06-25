@@ -37,8 +37,7 @@ const FlashSaleStrip: React.FC = () => {
 
   return (
     <div className="fixed top-0 left-0 w-full z-[60] bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-yellow-300 font-bold shadow-md px-4 py-2">
-   <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 max-sm:gap-2 text-sm sm:text-base text-center sm:text-left">
-
+     <div className="flash-strip-wrapper flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm sm:text-base text-center sm:text-left">
 
         {/* Flash Sale Text */}
         <div className="flex items-center gap-2">
@@ -55,7 +54,7 @@ const FlashSaleStrip: React.FC = () => {
   <span>:</span>
   <span>{format(timeLeft.minutes)}</span>
   <span>:</span>
-  <span>{format(timeLeft.seconds)}</span>
+  <span>{format(timeLeft.seconds)} </span>
 </div>
 
 
