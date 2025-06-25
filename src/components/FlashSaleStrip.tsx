@@ -1,5 +1,3 @@
-Make everything come in one line even on small screens - 
-
 import React, { useState, useEffect } from 'react';
 import { Clock, Zap, X, Copy, Check } from 'lucide-react';
 
