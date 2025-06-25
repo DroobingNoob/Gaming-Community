@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media (max-width: 640px) {
+  .flash-strip-wrapper {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    gap: 0.25rem;
+  }
+
+  .flash-strip-wrapper span,
+  .flash-strip-wrapper button {
+    font-size: 11px !important;
+  }
+
+  .flash-strip-wrapper svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .flash-strip-wrapper button {
+    padding: 4px 8px !important;
+  }
+}
