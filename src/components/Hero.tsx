@@ -21,7 +21,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
     {
       title: "🎁 MYSTERY BOX DEAL! 🎁",
       subtitle: "First 30 Orders Above ₹3000",
-      description: "Get a FREE Mystery Game (1 Month Rent) with your order!",
+      description: "Get a FREE Mystery Game with your order!",
       couponCode: "MYSTERYBOX",
       image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080",
       overlay: "bg-gradient-to-br from-purple-900/95 via-indigo-900/90 to-purple-900/85",
