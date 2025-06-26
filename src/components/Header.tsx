@@ -231,57 +231,67 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
               {/* Mobile Menu */}
               {/* Overlay backdrop */}
 {isMobileMenuOpen && (
-  <div
-    onClick={() => setIsMobileMenuOpen(false)}
-    className="fixed inset-0 bg-black bg-opacity-30 z-40"
-  />
+  <>
+    {/* Overlay backdrop */}
+    <div
+      onClick={() => setIsMobileMenuOpen(false)}
+      className="fixed inset-0 bg-black bg-opacity-30 z-40"
+    />
+
+    {/* Sidebar */}
+    <div
+      className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg border-r border-gray-200 z-50 transform transition-transform duration-300"
+    >
+      <div className="p-4 overflow-y-auto h-full">
+        <nav className="space-y-2">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleNavClick(item.id)}
+              className={`block w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg flex items-center space-x-2 ${
+                item.id === 'admin'
+                  ? 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200'
+                  : ''
+              }`}
+            >
+              {item.id === 'admin' && <Shield className="w-4 h-4" />}
+              <span>{item.name}</span>
+            </button>
+          ))}
+        </nav>
+
+        {isLoggedIn ? (
+          <div className="mt-4 space-y-2">
+            <div className="py-3 px-2 text-green-600 bg-green-50 rounded-lg">
+              Welcome, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}!
+            </div>
+            <button
+              onClick={() => {
+                onNavigation('logout');
+                setIsMobileMenuOpen(false);
+              }}
+              className="w-full text-left py-3 px-2 text-red-600 hover:text-red-700 transition-colors hover:bg-red-50 rounded-lg flex items-center space-x-2"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => {
+              onLoginClick();
+              setIsMobileMenuOpen(false);
+            }}
+            className="mt-4 w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg"
+          >
+            Login with Google
+          </button>
+        )}
+      </div>
+    </div>
+  </>
 )}
 
-{/* Sidebar */}
-<div
-  className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg border-r border-gray-200 z-50 transform transition-transform duration-300 ${
-    isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-  }`}
->
-  <div className="p-4">
-
-                    <nav className="space-y-2">
-                      {navItems.map((item) => (
-                        <button
-                          key={item.id}
-                          onClick={() => handleNavClick(item.id)}
-                          className={`block w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg flex items-center space-x-2 ${
-                            item.id === 'admin' ? 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200' : ''
-                          }`}
-                        >
-                          {item.id === 'admin' && <Shield className="w-4 h-4" />}
-                          <span>{item.name}</span>
-                        </button>
-                      ))}
-                    </nav>
-                    
-                    {isLoggedIn ? (
-                      <div className="mt-4 space-y-2">
-                        <div className="py-3 px-2 text-green-600 bg-green-50 rounded-lg">
-                          Welcome, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}!
-                        </div>
-                        <button
-                          onClick={() => {
-                            onNavigation('logout');
-                            setIsMobileMenuOpen(false);
-                          }}
-                          className="w-full text-left py-3 px-2 text-red-600 hover:text-red-700 transition-colors hover:bg-red-50 rounded-lg flex items-center space-x-2"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          <span>Logout</span>
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          onLoginClick();
-                          setIsMobileMenuOpen(false);
-                        }}
                         className="mt-4 w-full text-left py-3 px-2 text-cyan-600 hover:text-orange-500 transition-colors hover:bg-gray-50 rounded-lg"
                       >
                         Login with Google
