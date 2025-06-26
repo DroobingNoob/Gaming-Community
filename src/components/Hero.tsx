@@ -203,13 +203,13 @@ const goToPrevSlide = () => {
         </div>
       ))}
 
-      {/* Left Arrow */}
+   {/* Left Arrow */}
 <button
   onClick={goToPrevSlide}
-  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 backdrop-blur text-white rounded-full p-2 sm:p-3 md:p-4 shadow-md transition"
+  className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 backdrop-blur text-white rounded-full p-1 sm:p-3 shadow-md transition"
   aria-label="Previous Slide"
 >
-  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+  <svg className="w-3 h-3 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
   </svg>
 </button>
@@ -217,13 +217,14 @@ const goToPrevSlide = () => {
 {/* Right Arrow */}
 <button
   onClick={goToNextSlide}
-  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 backdrop-blur text-white rounded-full p-2 sm:p-3 md:p-4 shadow-md transition"
+  className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 backdrop-blur text-white rounded-full p-1 sm:p-3 shadow-md transition"
   aria-label="Next Slide"
 >
-  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+  <svg className="w-3 h-3 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
   </svg>
 </button>
+
 
       {/* Promotional Badge */}
      {/* Slide-Specific Badges (hidden on mobile) */}
