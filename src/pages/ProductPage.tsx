@@ -173,9 +173,11 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
 ✔️ We provide a fully legal account with your desired rental game pre-purchased.
 ✔️ You just need to download and play – quick and hassle-free!
 ✔️ Games can be rented for the following durations:
+
 • 1 Month
 • 3 Months
 • 6 Months
+
 ✔️ Online play is available.
 ✔️ Console must remain connected to the internet during the rental period.
 ✔️ After the selected rental period ends, the game must be returned as per the agreed process.
