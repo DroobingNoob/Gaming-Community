@@ -98,6 +98,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
       MYSTERYBOX
     </div>
     <button
+      type="button"
   onClick={(e) => {
     e.preventDefault();
     copyToClipboard();
