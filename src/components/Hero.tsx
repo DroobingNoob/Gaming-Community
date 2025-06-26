@@ -183,28 +183,7 @@ const goToPrevSlide = () => {
   onMouseLeave={() => setIsHovered(false)}
       >
       {slides.map((slide, index) => (
-        {/* Left Arrow */}
-<button
-  onClick={goToPrevSlide}
-  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 backdrop-blur text-white rounded-full p-2 sm:p-3 md:p-4 shadow-md transition"
-  aria-label="Previous Slide"
->
-  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-  </svg>
-</button>
-
-{/* Right Arrow */}
-<button
-  onClick={goToNextSlide}
-  className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 backdrop-blur text-white rounded-full p-2 sm:p-3 md:p-4 shadow-md transition"
-  aria-label="Next Slide"
->
-  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-  </svg>
-</button>
-
+        
         <div
           key={index}
           className={`absolute inset-0 transition-opacity duration-1000 ${
