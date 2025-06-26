@@ -172,57 +172,19 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
         </div>
       ))}
 
-    {/* Conditional Promotional Badges - visible only on tablet and larger */}
-<div className="hidden sm:block">
-  {/* Slide 1: Mystery Box */}
-  {currentSlide === 0 && (
-    <>
-      <div className="absolute top-3 left-3">
-        <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg animate-pulse">
+      {/* Promotional Badge */}
+      <div className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 left-2 sm:left-3 md:left-4 lg:left-6 xl:left-8">
+        <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-1.5 md:py-2 lg:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold shadow-lg animate-pulse">
           🎁 MYSTERY BOX
         </div>
       </div>
-      <div className="absolute top-3 right-3">
-        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg animate-bounce">
-          🎮 FREE GIFT
-        </div>
-      </div>
-    </>
-  )}
 
-  {/* Slide 2: Premium Gaming */}
-  {currentSlide === 1 && (
-    <>
-      <div className="absolute top-3 left-3">
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-700 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-          🕹 BEST GAMES
-        </div>
-      </div>
-      <div className="absolute top-3 right-3">
-        <div className="bg-gradient-to-r from-green-400 to-teal-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-          💰 BEST PRICES
-        </div>
-      </div>
-    </>
-  )}
-
-  {/* Slide 3: Instant Delivery */}
-  {currentSlide === 2 && (
-    <>
-      <div className="absolute top-3 left-3">
-        <div className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+      {/* Special Offer Badge */}
+      <div className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 right-2 sm:right-3 md:right-4 lg:right-6 xl:right-8">
+        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-1.5 md:py-2 lg:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold shadow-lg animate-bounce">
           ⚡ INSTANT DELIVERY
         </div>
       </div>
-      <div className="absolute top-3 right-3">
-        <div className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-          🕒 24/7 SUPPORT
-        </div>
-      </div>
-    </>
-  )}
-</div>
-
 
       {/* Slide Indicators */}
       <div className="absolute bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-1 sm:space-x-2">
