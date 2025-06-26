@@ -11,6 +11,13 @@ interface HeroProps {
 const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const copyToClipboard = () => {
+  navigator.clipboard.writeText("MYSTERYBOX").then(() => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500); // reset after 1.5s
+  });
+};
+
   // Auto-slide every 5 seconds
   useEffect(() => {
     const timer = setInterval(() => {
