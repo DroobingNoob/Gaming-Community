@@ -204,14 +204,14 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                 </button>
 
                 {/* Mobile Logo - Centered and Prominent */}
-                <div className="absolute left-1/2 transform -translate-x-1/2">
-                  <img 
-                    src="/1000156095.jpg" 
-                    alt="Gaming Community" 
-                    className="w-16 h-16 xs:w-18 xs:h-18 sm:w-20 sm:h-20 md:w-22 md:h-22 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg cursor-pointer"
-                    onClick={() => navigate('/')}
-                  />
-                </div>
+               <div className="flex justify-center w-full">
+  <img 
+    src="/1000156095.jpg"
+    alt="Gaming Community"
+    className="w-16 h-16 xs:w-18 xs:h-18 sm:w-20 sm:h-20 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg cursor-pointer"
+    onClick={() => navigate('/')}
+  />
+</div>
 
                 <div className="flex items-center space-x-2">
                   <button onClick={handleSearchClick} className="text-cyan-600 p-1">
