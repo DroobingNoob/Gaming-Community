@@ -11,6 +11,8 @@ interface HeroProps {
 const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
 
   const copyToClipboard = () => {
   navigator.clipboard.writeText("MYSTERYBOX").then(() => {
