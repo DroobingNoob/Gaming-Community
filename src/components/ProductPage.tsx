@@ -414,11 +414,11 @@ This option is best suited for single-player games or customers who prefer offli
                           <div>
                             <h4 className="font-bold text-gray-800 mb-2">Platform</h4>
                             <p className="text-gray-600">{selectedPlatform}</p>
-                          </div>
-                          <div>
+                          </div> 
+                          {/* <div>
                             <h4 className="font-bold text-gray-800 mb-2">Language Support</h4>
                             <p className="text-gray-600">English, Spanish, French, German, Italian</p>
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                     )}
