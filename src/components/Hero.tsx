@@ -104,6 +104,9 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
       <ClipboardCopy className="w-4 h-4 sm:w-5 sm:h-5" />
     </button>
             </div>
+            {copied && (
+    <div className="text-xs text-green-300 mt-1">Copied!</div>
+  )}
           </div>
         )}
 
