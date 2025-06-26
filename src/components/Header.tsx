@@ -204,7 +204,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                 </button>
 
                 {/* Mobile Logo - Centered and Prominent */}
-               <div className="flex justify-center w-full">
+               <div className="flex justify-center w-full relative">
   <img 
     src="/1000156095.jpg"
     alt="Gaming Community"
