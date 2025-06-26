@@ -195,7 +195,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
 
             {/* Mobile Header */}
             <div className="lg:hidden">
-             <div className="relative flex items-center justify-between">
+              <div className="flex items-center justify-between">
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="text-cyan-600 p-1 z-50 relative"
@@ -204,10 +204,10 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                 </button>
 
                 {/* Mobile Logo - Centered and Prominent */}
-                <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+               <div className="flex justify-center w-full">
   <img 
     src="/1000156095.jpg"
-    alt="Gaming Community"
+    alt="Gaming Community "
     className="w-16 h-16 xs:w-18 xs:h-18 sm:w-20 sm:h-20 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg cursor-pointer"
     onClick={() => navigate('/')}
   />
