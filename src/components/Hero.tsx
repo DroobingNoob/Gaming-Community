@@ -97,7 +97,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
     <div className="text-sm xs:text-base sm:text-lg md:text-xl font-mono font-bold text-yellow-300 tracking-wider">
       MYSTERYBOX
     </div>
-    <button
+    {/* <button
       type="button"
   onClick={(e) => {
     e.preventDefault();
@@ -114,7 +114,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
   <div className="absolute text-xs text-green-300 mt-1 text-center left-1/2 -translate-x-1/2 top-full">
     Copied!
   </div>
-)}
+)} */}
 
 </div>
 
