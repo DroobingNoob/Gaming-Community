@@ -124,18 +124,19 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
   const getTypeDescription = () => {
     if (selectedType === 'Rent') {
-      return `You can rent the game for the following durations:
+      return ` 🎮 Rental Game Accounts:
 
-1 Month
-2 Months
-3 Months
-6 Months
-
-You have to connect your console to the internet after renting the game.
-
-After the selected rental period ends, you must return the game.
-
-Continued use after the rental period may result in access restrictions or being blocked from future rentals.`;
+✔️ We provide a fully legal account with your desired rental game pre-purchased.
+✔️ You just need to download and play – quick and hassle-free!
+✔️ Games can be rented for the following durations:
+• 1 Month
+• 3 Months
+• 6 Months
+✔️ Online play is available.
+✔️ Console must remain connected to the internet during the rental period.
+✔️ After the selected rental period ends, the game must be returned as per the agreed process.
+✔️ Continuing to use the game after your rental period may result in account restrictions or being blocked from future rentals.
+✔️ Credentials cannot be changed. If changed, the game will be removed, and no refund or recovery will be provided.`;
     } else if (selectedType === 'Permanent Offline') {
       return `This version allows you to play the game permanently, but only in offline mode.
 
