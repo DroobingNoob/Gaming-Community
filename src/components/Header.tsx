@@ -194,7 +194,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
             </div>
 
             {/* Mobile Header */}
-            <div className="lg:hidden relative">
+            <div className="lg:hidden">
               <div className="flex items-center justify-between">
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
