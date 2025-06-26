@@ -230,7 +230,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
 
               {/* Mobile Menu */}
               {isMobileMenuOpen && (
-                <div className="absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-40">
+                <div className="absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-50">
                   <div className="container mx-auto px-3 sm:px-4 py-4">
                     <nav className="space-y-2">
                       {navItems.map((item) => (
