@@ -23,6 +23,8 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
 
   // Auto-slide every 5 seconds
   useEffect(() => {
+     if (isHovered) return;
+    
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
