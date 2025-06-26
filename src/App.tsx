@@ -334,7 +334,6 @@ function App() {
       onNavigation={handleNavigation}
       user={user}
     />
-
       </div>
       
       {/* Main content - Below header with proper spacing */}
