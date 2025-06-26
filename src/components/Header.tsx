@@ -208,7 +208,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
   <img 
     src="/1000156095.jpg"
     alt="Gaming Community"
-    className="w-16 h-16 xs:w-18 xs:h-18 sm:w-20 sm:h-20 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg cursor-pointer"
+   className="w-16 h-16 xs:w-18 xs:h-18 sm:w-20 sm:h-20 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg cursor-pointer relative left-2 sm:left-4 md:left-0"
     onClick={() => navigate('/')}
   />
 </div>
