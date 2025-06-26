@@ -96,6 +96,13 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
                   MYSTERYBOX
                 </div>
               </div>
+              <button
+      onClick={copyToClipboard}
+      className="ml-2 text-purple-200 hover:text-yellow-300 transition"
+      title="Copy code"
+    >
+      <ClipboardCopy className="w-4 h-4 sm:w-5 sm:h-5" />
+    </button>
             </div>
           </div>
         )}
