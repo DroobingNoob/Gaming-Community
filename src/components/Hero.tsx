@@ -189,6 +189,25 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
       <div className="absolute bottom-1/4 left-4 sm:left-6 md:left-8 lg:left-12 xl:left-16 animate-bounce-slow opacity-20" style={{ animationDelay: '1s' }}>
         <div className="w-4 h-4 sm:w-6 sm:h-6 md:w-10 md:h-10 lg:w-12 lg:h-12 bg-orange-400 rounded-full"></div>
       </div>
+       <button
+    onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
+    className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full z-10 shadow-md"
+  >
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+    </svg>
+  </button>
+
+  {/* Right Arrow */}
+  <button
+    onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
+    className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full z-10 shadow-md"
+  >
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
+</section>
     </section>
   );
 };
