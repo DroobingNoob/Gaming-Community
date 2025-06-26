@@ -57,7 +57,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const faqs = [
     {
       question: "What is the difference between rental and permanent purchase?",
-      answer: "Rental: You get access to the game for 30 days. You must return the account after the rental period ends.\n\nPermanent Purchase: You get lifetime access to the game on your console (single device), with warranty and reinstallation support."
+      answer: "Rental: You get access to the game for 30 days. You must return the account after the rental period ends.\n\nPermanent Purchase: You get permanent access to the game on your console (single device), with warranty and reinstallation support."
     },
     {
       question: "How does the rental process work?",
