@@ -170,7 +170,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
 
   return (
     <section className="relative h-64 xs:h-72 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] 2xl:h-[700px] overflow-hidden"
-      onMouseEnter={() => setIsHovered(true)}
+    onMouseEnter={() => setIsHovered(true)}
   onMouseLeave={() => setIsHovered(false)}
       >
       {slides.map((slide, index) => (
