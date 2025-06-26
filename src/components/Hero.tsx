@@ -100,7 +100,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
       onClick={copyToClipboard}
       className="ml-2 text-purple-200 hover:text-yellow-300 transition"
       title="Copy code"
-    > Hellow
+    >
       <ClipboardCopy className="w-4 h-4 sm:w-5 sm:h-5" />
     </button>
             </div>
