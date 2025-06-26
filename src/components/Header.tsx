@@ -121,7 +121,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                 </div>
 
                 {/* Logo - Made Much More Prominent */}
-                <div className="absolute left-1/2 transform -translate-x-1/2">
+               <div className="flex items-center justify-center">
                   <img 
                     src="/1000156095.jpg" 
                     alt="Gaming Community" 
