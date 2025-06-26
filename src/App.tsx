@@ -320,23 +320,21 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-      {/* Flash Sale Strip - At the very top with highest z-index */}
-      
-        <FlashSaleStrip />
-   
-      
-      {/* Header - Below flash sale strip with proper z-index */}
-      <div>
-        <Header
-          onLoginClick={() => setIsLoginModalOpen(true)}
-          onCartClick={handleCartClick}
-          isLoggedIn={isLoggedIn}
-          isAdmin={isAdmin}
-          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-          onNavigation={handleNavigation}
-          user={user}
-        />
+   <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+    {/* Flash Sale Strip - Appears above header in normal flow */}
+    <FlashSaleStrip />
+
+    {/* Header - Immediately below Flash Sale Strip */}
+    <Header
+      onLoginClick={() => setIsLoginModalOpen(true)}
+      onCartClick={handleCartClick}
+      isLoggedIn={isLoggedIn}
+      isAdmin={isAdmin}
+      cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+      onNavigation={handleNavigation}
+      user={user}
+    />
+
       </div>
       
       {/* Main content - Below header with proper spacing */}
