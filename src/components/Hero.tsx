@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Gift, Trophy, Star, ClipboardCopy } from 'lucide-react';
 
+const [copied, setCopied] = useState(false);
+
 interface HeroProps {
   onShopBestsellers: () => void;
   onBrowseCategories: () => void;
