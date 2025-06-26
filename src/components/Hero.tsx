@@ -20,7 +20,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
   const slides = [
     {
       title: "🎁 MYSTERY BOX DEAL! 🎁",
-      subtitle: "First 30 Orders Above ₹3000",
+      subtitle: "",
       description: "Get a FREE Mystery Game with your order!",
       couponCode: "MYSTERYBOX",
       image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080",
