@@ -65,7 +65,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
     },
     {
       question: "Can I play games from my personal account?",
-      answer: "Yes! All our rentals and permanent purchases are configured to work from your personal account, unless specifically stated otherwise."
+      answer: "Yes! All our permanent purchases are configured to work from your personal account, unless specifically stated otherwise."
     },
     {
       question: "Are these accounts legal and safe?",
