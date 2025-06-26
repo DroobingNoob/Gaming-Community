@@ -153,7 +153,7 @@ If your console connects to the internet, there is an 80% chance the game will g
 
 This option is best suited for single-player games or customers who prefer offline gaming.`;
     } else if (selectedType === 'Permanent Offline + Online') {
-      return ` ❕ Permanent Game Details ❕
+      return ` ❕ Permanent Game Details
 
 ✔️ We provide you with an account where the game is already purchased.
 
