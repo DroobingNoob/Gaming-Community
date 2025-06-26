@@ -174,7 +174,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
 
       {/* Promotional Badge */}
      {/* Slide-Specific Badges (hidden on mobile) */}
-<div className="hidden sm:block">
+<div className="hidden max-sm:block">
   {/* Slide 0: Mystery Box */}
   {currentSlide === 0 && (
     <>
