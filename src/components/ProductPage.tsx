@@ -149,13 +149,19 @@ This option is best suited for single-player games or customers who prefer offli
       return ` ❕ Permanent Game Details ❕
 
 ✔️ We provide you with an account where the game is already purchased.
+
 ✔️ Simply log in, download the game, and play — no additional purchase required.
+
 ✔️ You can play the game from your own personal account.
+
 ✔️ Both online and offline play is supported.
+
 ✔️ The game will remain permanently accessible on your console.
+
 ✔️ 1-Year Warranty included on all permanent games.
 
 🚫 Account credentials cannot be changed.
+
 🚫 If you change the credentials, game access will be lost permanently and no refund or return will be provided.
 
 `;
