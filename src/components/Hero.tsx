@@ -57,12 +57,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
     return (
       <div className="text-white w-full max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-3xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Promotional Badge */}
-        {slide.isPromo && (
-          <div className="inline-flex items-center space-x-2 sm:space-x-3 bg-white/20 backdrop-blur-sm rounded-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 mb-3 sm:mb-4 md:mb-6 shadow-lg">
-            <Gift className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-yellow-400" />
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg font-bold tracking-wide">LIMITED OFFER</span>
-          </div>
-        )}
+        
 
         <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-black mb-2 xs:mb-3 sm:mb-4 md:mb-6 leading-tight text-center">
           {slide.title}
