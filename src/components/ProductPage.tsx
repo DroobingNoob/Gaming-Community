@@ -146,13 +146,19 @@ If your console connects to the internet, there is an 80% chance the game will g
 
 This option is best suited for single-player games or customers who prefer offline gaming.`;
     } else if (selectedType === 'Permanent Offline + Online') {
-      return `This version allows you to play the game both online and offline without restrictions.
+      return ` ❕ Permanent Game Details ❕
 
-You can connect your console to the internet anytime without worrying about the game being locked.
+✔️ We provide you with an account where the game is already purchased.
+✔️ Simply log in, download the game, and play — no additional purchase required.
+✔️ You can play the game from your own personal account.
+✔️ Both online and offline play is supported.
+✔️ The game will remain permanently accessible on your console.
+✔️ 1-Year Warranty included on all permanent games.
 
-If you want to delete the game and reinstall it, you are free to do so in this plan.
+🚫 Account credentials cannot be changed.
+🚫 If you change the credentials, game access will be lost permanently and no refund or return will be provided.
 
-Suitable for multiplayer games, online features, and users who want full flexibility.`;
+`;
     }
     return '';
   };
