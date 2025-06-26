@@ -98,12 +98,16 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
       MYSTERYBOX
     </div>
     <button
-      onClick={copyToClipboard}
-      className="text-purple-200 hover:text-yellow-300 transition"
-      title="Copy code"
-    >
-      <ClipboardCopy className="w-4 h-4 sm:w-5 sm:h-5" />
-    </button>
+  onClick={(e) => {
+    e.preventDefault();
+    copyToClipboard();
+  }}
+  className="text-purple-200 hover:text-yellow-300 transition"
+  title="Copy code"
+>
+  <ClipboardCopy className="w-4 h-4 sm:w-5 sm:h-5" />
+</button>
+
   </div>
   {copied && (
     <div className="text-xs text-green-300 mt-1 text-center">Copied!</div>
