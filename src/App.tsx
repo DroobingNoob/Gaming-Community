@@ -327,7 +327,7 @@ function App() {
       </div>
       
       {/* Header - Below flash sale strip with proper z-index */}
-      <div className="relative z-20 mt-[5.6rem]">
+      <div className="relative z-20 mt-[3rem]">
         <Header
           onLoginClick={() => setIsLoginModalOpen(true)}
           onCartClick={handleCartClick}
