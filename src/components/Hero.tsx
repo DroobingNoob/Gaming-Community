@@ -97,22 +97,26 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
     <div className="text-sm xs:text-base sm:text-lg md:text-xl font-mono font-bold text-yellow-300 tracking-wider">
       MYSTERYBOX
     </div>
-   <div className="relative">
-  <button
-    type="button"
-    onClick={copyToClipboard}
-    className="text-purple-200 hover:text-yellow-300 transition"
-    title="Copy code"
-  >
-    <ClipboardCopy className="w-4 h-4 sm:w-5 sm:h-5" />
-  </button>
-  {copied && (
-    <div className="absolute text-xs text-green-300 top-full mt-1 left-1/2 -translate-x-1/2">
-      Copied!
-    </div>
-  )}
-</div>
+    <button
+      type="button"
+  onClick={(e) => {
+    e.preventDefault();
+    copyToClipboard();
+  }}
+  className="text-purple-200 hover:text-yellow-300 transition"
+  title="Copy code"
+>
+  <ClipboardCopy className="w-4 h-4 sm:w-5 sm:h-5" />
+</button>
 
+  </div>
+  {copied && (
+  <div className="absolute text-xs text-green-300 mt-1 text-center left-1/2 -translate-x-1/2 top-full">
+    Copied!
+  </div>
+)}
+
+</div>
 
             </div>
             {copied && (
