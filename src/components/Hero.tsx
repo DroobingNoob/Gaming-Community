@@ -95,7 +95,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
   <div className="text-xs sm:text-sm text-purple-200 mb-1 text-center">Use Coupon Code:</div>
   <div className="flex items-center justify-center gap-2">
     <div className="text-sm xs:text-base sm:text-lg md:text-xl font-mono font-bold text-yellow-300 tracking-wider">
-      MYSTERYBOX
+      MYSTERYBOXy
     </div>
     <button
   onClick={(e) => {
