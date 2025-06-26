@@ -335,7 +335,7 @@ Suitable for multiplayer games, online features, and users who want full flexibi
                     <Clock className="w-8 h-8 text-blue-500" />
                     <div>
                       <div className="font-bold text-gray-800">Instant Delivery</div>
-                      <div className="text-gray-600 text-sm">Within 5 minutes</div>
+                      <div className="text-gray-600 text-sm">Within 1 hour</div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
