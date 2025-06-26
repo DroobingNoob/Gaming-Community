@@ -21,6 +21,15 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
   });
 };
 
+  const goToNextSlide = () => {
+  setCurrentSlide((prev) => (prev + 1) % slides.length);
+};
+
+const goToPrevSlide = () => {
+  setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+};
+
+
   // Auto-slide every 5 seconds
   useEffect(() => {
      if (isHovered) return;
