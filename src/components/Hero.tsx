@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Gift, Trophy, Star, ClipboardCopy } from 'lucide-react';
 
-const [copied, setCopied] = useState(false);
+
 
 interface HeroProps {
   onShopBestsellers: () => void;
@@ -10,6 +10,7 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
   navigator.clipboard.writeText("MYSTERYBOX").then(() => {
