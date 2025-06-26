@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Gift, Trophy, Star } from 'lucide-react';
+import { Gift, Trophy, Star, ClipboardCopy } from 'lucide-react';
 
 interface HeroProps {
   onShopBestsellers: () => void;
