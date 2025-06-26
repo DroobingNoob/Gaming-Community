@@ -33,7 +33,7 @@ const FAQPage: React.FC<FAQPageProps> = ({ onBackToHome }) => {
     {
       id: 4,
       question: "Can I play games from my personal account?",
-      answer: "Yes! All our rentals and permanent purchases are configured to work from your personal account, unless specifically stated otherwise.",
+      answer: "Yes! All our permanent purchases are configured to work from your personal account, unless specifically stated otherwise.",
       icon: <Users className="w-5 h-5" />,
       category: "Account"
     },
