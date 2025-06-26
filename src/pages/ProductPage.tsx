@@ -473,10 +473,10 @@ This option is best suited for single-player games or customers who prefer offli
                             <h4 className="font-bold text-gray-800 mb-2 text-sm xl:text-base">Platform</h4>
                             <p className="text-gray-600 text-sm xl:text-base">{selectedPlatform}</p>
                           </div>
-                          <div>
+                          {/* <div>
                             <h4 className="font-bold text-gray-800 mb-2 text-sm xl:text-base">Language Support</h4>
                             <p className="text-gray-600 text-sm xl:text-base">English, Spanish, French, German, Italian</p>
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                     )}
@@ -718,11 +718,11 @@ This option is best suited for single-player games or customers who prefer offli
                       <div>
                         <h4 className="font-bold text-gray-800 mb-1 sm:mb-2 text-sm">Platform</h4>
                         <p className="text-gray-600 text-xs sm:text-sm">{selectedPlatform}</p>
-                      </div>
-                      <div>
+                      </div> 
+                      {/* <div>
                         <h4 className="font-bold text-gray-800 mb-1 sm:mb-2 text-sm">Language Support</h4>
                         <p className="text-gray-600 text-xs sm:text-sm">English, Spanish, French, German, Italian</p>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 )}
