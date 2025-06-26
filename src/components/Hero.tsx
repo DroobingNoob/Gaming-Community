@@ -97,7 +97,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
     <div className="text-sm xs:text-base sm:text-lg md:text-xl font-mono font-bold text-yellow-300 tracking-wider">
       MYSTERYBOX
     </div>
-    <button
+    {/* <button
       type="button"
   onClick={(e) => {
     e.preventDefault();
@@ -107,10 +107,10 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
   title="Copy code"
 >
   <ClipboardCopy className="w-4 h-4 sm:w-5 sm:h-5" />
-</button>
+</button> */}
 
   </div>
-  {copied && (
+  {/* {copied && (
   <div className="absolute text-xs text-green-300 mt-1 text-center left-1/2 -translate-x-1/2 top-full">
     Copied!
   </div>
@@ -121,7 +121,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
             </div>
             {copied && (
     <div className="text-xs text-green-300 mt-1">Copied!</div>
-  )}
+  )} */}
           </div>
         )}
 
