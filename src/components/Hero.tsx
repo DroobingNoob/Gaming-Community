@@ -73,10 +73,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
         {/* Mystery Box Deal Details - Only for promo slide */}
         {slide.isPromo && (
           <div className="bg-gradient-to-r from-purple-900/80 to-indigo-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl md:rounded-3xl p-3 sm:p-4 md:p-6 lg:p-8 mb-4 sm:mb-6 md:mb-8 lg:mb-10 border-2 border-purple-400/50 shadow-2xl max-w-lg mx-auto">
-            <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-2 sm:mb-3 md:mb-4">
-              <Trophy className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-purple-400" />
-              <span className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-purple-300 tracking-wider">MYSTERY BOX DEAL</span>
-            </div>
+           
             <div className="text-center">
               <div className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white mb-2 sm:mb-3">
                 First 30 Orders Above ₹3000
