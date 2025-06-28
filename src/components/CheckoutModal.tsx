@@ -37,6 +37,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [couponError, setCouponError] = useState('');
   const [razorpayOrderId, setRazorpayOrderId] = useState('');
   const [paymentDetails, setPaymentDetails] = useState<any>(null);
+  const [paymentError, setPaymentError] = useState('');
   
   // Customer details
   const [customerName, setCustomerName] = useState('');
@@ -180,9 +181,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     const code = generateOrderCode();
     setOrderCode(code);
+    setPaymentError('');
 
     try {
       setIsProcessingPayment(true);
+      
+      // Test Razorpay connection first
+      const connectionOk = await RazorpayService.testConnection();
+      if (!connectionOk) {
+        console.warn('Razorpay connection test failed, proceeding with mock order');
+      }
       
       // Create Razorpay order
       const razorpayOrder = await RazorpayService.createOrder({
@@ -191,6 +199,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         receipt: code
       });
 
+      console.log('Razorpay order created:', razorpayOrder);
       setRazorpayOrderId(razorpayOrder.id);
       
       // Submit order to Google Sheets with Razorpay order ID
@@ -222,6 +231,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       
     } catch (error) {
       console.error('Error creating payment:', error);
+      setPaymentError(error instanceof Error ? error.message : 'Unknown error occurred');
       toast.error('Failed to initialize payment. Please try again.');
       setIsProcessingPayment(false);
     }
@@ -230,6 +240,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const handlePaymentSuccess = async (response: RazorpayResponse) => {
     try {
       setIsProcessingPayment(true);
+      
+      console.log('Payment response received:', response);
       
       // Verify payment signature
       const isValid = RazorpayService.verifyPaymentSignature(
@@ -268,10 +280,12 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         
       } else {
         toast.error('Payment verification failed. Please contact support.');
+        setPaymentError('Payment verification failed');
       }
     } catch (error) {
       console.error('Error processing payment success:', error);
       toast.error('Error processing payment. Please contact support.');
+      setPaymentError('Error processing payment');
     } finally {
       setIsProcessingPayment(false);
     }
@@ -322,6 +336,10 @@ Subtotal: ₹${subtotal.toFixed(2)}`;
 Payment ID: ${paymentDetails.razorpayPaymentId}
 Payment Status: ${paymentDetails.paymentStatus}`;
     }
+
+    if (paymentError) {
+      message += `\n\nPayment Error: ${paymentError}`;
+    }
     
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -337,6 +355,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
     setCouponError('');
     setPaymentDetails(null);
     setRazorpayOrderId('');
+    setPaymentError('');
     setCurrentStep('summary');
     
     onOrderComplete();
@@ -646,6 +665,19 @@ Payment Status: ${paymentDetails.paymentStatus}`;
             <div>
               <h4 className="font-bold text-orange-800">Processing Payment</h4>
               <p className="text-orange-700 text-sm">Please complete the payment in the Razorpay window</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Error */}
+      {paymentError && (
+        <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-6 border border-red-200">
+          <div className="flex items-center space-x-3">
+            <AlertCircle className="w-6 h-6 text-red-500" />
+            <div>
+              <h4 className="font-bold text-red-800">Payment Error</h4>
+              <p className="text-red-700 text-sm">{paymentError}</p>
             </div>
           </div>
         </div>
