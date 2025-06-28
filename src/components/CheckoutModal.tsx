@@ -37,8 +37,9 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [razorpayOrderId, setRazorpayOrderId] = useState('');
   const [paymentDetails, setPaymentDetails] = useState<any>(null);
   const [paymentError, setPaymentError] = useState('');
-  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'failed'>('checking');
+  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'failed' | 'mock'>('checking');
   const [hasError, setHasError] = useState(false);
+  const [isMockMode, setIsMockMode] = useState(false);
   
   // Customer details
   const [customerName, setCustomerName] = useState('');
@@ -59,6 +60,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setPaymentDetails(null);
       setPaymentError('');
       setHasError(false);
+      setIsMockMode(false);
       testBackendConnection();
     }
   }, [isOpen]);
@@ -96,15 +98,25 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const testBackendConnection = async () => {
     try {
       setConnectionStatus('checking');
-      const isConnected = await BackendService.testConnection();
-      setConnectionStatus(isConnected ? 'connected' : 'failed');
+      console.log('Testing backend connection...');
       
-      if (!isConnected) {
-        console.warn('Backend connection failed, payment may use fallback mode');
+      const isConnected = await BackendService.testRazorpayConnection();
+      console.log('Backend connection test result:', isConnected);
+      
+      if (isConnected) {
+        setConnectionStatus('connected');
+        setIsMockMode(false);
+      } else {
+        setConnectionStatus('mock');
+        setIsMockMode(true);
+        console.warn('Razorpay connection failed, using mock mode');
+        toast.info('Payment system in demo mode - orders will be tracked but payments are simulated');
       }
     } catch (error) {
       console.error('Connection test error:', error);
-      setConnectionStatus('failed');
+      setConnectionStatus('mock');
+      setIsMockMode(true);
+      toast.warning('Payment system in demo mode due to connectivity issues');
     }
   };
 
@@ -273,17 +285,42 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setIsProcessingPayment(true);
       
       console.log('Starting payment process...');
+      console.log('Mock mode:', isMockMode);
       
-      // Test Razorpay connection
-      const connectionOk = await BackendService.testRazorpayConnection();
-      console.log('Razorpay connection status:', connectionOk);
+      // Submit order to backend first
+      await submitOrderToBackend(code);
       
-      if (!connectionOk) {
-        console.warn('Razorpay connection failed, proceeding with mock order');
-        toast.warning('Payment system in test mode');
+      if (isMockMode) {
+        // In mock mode, simulate the payment process
+        console.log('Running in mock mode - simulating payment');
+        
+        // Create a mock order
+        const mockOrder = {
+          id: `order_mock_${Date.now()}`,
+          amount: Math.round(total * 100),
+          currency: 'INR',
+          receipt: code
+        };
+        
+        setRazorpayOrderId(mockOrder.id);
+        
+        // Simulate payment success after a short delay
+        setTimeout(() => {
+          const mockPaymentResponse = {
+            razorpay_order_id: mockOrder.id,
+            razorpay_payment_id: `pay_mock_${Date.now()}`,
+            razorpay_signature: `sig_mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          };
+          
+          handlePaymentSuccess(mockPaymentResponse);
+        }, 2000);
+        
+        setCurrentStep('payment');
+        toast.info('Demo payment initiated - this will complete automatically');
+        return;
       }
       
-      // Create Razorpay order via backend
+      // Real Razorpay flow
       console.log('Creating Razorpay order...');
       const razorpayOrder = await BackendService.createRazorpayOrder({
         amount: Math.round(total * 100), // Convert to paise
@@ -293,9 +330,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
       console.log('Razorpay order created:', razorpayOrder);
       setRazorpayOrderId(razorpayOrder.id);
-      
-      // Submit order to backend
-      await submitOrderToBackend(code, razorpayOrder.id);
       
       // Check if Razorpay SDK is loaded
       if (typeof window.Razorpay === 'undefined') {
@@ -359,19 +393,19 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
           razorpayOrderId: response.razorpay_order_id,
           razorpayPaymentId: response.razorpay_payment_id,
           razorpaySignature: response.razorpay_signature,
-          paymentMethod: paymentInfo.method || 'Unknown',
-          paymentStatus: 'Completed'
+          paymentMethod: paymentInfo.method || 'UPI',
+          paymentStatus: isMockMode ? 'Demo Completed' : 'Completed'
         });
 
         // Update order status via backend
         await BackendService.updatePaymentDetails(orderCode, {
           razorpayPaymentId: response.razorpay_payment_id,
           razorpaySignature: response.razorpay_signature,
-          paymentMethod: paymentInfo.method || 'Unknown',
-          paymentStatus: 'Completed'
+          paymentMethod: paymentInfo.method || 'UPI',
+          paymentStatus: isMockMode ? 'Demo Completed' : 'Completed'
         });
 
-        toast.success('Payment successful!');
+        toast.success(isMockMode ? 'Demo payment completed!' : 'Payment successful!');
         setCurrentStep('confirmation');
         
         // Complete the order after a delay
@@ -451,6 +485,10 @@ Payment Status: ${paymentDetails.paymentStatus}`;
       if (paymentError) {
         message += `\n\nPayment Error: ${paymentError}`;
       }
+
+      if (isMockMode) {
+        message += `\n\nNote: This was a demo order for testing purposes.`;
+      }
       
       const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, '_blank');
@@ -527,21 +565,29 @@ Payment Status: ${paymentDetails.paymentStatus}`;
       {/* Connection Status */}
       <div className={`rounded-xl p-4 border ${
         connectionStatus === 'connected' ? 'bg-green-50 border-green-200' :
-        connectionStatus === 'failed' ? 'bg-yellow-50 border-yellow-200' :
+        connectionStatus === 'mock' ? 'bg-yellow-50 border-yellow-200' :
+        connectionStatus === 'failed' ? 'bg-red-50 border-red-200' :
         'bg-blue-50 border-blue-200'
       }`}>
         <div className="flex items-center space-x-2">
           <div className={`w-3 h-3 rounded-full ${
             connectionStatus === 'connected' ? 'bg-green-500' :
-            connectionStatus === 'failed' ? 'bg-yellow-500' :
+            connectionStatus === 'mock' ? 'bg-yellow-500' :
+            connectionStatus === 'failed' ? 'bg-red-500' :
             'bg-blue-500 animate-pulse'
           }`}></div>
           <span className="text-sm font-medium">
             {connectionStatus === 'checking' && 'Checking payment system...'}
             {connectionStatus === 'connected' && 'Payment system ready'}
-            {connectionStatus === 'failed' && 'Payment system in test mode'}
+            {connectionStatus === 'mock' && 'Demo mode - payments simulated'}
+            {connectionStatus === 'failed' && 'Payment system unavailable'}
           </span>
         </div>
+        {connectionStatus === 'mock' && (
+          <p className="text-xs text-yellow-700 mt-2">
+            Orders will be tracked but payments are simulated for demonstration purposes.
+          </p>
+        )}
       </div>
 
       {/* Customer Details Form */}
@@ -733,7 +779,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
           ) : (
             <>
               <CreditCard className="w-4 h-4" />
-              <span>Pay with Razorpay</span>
+              <span>{isMockMode ? 'Demo Payment' : 'Pay with Razorpay'}</span>
             </>
           )}
         </button>
@@ -745,9 +791,11 @@ Payment Status: ${paymentDetails.paymentStatus}`;
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
-          Payment Processing
+          {isMockMode ? 'Demo Payment Processing' : 'Payment Processing'}
         </h2>
-        <p className="text-gray-600">Complete your payment with Razorpay</p>
+        <p className="text-gray-600">
+          {isMockMode ? 'Simulating payment for demonstration' : 'Complete your payment with Razorpay'}
+        </p>
       </div>
 
       {/* Customer Details Display */}
@@ -804,21 +852,40 @@ Payment Status: ${paymentDetails.paymentStatus}`;
       <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
         <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
           <CreditCard className="w-5 h-5 text-blue-500" />
-          <span>Secure Payment with Razorpay</span>
+          <span>{isMockMode ? 'Demo Payment Mode' : 'Secure Payment with Razorpay'}</span>
         </h3>
         <div className="space-y-3 text-gray-700">
-          <div className="flex items-center space-x-3">
-            <Shield className="w-5 h-5 text-green-500" />
-            <span>Your payment is secured with 256-bit SSL encryption</span>
-          </div>
-          <div className="flex items-center space-x-3">
-            <CreditCard className="w-5 h-5 text-blue-500" />
-            <span>Supports UPI, Cards, Net Banking, and Wallets</span>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Smartphone className="w-5 h-5 text-purple-500" />
-            <span>Complete payment in the Razorpay popup window</span>
-          </div>
+          {isMockMode ? (
+            <>
+              <div className="flex items-center space-x-3">
+                <AlertCircle className="w-5 h-5 text-yellow-500" />
+                <span>This is a demonstration - no real payment will be processed</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <FileSpreadsheet className="w-5 h-5 text-blue-500" />
+                <span>Your order will still be tracked in our system</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <MessageCircle className="w-5 h-5 text-green-500" />
+                <span>Contact support for real payment processing</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center space-x-3">
+                <Shield className="w-5 h-5 text-green-500" />
+                <span>Your payment is secured with 256-bit SSL encryption</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <CreditCard className="w-5 h-5 text-blue-500" />
+                <span>Supports UPI, Cards, Net Banking, and Wallets</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Smartphone className="w-5 h-5 text-purple-500" />
+                <span>Complete payment in the Razorpay popup window</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -829,7 +896,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
             ₹{total.toFixed(2)}
           </div>
           <p className="text-sm text-gray-600">
-            Total amount to be paid
+            {isMockMode ? 'Demo amount (no charge)' : 'Total amount to be paid'}
           </p>
         </div>
       </div>
@@ -840,8 +907,15 @@ Payment Status: ${paymentDetails.paymentStatus}`;
           <div className="flex items-center space-x-3">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500"></div>
             <div>
-              <h4 className="font-bold text-orange-800">Processing Payment</h4>
-              <p className="text-orange-700 text-sm">Please complete the payment in the Razorpay window</p>
+              <h4 className="font-bold text-orange-800">
+                {isMockMode ? 'Processing Demo Payment' : 'Processing Payment'}
+              </h4>
+              <p className="text-orange-700 text-sm">
+                {isMockMode 
+                  ? 'Demo payment will complete automatically in a few seconds'
+                  : 'Please complete the payment in the Razorpay window'
+                }
+              </p>
             </div>
           </div>
         </div>
@@ -886,7 +960,9 @@ Payment Status: ${paymentDetails.paymentStatus}`;
         <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
           <Check className="w-8 h-8 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Payment Successful!</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          {isMockMode ? 'Demo Order Completed!' : 'Payment Successful!'}
+        </h2>
         <p className="text-gray-600 mb-4">
           Your order <strong className="font-mono text-cyan-600">{orderCode}</strong> has been confirmed.
         </p>
@@ -917,8 +993,18 @@ Payment Status: ${paymentDetails.paymentStatus}`;
         
         <div className="bg-white rounded-xl p-4 border border-green-200">
           <p className="text-sm text-gray-700">
-            Your games will be delivered within <strong>1 hour</strong>.
-            You'll receive delivery confirmation via WhatsApp.
+            {isMockMode ? (
+              <>
+                This was a <strong>demonstration order</strong>. For real purchases, contact our support team.
+                <br />
+                Your order details have been saved for reference.
+              </>
+            ) : (
+              <>
+                Your games will be delivered within <strong>1 hour</strong>.
+                You'll receive delivery confirmation via WhatsApp.
+              </>
+            )}
           </p>
         </div>
       </div>
@@ -938,7 +1024,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
             </div>
             <h2 className="text-xl font-bold text-gray-800">
               {currentStep === 'summary' && 'Order Summary'}
-              {currentStep === 'payment' && 'Payment'}
+              {currentStep === 'payment' && (isMockMode ? 'Demo Payment' : 'Payment')}
               {currentStep === 'confirmation' && 'Confirmation'}
             </h2>
           </div>
