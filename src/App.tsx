@@ -8,6 +8,8 @@ import Footer from './components/Footer';
 import LoginModal from './components/LoginModal';
 import CartModal from './components/CartModal';
 import CheckoutModal from './components/CheckoutModal';
+import NewsletterModal from './components/NewsletterModal';
+import NewsletterBanner from './components/NewsletterBanner';
 import WhatsAppButton from './components/WhatsAppButton';
 
 // Page Components
@@ -82,10 +84,13 @@ function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [isNewsletterModalOpen, setIsNewsletterModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [showNewsletterBanner, setShowNewsletterBanner] = useState(false);
+  const [hasNewsletterDiscount, setHasNewsletterDiscount] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -93,6 +98,7 @@ function App() {
   // Track if we've already shown login toast to prevent duplicates
   const hasShownLoginToast = useRef(false);
   const hasShownLogoutToast = useRef(false);
+  const hasShownNewsletterPrompt = useRef(false);
 
   // Load cart from Google Sheets when user logs in
   const loadUserCart = async (userId: string) => {
@@ -116,6 +122,22 @@ function App() {
     }
   };
 
+  // Check if user is eligible for newsletter signup
+  const checkNewsletterEligibility = (userData: any) => {
+    const hasSubscribed = userData?.user_metadata?.newsletter_subscribed;
+    const hasFirstOrderDiscount = userData?.user_metadata?.first_order_discount_available;
+    
+    setHasNewsletterDiscount(hasFirstOrderDiscount === true);
+    
+    // Show newsletter modal for new users who haven't subscribed
+    if (!hasSubscribed && !hasShownNewsletterPrompt.current) {
+      setTimeout(() => {
+        setIsNewsletterModalOpen(true);
+        hasShownNewsletterPrompt.current = true;
+      }, 2000); // Show after 2 seconds
+    }
+  };
+
   // Check authentication status on app load
   useEffect(() => {
     // Get initial session
@@ -126,8 +148,14 @@ function App() {
         // Check if user is admin (you can customize this logic)
         setIsAdmin(session.user.email === 'communitygamiing1@gmail.com' || session.user.user_metadata?.role === 'admin');
         
+        // Check newsletter eligibility
+        checkNewsletterEligibility(session.user);
+        
         // Load user's cart from Google Sheets
         loadUserCart(session.user.id);
+      } else {
+        // Show newsletter banner for non-logged-in users
+        setShowNewsletterBanner(true);
       }
     });
 
@@ -140,6 +168,8 @@ function App() {
       if (session) {
         setUser(session.user);
         setIsLoggedIn(true);
+        setShowNewsletterBanner(false);
+        
         // Check if user is admin (you can customize this logic)
         setIsAdmin(session.user.email === 'communitygamiing1@gmail.com' || session.user.user_metadata?.role === 'admin');
         
@@ -147,6 +177,9 @@ function App() {
           toast.success('Successfully signed in!');
           setIsLoginModalOpen(false);
           hasShownLoginToast.current = true;
+          
+          // Check newsletter eligibility for new login
+          checkNewsletterEligibility(session.user);
           
           // Load user's cart from Google Sheets
           loadUserCart(session.user.id);
@@ -160,6 +193,8 @@ function App() {
         setUser(null);
         setIsLoggedIn(false);
         setIsAdmin(false);
+        setShowNewsletterBanner(true);
+        setHasNewsletterDiscount(false);
         
         // Clear cart when user logs out
         setCartItems([]);
@@ -212,6 +247,31 @@ function App() {
     }
   };
 
+  const handleNewsletterSignup = async (mobile: string) => {
+    try {
+      // Update local state
+      setHasNewsletterDiscount(true);
+      setShowNewsletterBanner(false);
+      
+      // Refresh user data to get updated metadata
+      const { data: { user: updatedUser } } = await supabase.auth.getUser();
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
+    } catch (error) {
+      console.error('Error handling newsletter signup:', error);
+    }
+  };
+
+  const handleNewsletterBannerClick = () => {
+    if (isLoggedIn) {
+      setIsNewsletterModalOpen(true);
+    } else {
+      setIsLoginModalOpen(true);
+      toast.info('Please login first to get your 10% discount!');
+    }
+  };
+
   const handleCartClick = () => {
     setIsCartModalOpen(true);
   };
@@ -237,6 +297,19 @@ function App() {
         await CartStorageService.clearCart(user.id);
       }
       setCartItems([]);
+      
+      // If user used newsletter discount, mark it as used
+      if (hasNewsletterDiscount && user) {
+        await supabase.auth.updateUser({
+          data: {
+            first_order_discount_available: false,
+            first_order_completed: true,
+            first_order_date: new Date().toISOString()
+          }
+        });
+        setHasNewsletterDiscount(false);
+      }
+      
       toast.success('Order placed successfully! You will receive your games within 15 minutes.');
     } catch (error) {
       console.error('Error completing order:', error);
@@ -409,6 +482,11 @@ function App() {
         {/* Flash Sale Strip - At the very top with highest z-index */}
         <FlashSaleStrip />
 
+        {/* Newsletter Banner - Show for non-logged-in users or logged-in users without newsletter discount */}
+        {(showNewsletterBanner || (isLoggedIn && !user?.user_metadata?.newsletter_subscribed)) && (
+          <NewsletterBanner onSignupClick={handleNewsletterBannerClick} />
+        )}
+
         {/* Header - Immediately below Flash Sale Strip */}
         <Header
           onLoginClick={() => setIsLoginModalOpen(true)}
@@ -418,6 +496,7 @@ function App() {
           cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onNavigation={handleNavigation}
           user={user}
+          hasNewsletterDiscount={hasNewsletterDiscount}
         />
 
         {/* Main content - Below header with proper spacing */}
@@ -445,6 +524,13 @@ function App() {
           onLogin={handleLogin}
         />
 
+        <NewsletterModal
+          isOpen={isNewsletterModalOpen}
+          onClose={() => setIsNewsletterModalOpen(false)}
+          onSignup={handleNewsletterSignup}
+          userEmail={user?.email}
+        />
+
         <CartModal
           isOpen={isCartModalOpen}
           onClose={() => setIsCartModalOpen(false)}
@@ -459,6 +545,8 @@ function App() {
           onClose={() => setIsCheckoutModalOpen(false)}
           cartItems={cartItems}
           onOrderComplete={handleOrderComplete}
+          hasNewsletterDiscount={hasNewsletterDiscount}
+          user={user}
         />
 
         {/* WhatsApp Button */}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, Gift } from 'lucide-react';
 import { supabase } from '../config/supabase';
 import { toast } from 'react-toastify';
 
@@ -63,7 +63,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}`
+            emailRedirectTo: `${window.location.origin}`,
+            data: {
+              newsletter_subscribed: false,
+              first_order_discount_available: false
+            }
           }
         });
 
@@ -111,12 +115,23 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             {isSignUp ? 'Create Account' : 'Welcome Back!'}
           </h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-gray-600 mb-4">
             {isSignUp 
               ? 'Sign up to access your account and start shopping' 
               : 'Sign in to access your account and continue shopping'
             }
           </p>
+
+          {/* Newsletter Discount Promo */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200 mb-6">
+            <div className="flex items-center justify-center space-x-2 mb-2">
+              <Gift className="w-5 h-5 text-green-500" />
+              <h3 className="font-bold text-green-800">10% OFF Your First Order!</h3>
+            </div>
+            <p className="text-green-700 text-sm">
+              Sign up for our newsletter after login to get 10% off your first purchase!
+            </p>
+          </div>
 
           {/* Google Login - Primary Option */}
           <button

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Copy, Check, CreditCard, Smartphone, MessageCircle, Download, FileSpreadsheet, User, Phone, Tag, AlertCircle, Shield } from 'lucide-react';
+import { X, Copy, Check, CreditCard, Smartphone, MessageCircle, Download, FileSpreadsheet, User, Phone, Tag, AlertCircle, Shield, Gift } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { BackendService } from '../services/backendService';
 
@@ -18,13 +18,17 @@ interface CheckoutModalProps {
   onClose: () => void;
   cartItems: CartItem[];
   onOrderComplete: () => void;
+  hasNewsletterDiscount?: boolean;
+  user?: any;
 }
 
 const CheckoutModal: React.FC<CheckoutModalProps> = ({ 
   isOpen, 
   onClose, 
   cartItems, 
-  onOrderComplete 
+  onOrderComplete,
+  hasNewsletterDiscount = false,
+  user
 }) => {
   const [currentStep, setCurrentStep] = useState<'summary' | 'payment' | 'confirmation'>('summary');
   const [orderCode, setOrderCode] = useState('');
@@ -61,9 +65,21 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setPaymentError('');
       setHasError(false);
       setIsMockMode(false);
+      
+      // Pre-fill customer details if user is logged in
+      if (user) {
+        setCustomerName(user.user_metadata?.full_name || user.email?.split('@')[0] || '');
+        setCustomerMobile(user.user_metadata?.mobile_number || '');
+      }
+      
+      // Auto-apply newsletter discount if available
+      if (hasNewsletterDiscount) {
+        setAppliedCoupon('NEWSLETTER10');
+      }
+      
       testBackendConnection();
     }
-  }, [isOpen]);
+  }, [isOpen, user, hasNewsletterDiscount]);
 
   // Error boundary effect
   useEffect(() => {
@@ -122,8 +138,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   
-  // Coupon logic
+  // Enhanced coupon logic with newsletter discount
   const applyCouponDiscount = (amount: number, coupon: string) => {
+    if (coupon === 'NEWSLETTER10') {
+      return amount * 0.9; // 10% off for newsletter subscribers
+    }
     if (coupon === 'GAMINGCOMMUNITY50') {
       return amount * 0.5; // 50% off
     }
@@ -175,6 +194,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         totalAmount: total,
         status: 'Payment Pending',
         mysteryBoxEligible: appliedCoupon === 'MYSTERYBOX' && subtotal >= 3000,
+        newsletterDiscount: appliedCoupon === 'NEWSLETTER10',
         razorpayOrderId: razorpayOrderId,
         paymentStatus: 'Pending'
       };
@@ -207,8 +227,14 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
       const coupon = couponInput.trim().toUpperCase();
       
+      // Prevent applying other coupons if newsletter discount is already applied
+      if (appliedCoupon === 'NEWSLETTER10' && coupon !== 'NEWSLETTER10') {
+        setCouponError('Newsletter discount is already applied. Remove it first to use another coupon.');
+        return;
+      }
+      
       if (coupon === 'GAMINGCOMMUNITY50') {
-        if (appliedCoupon) {
+        if (appliedCoupon && appliedCoupon !== 'NEWSLETTER10') {
           setCouponError('A coupon is already applied');
           return;
         }
@@ -216,7 +242,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         setCouponInput('');
         toast.success('50% discount applied!');
       } else if (coupon === 'MYSTERYBOX') {
-        if (appliedCoupon) {
+        if (appliedCoupon && appliedCoupon !== 'NEWSLETTER10') {
           setCouponError('A coupon is already applied');
           return;
         }
@@ -227,6 +253,14 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         setAppliedCoupon(coupon);
         setCouponInput('');
         toast.success('Mystery Box coupon applied! You will receive a free mystery game.');
+      } else if (coupon === 'NEWSLETTER10') {
+        if (!hasNewsletterDiscount) {
+          setCouponError('This discount is only available for newsletter subscribers');
+          return;
+        }
+        setAppliedCoupon(coupon);
+        setCouponInput('');
+        toast.success('Newsletter discount applied!');
       } else {
         setCouponError('Invalid coupon code');
       }
@@ -238,6 +272,12 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleRemoveCoupon = () => {
     try {
+      // Don't allow removing newsletter discount if it was auto-applied
+      if (appliedCoupon === 'NEWSLETTER10' && hasNewsletterDiscount) {
+        toast.info('Newsletter discount cannot be removed. It\'s automatically applied for newsletter subscribers.');
+        return;
+      }
+      
       setAppliedCoupon('');
       setCouponError('');
       toast.info('Coupon removed');
@@ -472,6 +512,9 @@ Subtotal: ₹${subtotal.toFixed(2)}`;
         if (appliedCoupon === 'MYSTERYBOX') {
           message += `\nMystery Box: FREE mystery game included!`;
         }
+        if (appliedCoupon === 'NEWSLETTER10') {
+          message += `\nNewsletter Discount: 10% off first order`;
+        }
       }
 
       message += `\nTotal: ₹${total.toFixed(2)}`;
@@ -561,6 +604,21 @@ Payment Status: ${paymentDetails.paymentStatus}`;
         </h2>
         <p className="text-gray-600">Review your order and enter your details</p>
       </div>
+
+      {/* Newsletter Discount Banner */}
+      {hasNewsletterDiscount && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-200">
+          <div className="flex items-center space-x-3">
+            <div className="bg-green-500 p-2 rounded-full">
+              <Gift className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-green-800">Newsletter Subscriber Discount Active!</h3>
+              <p className="text-green-700 text-sm">You get 10% off your first order as a newsletter subscriber</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Connection Status */}
       <div className={`rounded-xl p-4 border ${
@@ -687,18 +745,29 @@ Payment Status: ${paymentDetails.paymentStatus}`;
           <div className="bg-green-50 border border-green-200 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-bold text-green-800">Coupon Applied: {appliedCoupon}</div>
+                <div className="font-bold text-green-800 flex items-center space-x-2">
+                  <span>Coupon Applied: {appliedCoupon}</span>
+                  {appliedCoupon === 'NEWSLETTER10' && (
+                    <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs flex items-center space-x-1">
+                      <Gift className="w-3 h-3" />
+                      <span>Newsletter</span>
+                    </div>
+                  )}
+                </div>
                 <div className="text-green-700 text-sm">
+                  {appliedCoupon === 'NEWSLETTER10' && `10% newsletter discount: -₹${discount.toFixed(2)}`}
                   {appliedCoupon === 'GAMINGCOMMUNITY50' && `50% discount: -₹${discount.toFixed(2)}`}
                   {appliedCoupon === 'MYSTERYBOX' && 'Free mystery game included!'}
                 </div>
               </div>
-              <button
-                onClick={handleRemoveCoupon}
-                className="text-red-600 hover:text-red-700 text-sm font-medium"
-              >
-                Remove
-              </button>
+              {appliedCoupon !== 'NEWSLETTER10' && (
+                <button
+                  onClick={handleRemoveCoupon}
+                  className="text-red-600 hover:text-red-700 text-sm font-medium"
+                >
+                  Remove
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -769,7 +838,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
         <button
           onClick={handleProceedToPayment}
           disabled={isSubmittingOrder || isProcessingPayment || !customerName.trim() || !customerMobile.trim() || connectionStatus === 'checking'}
-          className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+          className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-semibol transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
         >
           {isProcessingPayment ? (
             <>
@@ -839,8 +908,17 @@ Payment Status: ${paymentDetails.paymentStatus}`;
         <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-4 border border-purple-200">
           <h3 className="font-bold text-purple-800 mb-3">Applied Coupon</h3>
           <div className="text-purple-700">
-            <div className="font-semibold">{appliedCoupon}</div>
+            <div className="font-semibold flex items-center space-x-2">
+              <span>{appliedCoupon}</span>
+              {appliedCoupon === 'NEWSLETTER10' && (
+                <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs flex items-center space-x-1">
+                  <Gift className="w-3 h-3" />
+                  <span>Newsletter</span>
+                </div>
+              )}
+            </div>
             <div className="text-sm">
+              {appliedCoupon === 'NEWSLETTER10' && `10% newsletter discount: -₹${discount.toFixed(2)}`}
               {appliedCoupon === 'GAMINGCOMMUNITY50' && `50% discount applied: -₹${discount.toFixed(2)}`}
               {appliedCoupon === 'MYSTERYBOX' && 'You will receive a FREE mystery game!'}
             </div>
@@ -982,6 +1060,11 @@ Payment Status: ${paymentDetails.paymentStatus}`;
           <div className="bg-white rounded-xl p-4 border border-green-200 mb-4">
             <p className="text-sm text-gray-700">
               <strong>Coupon Applied:</strong> {appliedCoupon}
+              {appliedCoupon === 'NEWSLETTER10' && (
+                <span className="block text-green-600 font-semibold mt-1">
+                  🎁 10% newsletter discount applied!
+                </span>
+              )}
               {appliedCoupon === 'MYSTERYBOX' && subtotal >= 3000 && (
                 <span className="block text-purple-600 font-semibold mt-1">
                   🎁 You will receive a FREE mystery game!

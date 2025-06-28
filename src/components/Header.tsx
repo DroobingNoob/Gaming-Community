@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingCart, User, Menu, X, Shield, LogOut } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, Shield, LogOut, Gift } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useGames, useSubscriptions } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
@@ -12,9 +12,19 @@ interface HeaderProps {
   cartItemCount: number;
   onNavigation: (section: string) => void;
   user?: any;
+  hasNewsletterDiscount?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, isAdmin, cartItemCount, onNavigation, user }) => {
+const Header: React.FC<HeaderProps> = ({ 
+  onLoginClick, 
+  onCartClick, 
+  isLoggedIn, 
+  isAdmin, 
+  cartItemCount, 
+  onNavigation, 
+  user,
+  hasNewsletterDiscount 
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -139,6 +149,12 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                         <span className="text-green-700 font-medium text-sm">
                           {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
                         </span>
+                        {hasNewsletterDiscount && (
+                          <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
+                            <Gift className="w-3 h-3" />
+                            <span>10% OFF</span>
+                          </div>
+                        )}
                       </div>
                       <button
                         onClick={() => onNavigation('logout')}
@@ -249,8 +265,14 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onCartClick, isLoggedIn, 
                     
                     {isLoggedIn ? (
                       <div className="mt-4 space-y-2">
-                        <div className="py-3 px-2 text-green-600 bg-green-50 rounded-lg">
-                          Welcome, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}!
+                        <div className="py-3 px-2 text-green-600 bg-green-50 rounded-lg flex items-center justify-between">
+                          <span>Welcome, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}!</span>
+                          {hasNewsletterDiscount && (
+                            <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
+                              <Gift className="w-3 h-3" />
+                              <span>10% OFF</span>
+                            </div>
+                          )}
                         </div>
                         <button
                           onClick={() => {
