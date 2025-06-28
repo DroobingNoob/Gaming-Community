@@ -24,7 +24,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
   const [isImageSticky, setIsImageSticky] = useState(true);
   const [selectedPlatform, setSelectedPlatform] = useState('');
   const [selectedType, setSelectedType] = useState('');
-  const [selectedRentDuration, setSelectedRentDuration] = useState<'1_month' | '2_months' | '3_months' | '6_months'>('1_month');
+  const [selectedRentDuration, setSelectedRentDuration] = useState<'1_month' | '3_months' | '6_months'>('1_month');
 
   const isLoading = gamesLoading || subscriptionsLoading;
 
@@ -323,14 +323,13 @@ This option is best suited for single-player games or customers who prefer offli
                   </div>
                 </div>
 
-                {/* Rent Duration Selection - Only show if Rent is selected */}
+                {/* Rent Duration Selection - Only show if Rent is selected (removed 2 months) */}
                 {selectedType === 'Rent' && (
                   <div className="mb-4 xl:mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-3">Rental Duration</label>
-                    <div className="grid grid-cols-2 gap-2 xl:gap-3">
+                    <div className="grid grid-cols-3 gap-2 xl:gap-3">
                       {[
                         { key: '1_month', label: '1 Month', price: product.rent_1_month },
-                        { key: '2_months', label: '2 Months', price: product.rent_2_months },
                         { key: '3_months', label: '3 Months', price: product.rent_3_months },
                         { key: '6_months', label: '6 Months', price: product.rent_6_months }
                       ].map((duration) => (
@@ -473,10 +472,6 @@ This option is best suited for single-player games or customers who prefer offli
                             <h4 className="font-bold text-gray-800 mb-2 text-sm xl:text-base">Platform</h4>
                             <p className="text-gray-600 text-sm xl:text-base">{selectedPlatform}</p>
                           </div>
-                          {/* <div>
-                            <h4 className="font-bold text-gray-800 mb-2 text-sm xl:text-base">Language Support</h4>
-                            <p className="text-gray-600 text-sm xl:text-base">English, Spanish, French, German, Italian</p>
-                          </div> */}
                         </div>
                       </div>
                     )}
@@ -576,14 +571,13 @@ This option is best suited for single-player games or customers who prefer offli
                 </div>
               </div>
 
-              {/* Rent Duration Selection - Only show if Rent is selected */}
+              {/* Rent Duration Selection - Only show if Rent is selected (removed 2 months) */}
               {selectedType === 'Rent' && (
                 <div className="mb-4 sm:mb-6">
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Rental Duration</label>
-                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
                     {[
                       { key: '1_month', label: '1 Month', price: product.rent_1_month },
-                      { key: '2_months', label: '2 Months', price: product.rent_2_months },
                       { key: '3_months', label: '3 Months', price: product.rent_3_months },
                       { key: '6_months', label: '6 Months', price: product.rent_6_months }
                     ].map((duration) => (
@@ -719,10 +713,6 @@ This option is best suited for single-player games or customers who prefer offli
                         <h4 className="font-bold text-gray-800 mb-1 sm:mb-2 text-sm">Platform</h4>
                         <p className="text-gray-600 text-xs sm:text-sm">{selectedPlatform}</p>
                       </div> 
-                      {/* <div>
-                        <h4 className="font-bold text-gray-800 mb-1 sm:mb-2 text-sm">Language Support</h4>
-                        <p className="text-gray-600 text-xs sm:text-sm">English, Spanish, French, German, Italian</p>
-                      </div> */}
                     </div>
                   </div>
                 )}

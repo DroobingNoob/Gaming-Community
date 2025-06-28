@@ -695,7 +695,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                       />
                     </div>
 
-                    {/* Rental Prices - Only show if Rent type is selected for games */}
+                    {/* Rental Prices - Only show if Rent type is selected for games (removed 2 months) */}
                     {!isSubscription && formData.type?.includes('Rent') && (
                       <>
                         <div>
@@ -705,18 +705,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                             step="0.01"
                             value={formData.rent_1_month || ''}
                             onChange={(e) => setFormData({ ...formData, rent_1_month: parseFloat(e.target.value) })}
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                            placeholder="0.00"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-3">2 Months Rent (₹)</label>
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={formData.rent_2_months || ''}
-                            onChange={(e) => setFormData({ ...formData, rent_2_months: parseFloat(e.target.value) })}
                             className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                             placeholder="0.00"
                           />

@@ -12,9 +12,8 @@ export interface Game {
   image: string;
   original_price: number;
   sale_price: number; // Keep for subscriptions compatibility
-  // Rental pricing
+  // Rental pricing (removed rent_2_months)
   rent_1_month?: number;
-  rent_2_months?: number;
   rent_3_months?: number;
   rent_6_months?: number;
   // Permanent pricing
@@ -53,7 +52,6 @@ export const getGameDisplayPrice = (game: Game, selectedType: string, selectedRe
   if (selectedType === 'Rent') {
     const rentPrices = {
       '1_month': game.rent_1_month || 0,
-      '2_months': game.rent_2_months || 0,
       '3_months': game.rent_3_months || 0,
       '6_months': game.rent_6_months || 0
     };
