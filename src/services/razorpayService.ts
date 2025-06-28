@@ -46,8 +46,8 @@ export interface CreateOrderResponse {
 
 export class RazorpayService {
   // Test credentials - Replace with your actual Razorpay credentials
-  private static readonly KEY_ID = 'rzp_test_1234567890'; // Replace with your actual key
-  private static readonly KEY_SECRET = 'your_key_secret_here'; // Replace with your actual secret
+  private static readonly KEY_ID = 'rzp_test_97bx92TAEIdxcG'; // Replace with your actual key
+  private static readonly KEY_SECRET = 'nDe73UP4KMgrDdypgifQA3o2'; // Replace with your actual secret
   
   // Create order on Razorpay
   static async createOrder(orderData: CreateOrderRequest): Promise<CreateOrderResponse> {
