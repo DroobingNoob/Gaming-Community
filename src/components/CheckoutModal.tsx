@@ -38,20 +38,61 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [paymentDetails, setPaymentDetails] = useState<any>(null);
   const [paymentError, setPaymentError] = useState('');
   const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'failed'>('checking');
+  const [hasError, setHasError] = useState(false);
   
   // Customer details
   const [customerName, setCustomerName] = useState('');
   const [customerMobile, setCustomerMobile] = useState('');
 
-  if (!isOpen) return null;
-
-  // Test connection on modal open
+  // Reset state when modal opens/closes
   useEffect(() => {
     if (isOpen) {
+      setCurrentStep('summary');
+      setOrderCode('');
+      setCopiedOrderCode(false);
+      setIsSubmittingOrder(false);
+      setIsProcessingPayment(false);
+      setAppliedCoupon('');
+      setCouponInput('');
+      setCouponError('');
+      setRazorpayOrderId('');
+      setPaymentDetails(null);
+      setPaymentError('');
+      setHasError(false);
       testBackendConnection();
     }
   }, [isOpen]);
 
+  // Error boundary effect
+  useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      console.error('Checkout error:', event.error);
+      setHasError(true);
+      setIsProcessingPayment(false);
+      setIsSubmittingOrder(false);
+      toast.error('An error occurred. Please try again.');
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('Unhandled promise rejection:', event.reason);
+      setHasError(true);
+      setIsProcessingPayment(false);
+      setIsSubmittingOrder(false);
+      toast.error('Payment processing failed. Please try again.');
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
+  if (!isOpen) return null;
+
+  // Test connection on modal open
   const testBackendConnection = async () => {
     try {
       setConnectionStatus('checking');
@@ -144,78 +185,91 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   const handleApplyCoupon = () => {
-    setCouponError('');
-    
-    if (!couponInput.trim()) {
-      setCouponError('Please enter a coupon code');
-      return;
-    }
+    try {
+      setCouponError('');
+      
+      if (!couponInput.trim()) {
+        setCouponError('Please enter a coupon code');
+        return;
+      }
 
-    const coupon = couponInput.trim().toUpperCase();
-    
-    if (coupon === 'GAMINGCOMMUNITY50') {
-      if (appliedCoupon) {
-        setCouponError('A coupon is already applied');
-        return;
+      const coupon = couponInput.trim().toUpperCase();
+      
+      if (coupon === 'GAMINGCOMMUNITY50') {
+        if (appliedCoupon) {
+          setCouponError('A coupon is already applied');
+          return;
+        }
+        setAppliedCoupon(coupon);
+        setCouponInput('');
+        toast.success('50% discount applied!');
+      } else if (coupon === 'MYSTERYBOX') {
+        if (appliedCoupon) {
+          setCouponError('A coupon is already applied');
+          return;
+        }
+        if (subtotal < 3000) {
+          setCouponError('This coupon requires a minimum order of ₹3000');
+          return;
+        }
+        setAppliedCoupon(coupon);
+        setCouponInput('');
+        toast.success('Mystery Box coupon applied! You will receive a free mystery game.');
+      } else {
+        setCouponError('Invalid coupon code');
       }
-      setAppliedCoupon(coupon);
-      setCouponInput('');
-      toast.success('50% discount applied!');
-    } else if (coupon === 'MYSTERYBOX') {
-      if (appliedCoupon) {
-        setCouponError('A coupon is already applied');
-        return;
-      }
-      if (subtotal < 3000) {
-        setCouponError('This coupon requires a minimum order of ₹3000');
-        return;
-      }
-      setAppliedCoupon(coupon);
-      setCouponInput('');
-      toast.success('Mystery Box coupon applied! You will receive a free mystery game.');
-    } else {
-      setCouponError('Invalid coupon code');
+    } catch (error) {
+      console.error('Error applying coupon:', error);
+      setCouponError('Error applying coupon');
     }
   };
 
   const handleRemoveCoupon = () => {
-    setAppliedCoupon('');
-    setCouponError('');
-    toast.info('Coupon removed');
+    try {
+      setAppliedCoupon('');
+      setCouponError('');
+      toast.info('Coupon removed');
+    } catch (error) {
+      console.error('Error removing coupon:', error);
+    }
   };
 
   // Fixed mobile number input handler
   const handleMobileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Only allow digits and limit to 10 characters
-    const numericValue = value.replace(/\D/g, '').slice(0, 10);
-    setCustomerMobile(numericValue);
+    try {
+      const value = e.target.value;
+      // Only allow digits and limit to 10 characters
+      const numericValue = value.replace(/\D/g, '').slice(0, 10);
+      setCustomerMobile(numericValue);
+    } catch (error) {
+      console.error('Error handling mobile change:', error);
+    }
   };
 
   const handleProceedToPayment = async () => {
-    // Validate customer details
-    if (!customerName.trim()) {
-      toast.error('Please enter your name');
-      return;
-    }
-    
-    if (!customerMobile.trim()) {
-      toast.error('Please enter your mobile number');
-      return;
-    }
-    
-    // Validate mobile number (basic validation)
-    const mobileRegex = /^[6-9]\d{9}$/;
-    if (!mobileRegex.test(customerMobile.trim())) {
-      toast.error('Please enter a valid 10-digit mobile number');
-      return;
-    }
-
-    const code = generateOrderCode();
-    setOrderCode(code);
-    setPaymentError('');
-
     try {
+      // Validate customer details
+      if (!customerName.trim()) {
+        toast.error('Please enter your name');
+        return;
+      }
+      
+      if (!customerMobile.trim()) {
+        toast.error('Please enter your mobile number');
+        return;
+      }
+      
+      // Validate mobile number (basic validation)
+      const mobileRegex = /^[6-9]\d{9}$/;
+      if (!mobileRegex.test(customerMobile.trim())) {
+        toast.error('Please enter a valid 10-digit mobile number');
+        return;
+      }
+
+      const code = generateOrderCode();
+      setOrderCode(code);
+      setPaymentError('');
+
       setIsProcessingPayment(true);
       
       console.log('Starting payment process...');
@@ -339,21 +393,31 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   const handlePaymentDismiss = () => {
-    setIsProcessingPayment(false);
-    toast.info('Payment cancelled. You can try again.');
+    try {
+      setIsProcessingPayment(false);
+      toast.info('Payment cancelled. You can try again.');
+    } catch (error) {
+      console.error('Error handling payment dismiss:', error);
+    }
   };
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopiedOrderCode(true);
-      setTimeout(() => setCopiedOrderCode(false), 2000);
-      toast.success('Order code copied!');
-    });
+    try {
+      navigator.clipboard.writeText(text).then(() => {
+        setCopiedOrderCode(true);
+        setTimeout(() => setCopiedOrderCode(false), 2000);
+        toast.success('Order code copied!');
+      });
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      toast.error('Failed to copy order code');
+    }
   };
 
   const handleWhatsAppContact = () => {
-    const phoneNumber = '9266514434';
-    let message = `Hi! I have a question about my order: ${orderCode}
+    try {
+      const phoneNumber = '9266514434';
+      let message = `Hi! I have a question about my order: ${orderCode}
 
 Customer Details:
 Name: ${customerName}
@@ -366,48 +430,90 @@ ${cartItems.map(item =>
 
 Subtotal: ₹${subtotal.toFixed(2)}`;
 
-    if (appliedCoupon) {
-      message += `\nCoupon Applied: ${appliedCoupon}`;
-      if (discount > 0) {
-        message += `\nDiscount: -₹${discount.toFixed(2)}`;
+      if (appliedCoupon) {
+        message += `\nCoupon Applied: ${appliedCoupon}`;
+        if (discount > 0) {
+          message += `\nDiscount: -₹${discount.toFixed(2)}`;
+        }
+        if (appliedCoupon === 'MYSTERYBOX') {
+          message += `\nMystery Box: FREE mystery game included!`;
+        }
       }
-      if (appliedCoupon === 'MYSTERYBOX') {
-        message += `\nMystery Box: FREE mystery game included!`;
-      }
-    }
 
-    message += `\nTotal: ₹${total.toFixed(2)}`;
+      message += `\nTotal: ₹${total.toFixed(2)}`;
 
-    if (paymentDetails) {
-      message += `\n\nPayment Details:
+      if (paymentDetails) {
+        message += `\n\nPayment Details:
 Payment ID: ${paymentDetails.razorpayPaymentId}
 Payment Status: ${paymentDetails.paymentStatus}`;
-    }
+      }
 
-    if (paymentError) {
-      message += `\n\nPayment Error: ${paymentError}`;
+      if (paymentError) {
+        message += `\n\nPayment Error: ${paymentError}`;
+      }
+      
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+    } catch (error) {
+      console.error('Error opening WhatsApp:', error);
+      toast.error('Failed to open WhatsApp');
     }
-    
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
   };
 
   const handleOrderComplete = () => {
-    // Clear form data
-    setOrderCode('');
-    setCustomerName('');
-    setCustomerMobile('');
-    setAppliedCoupon('');
-    setCouponInput('');
-    setCouponError('');
-    setPaymentDetails(null);
-    setRazorpayOrderId('');
-    setPaymentError('');
-    setCurrentStep('summary');
-    
-    onOrderComplete();
-    onClose();
+    try {
+      // Clear form data
+      setOrderCode('');
+      setCustomerName('');
+      setCustomerMobile('');
+      setAppliedCoupon('');
+      setCouponInput('');
+      setCouponError('');
+      setPaymentDetails(null);
+      setRazorpayOrderId('');
+      setPaymentError('');
+      setCurrentStep('summary');
+      
+      onOrderComplete();
+      onClose();
+    } catch (error) {
+      console.error('Error completing order:', error);
+    }
   };
+
+  // Error fallback UI
+  if (hasError) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl max-w-md w-full p-8 shadow-2xl border border-white/20 text-center">
+          <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Something went wrong</h2>
+          <p className="text-gray-600 mb-6">
+            We encountered an error while processing your request. Please try again.
+          </p>
+          <div className="flex space-x-4">
+            <button
+              onClick={() => {
+                setHasError(false);
+                setCurrentStep('summary');
+              }}
+              className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-semibold transition-colors"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={onClose}
+              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-xl font-semibold transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const renderSummaryStep = () => (
     <div className="space-y-6">

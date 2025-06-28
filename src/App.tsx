@@ -33,6 +33,51 @@ interface CartItem {
   type: string;
 }
 
+// Error Boundary Component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('App Error Boundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50 flex items-center justify-center p-4">
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20 text-center max-w-md">
+            <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-white text-2xl">⚠️</span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">Something went wrong</h1>
+            <p className="text-gray-600 mb-6">
+              We encountered an unexpected error. Please refresh the page to try again.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -172,218 +217,257 @@ function App() {
   };
 
   const handleCheckout = () => {
-    if (cartItems.length === 0) {
-      toast.error('Your cart is empty');
-      return;
+    try {
+      if (cartItems.length === 0) {
+        toast.error('Your cart is empty');
+        return;
+      }
+      setIsCartModalOpen(false);
+      setIsCheckoutModalOpen(true);
+    } catch (error) {
+      console.error('Error opening checkout:', error);
+      toast.error('Failed to open checkout. Please try again.');
     }
-    setIsCartModalOpen(false);
-    setIsCheckoutModalOpen(true);
   };
 
   const handleOrderComplete = async () => {
-    // Clear cart after successful order
-    if (isLoggedIn && user) {
-      await CartStorageService.clearCart(user.id);
+    try {
+      // Clear cart after successful order
+      if (isLoggedIn && user) {
+        await CartStorageService.clearCart(user.id);
+      }
+      setCartItems([]);
+      toast.success('Order placed successfully! You will receive your games within 15 minutes.');
+    } catch (error) {
+      console.error('Error completing order:', error);
+      toast.error('Order completed but there was an issue clearing the cart.');
     }
-    setCartItems([]);
-    toast.success('Order placed successfully! You will receive your games within 15 minutes.');
   };
 
   const handleNavigation = (section: string) => {
-    if (section === 'admin' && isAdmin) {
-      navigate('/admin');
-      return;
-    }
+    try {
+      if (section === 'admin' && isAdmin) {
+        navigate('/admin');
+        return;
+      }
 
-    if (section === 'logout' && isLoggedIn) {
-      handleLogout();
-      return;
-    }
+      if (section === 'logout' && isLoggedIn) {
+        handleLogout();
+        return;
+      }
 
-    if (section === 'contact') {
-      // Open WhatsApp for contact
-      const phoneNumber = '9266514434';
-      const message = 'Hi! I need help with my gaming purchase.';
-      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
-      return;
-    }
+      if (section === 'contact') {
+        // Open WhatsApp for contact
+        const phoneNumber = '9266514434';
+        const message = 'Hi! I need help with my gaming purchase.';
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        return;
+      }
 
-    if (section === 'terms') {
-      navigate('/terms');
-      return;
-    }
+      if (section === 'terms') {
+        navigate('/terms');
+        return;
+      }
 
-    if (section === 'refund') {
-      navigate('/refund-policy');
-      return;
-    }
+      if (section === 'refund') {
+        navigate('/refund-policy');
+        return;
+      }
 
-    if (section === 'faq') {
-      navigate('/faq');
-      return;
-    }
+      if (section === 'faq') {
+        navigate('/faq');
+        return;
+      }
 
-    if (section === 'home') {
-      navigate('/');
-      return;
-    }
+      if (section === 'home') {
+        navigate('/');
+        return;
+      }
 
-    if (section === 'categories') {
-      // Scroll to categories section on home page
-      if (location.pathname !== '/') {
+      if (section === 'categories') {
+        // Scroll to categories section on home page
+        if (location.pathname !== '/') {
+          navigate('/');
+          setTimeout(() => {
+            scrollToSection('categories');
+          }, 100);
+        } else {
+          scrollToSection('categories');
+        }
+        return;
+      }
+      
+      // For other sections, scroll to them if on home page
+      if (location.pathname === '/') {
+        scrollToSection(section);
+      } else {
         navigate('/');
         setTimeout(() => {
-          scrollToSection('categories');
+          scrollToSection(section);
         }, 100);
-      } else {
-        scrollToSection('categories');
       }
-      return;
-    }
-    
-    // For other sections, scroll to them if on home page
-    if (location.pathname === '/') {
-      scrollToSection(section);
-    } else {
-      navigate('/');
-      setTimeout(() => {
-        scrollToSection(section);
-      }, 100);
+    } catch (error) {
+      console.error('Navigation error:', error);
+      toast.error('Navigation failed. Please try again.');
     }
   };
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    try {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } catch (error) {
+      console.error('Scroll error:', error);
     }
   };
 
   const handleAddToCart = (product: Game, platform: string, type: string, price: number) => {
-    const itemId = `${product.id}-${platform}-${type}`;
-    const existingItem = cartItems.find(item => item.id === itemId);
-    
-    if (existingItem) {
-      setCartItems(items =>
-        items.map(item =>
-          item.id === itemId
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      );
-    } else {
-      const newCartItem: CartItem = {
-        id: itemId,
-        title: product.title,
-        price: price,
-        quantity: 1,
-        image: product.image,
-        platform: platform,
-        type: type
-      };
-      setCartItems(items => [...items, newCartItem]);
+    try {
+      const itemId = `${product.id}-${platform}-${type}`;
+      const existingItem = cartItems.find(item => item.id === itemId);
+      
+      if (existingItem) {
+        setCartItems(items =>
+          items.map(item =>
+            item.id === itemId
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          )
+        );
+      } else {
+        const newCartItem: CartItem = {
+          id: itemId,
+          title: product.title,
+          price: price,
+          quantity: 1,
+          image: product.image,
+          platform: platform,
+          type: type
+        };
+        setCartItems(items => [...items, newCartItem]);
+      }
+      
+      toast.success(`${product.title} added to cart!`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error('Failed to add item to cart. Please try again.');
     }
-    
-    toast.success(`${product.title} added to cart!`, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
   };
 
   const handleBuyNow = (product: Game, platform: string, type: string, price: number) => {
-    // Add to cart first
-    handleAddToCart(product, platform, type, price);
-    
-    // Open checkout modal
-    setTimeout(() => {
-      setIsCheckoutModalOpen(true);
-    }, 500);
-    
-    toast.success('Redirecting to checkout!');
+    try {
+      // Add to cart first
+      handleAddToCart(product, platform, type, price);
+      
+      // Open checkout modal
+      setTimeout(() => {
+        setIsCheckoutModalOpen(true);
+      }, 500);
+      
+      toast.success('Redirecting to checkout!');
+    } catch (error) {
+      console.error('Error in buy now:', error);
+      toast.error('Failed to proceed to checkout. Please try again.');
+    }
   };
 
   const handleUpdateQuantity = (id: string, quantity: number) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
+    try {
+      setCartItems(items =>
+        items.map(item =>
+          item.id === id ? { ...item, quantity } : item
+        )
+      );
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+      toast.error('Failed to update quantity. Please try again.');
+    }
   };
 
   const handleRemoveItem = (id: string) => {
-    setCartItems(items => items.filter(item => item.id !== id));
+    try {
+      setCartItems(items => items.filter(item => item.id !== id));
+    } catch (error) {
+      console.error('Error removing item:', error);
+      toast.error('Failed to remove item. Please try again.');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-      {/* Flash Sale Strip - At the very top with highest z-index */}
-    <FlashSaleStrip />
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
+        {/* Flash Sale Strip - At the very top with highest z-index */}
+        <FlashSaleStrip />
 
-  {/* Header - Immediately below Flash Sale Strip */}
-  <Header
-    onLoginClick={() => setIsLoginModalOpen(true)}
-    onCartClick={handleCartClick}
-    isLoggedIn={isLoggedIn}
-    isAdmin={isAdmin}
-    cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-    onNavigation={handleNavigation}
-    user={user}
-  />
+        {/* Header - Immediately below Flash Sale Strip */}
+        <Header
+          onLoginClick={() => setIsLoginModalOpen(true)}
+          onCartClick={handleCartClick}
+          isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
+          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+          onNavigation={handleNavigation}
+          user={user}
+        />
 
+        {/* Main content - Below header with proper spacing */}
+        <main className="relative z-10">
+          <Routes>
+            <Route path="/" element={<HomePage onNavigation={handleNavigation} />} />
+            <Route path="/games" element={<GamesPage />} />
+            <Route path="/games/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
+            <Route path="/subscriptions" element={<SubscriptionsPage />} />
+            <Route path="/subscriptions/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
+            <Route path="/admin" element={isAdmin ? <AdminPage /> : <HomePage onNavigation={handleNavigation} />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/refund-policy" element={<RefundPolicyPage />} />
+            <Route path="/faq" element={<FAQPage />} />
+          </Routes>
+        </main>
 
-      
-      {/* Main content - Below header with proper spacing */}
-      <main className="relative z-10">
-        <Routes>
-          <Route path="/" element={<HomePage onNavigation={handleNavigation} />} />
-          <Route path="/games" element={<GamesPage />} />
-          <Route path="/games/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
-          <Route path="/subscriptions" element={<SubscriptionsPage />} />
-          <Route path="/subscriptions/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
-          <Route path="/admin" element={isAdmin ? <AdminPage /> : <HomePage onNavigation={handleNavigation} />} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/refund-policy" element={<RefundPolicyPage />} />
-          <Route path="/faq" element={<FAQPage />} />
-        </Routes>
-      </main>
+        {/* Footer */}
+        <Footer onNavigation={handleNavigation} />
 
-      {/* Footer */}
-      <Footer onNavigation={handleNavigation} />
+        {/* Modals - High z-index */}
+        <LoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          onLogin={handleLogin}
+        />
 
-      {/* Modals - High z-index */}
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        onLogin={handleLogin}
-      />
+        <CartModal
+          isOpen={isCartModalOpen}
+          onClose={() => setIsCartModalOpen(false)}
+          cartItems={cartItems}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+          onCheckout={handleCheckout}
+        />
 
-      <CartModal
-        isOpen={isCartModalOpen}
-        onClose={() => setIsCartModalOpen(false)}
-        cartItems={cartItems}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-        onCheckout={handleCheckout}
-      />
+        <CheckoutModal
+          isOpen={isCheckoutModalOpen}
+          onClose={() => setIsCheckoutModalOpen(false)}
+          cartItems={cartItems}
+          onOrderComplete={handleOrderComplete}
+        />
 
-      <CheckoutModal
-        isOpen={isCheckoutModalOpen}
-        onClose={() => setIsCheckoutModalOpen(false)}
-        cartItems={cartItems}
-        onOrderComplete={handleOrderComplete}
-      />
-
-      {/* WhatsApp Button */}
-      <WhatsAppButton />
-      
-      {/* Toast Container */}
-      <ToastContainer />
-    </div>
+        {/* WhatsApp Button */}
+        <WhatsAppButton />
+        
+        {/* Toast Container */}
+        <ToastContainer />
+      </div>
+    </ErrorBoundary>
   );
 }
 
