@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Copy, Check, CreditCard, Smartphone, MessageCircle, Download, FileSpreadsheet, User, Phone, Tag, AlertCircle, Shield } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { RazorpayService, RazorpayResponse } from '../services/razorpayService';
-import { GoogleSheetsService } from '../services/googleSheetsService';
+import { BackendService } from '../services/backendService';
 
 interface CartItem {
   id: string;
@@ -76,8 +75,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     return `GC${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
   };
 
-  // Submit order to Google Sheets with Razorpay details
-  const submitOrderToGoogleSheets = async (code: string, razorpayOrderId?: string) => {
+  // Submit order to backend
+  const submitOrderToBackend = async (code: string, razorpayOrderId?: string) => {
     try {
       setIsSubmittingOrder(true);
       
@@ -104,8 +103,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         paymentStatus: 'Pending'
       };
 
-      const success = await GoogleSheetsService.submitOrder(orderData);
-      if (success) {
+      const result = await BackendService.createOrder(orderData);
+      if (result.success) {
         toast.success('Order submitted to tracking system!');
       } else {
         toast.error('Failed to submit order to tracking system');
@@ -194,14 +193,14 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     try {
       setIsProcessingPayment(true);
       
-      // Test Razorpay connection first
-      const connectionOk = await RazorpayService.testConnection();
+      // Test backend connection first
+      const connectionOk = await BackendService.testRazorpayConnection();
       if (!connectionOk) {
-        console.warn('Razorpay connection test failed, proceeding with mock order');
+        console.warn('Backend connection test failed, proceeding with mock order');
       }
       
-      // Create Razorpay order
-      const razorpayOrder = await RazorpayService.createOrder({
+      // Create Razorpay order via backend
+      const razorpayOrder = await BackendService.createRazorpayOrder({
         amount: Math.round(total * 100), // Convert to paise
         currency: 'INR',
         receipt: code
@@ -210,12 +209,12 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       console.log('Razorpay order created:', razorpayOrder);
       setRazorpayOrderId(razorpayOrder.id);
       
-      // Submit order to Google Sheets with Razorpay order ID
-      await submitOrderToGoogleSheets(code, razorpayOrder.id);
+      // Submit order to backend
+      await submitOrderToBackend(code, razorpayOrder.id);
       
       // Initialize Razorpay payment
       const options = {
-        key: RazorpayService.getKeyId(),
+        key: BackendService.getKeyId(),
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         name: 'Gaming Community',
@@ -234,7 +233,13 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         }
       };
 
-      RazorpayService.initializePayment(options);
+      // Check if Razorpay is loaded
+      if (typeof window.Razorpay === 'undefined') {
+        throw new Error('Razorpay SDK not loaded. Please check your internet connection.');
+      }
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
       setCurrentStep('payment');
       
     } catch (error) {
@@ -245,22 +250,22 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   };
 
-  const handlePaymentSuccess = async (response: RazorpayResponse) => {
+  const handlePaymentSuccess = async (response: any) => {
     try {
       setIsProcessingPayment(true);
       
       console.log('Payment response received:', response);
       
-      // Verify payment signature
-      const isValid = RazorpayService.verifyPaymentSignature(
+      // Verify payment signature via backend
+      const isValid = await BackendService.verifyPaymentSignature(
         response.razorpay_order_id,
         response.razorpay_payment_id,
         response.razorpay_signature
       );
 
       if (isValid) {
-        // Get payment details
-        const paymentInfo = await RazorpayService.getPaymentDetails(response.razorpay_payment_id);
+        // Get payment details via backend
+        const paymentInfo = await BackendService.getPaymentDetails(response.razorpay_payment_id);
         
         setPaymentDetails({
           razorpayOrderId: response.razorpay_order_id,
@@ -270,8 +275,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
           paymentStatus: 'Completed'
         });
 
-        // Update order status in Google Sheets
-        await GoogleSheetsService.updatePaymentDetails(orderCode, {
+        // Update order status via backend
+        await BackendService.updatePaymentDetails(orderCode, {
           razorpayPaymentId: response.razorpay_payment_id,
           razorpaySignature: response.razorpay_signature,
           paymentMethod: paymentInfo.method || 'Unknown',
