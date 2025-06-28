@@ -160,6 +160,14 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     toast.info('Coupon removed');
   };
 
+  // Fixed mobile number input handler
+  const handleMobileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Only allow digits and limit to 10 characters
+    const numericValue = value.replace(/\D/g, '').slice(0, 10);
+    setCustomerMobile(numericValue);
+  };
+
   const handleProceedToPayment = async () => {
     // Validate customer details
     if (!customerName.trim()) {
@@ -391,6 +399,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                 placeholder="Enter your full name"
                 required
+                autoComplete="name"
               />
             </div>
           </div>
@@ -403,11 +412,14 @@ Payment Status: ${paymentDetails.paymentStatus}`;
               <input
                 type="tel"
                 value={customerMobile}
-                onChange={(e) => setCustomerMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                onChange={handleMobileChange}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
                 placeholder="Enter 10-digit mobile number"
                 maxLength={10}
                 required
+                autoComplete="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
               />
             </div>
           </div>
