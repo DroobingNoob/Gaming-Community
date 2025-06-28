@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Copy, Check, QrCode, Smartphone, MessageCircle, Download, FileSpreadsheet, User, Phone, Tag, AlertCircle } from 'lucide-react';
+import { X, Copy, Check, CreditCard, Smartphone, MessageCircle, Download, FileSpreadsheet, User, Phone, Tag, AlertCircle, Shield } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { RazorpayService, RazorpayResponse } from '../services/razorpayService';
+import { GoogleSheetsService } from '../services/googleSheetsService';
 
 interface CartItem {
   id: string;
@@ -29,9 +31,12 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderCode, setOrderCode] = useState('');
   const [copiedOrderCode, setCopiedOrderCode] = useState(false);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState('');
   const [couponInput, setCouponInput] = useState('');
   const [couponError, setCouponError] = useState('');
+  const [razorpayOrderId, setRazorpayOrderId] = useState('');
+  const [paymentDetails, setPaymentDetails] = useState<any>(null);
   
   // Customer details
   const [customerName, setCustomerName] = useState('');
@@ -70,8 +75,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     return `GC${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
   };
 
-  // Submit order to Google Sheets with the NEW URL
-  const submitOrderToGoogleSheets = async (code: string) => {
+  // Submit order to Google Sheets with Razorpay details
+  const submitOrderToGoogleSheets = async (code: string, razorpayOrderId?: string) => {
     try {
       setIsSubmittingOrder(true);
       
@@ -93,30 +98,17 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         discountAmount: discount,
         totalAmount: total,
         status: 'Payment Pending',
-        mysteryBoxEligible: appliedCoupon === 'MYSTERYBOX' && subtotal >= 3000
+        mysteryBoxEligible: appliedCoupon === 'MYSTERYBOX' && subtotal >= 3000,
+        razorpayOrderId: razorpayOrderId,
+        paymentStatus: 'Pending'
       };
 
-      // UPDATED GOOGLE APPS SCRIPT URL - Using your new webapp URL
-      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec';
-      
-      console.log('Submitting order to:', GOOGLE_SCRIPT_URL);
-      console.log('Order data:', orderData);
-      
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', // Required for Google Apps Script
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'addOrder',
-          data: orderData
-        })
-      });
-
-      // Since we're using no-cors mode, we can't read the response
-      // But we'll assume success if no error is thrown
-      toast.success('Order submitted to tracking system!');
+      const success = await GoogleSheetsService.submitOrder(orderData);
+      if (success) {
+        toast.success('Order submitted to tracking system!');
+      } else {
+        toast.error('Failed to submit order to tracking system');
+      }
       
     } catch (error) {
       console.error('Error submitting order:', error);
@@ -188,10 +180,106 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     const code = generateOrderCode();
     setOrderCode(code);
-    setCurrentStep('payment');
-    
-    // Submit order to Google Sheets
-    await submitOrderToGoogleSheets(code);
+
+    try {
+      setIsProcessingPayment(true);
+      
+      // Create Razorpay order
+      const razorpayOrder = await RazorpayService.createOrder({
+        amount: Math.round(total * 100), // Convert to paise
+        currency: 'INR',
+        receipt: code
+      });
+
+      setRazorpayOrderId(razorpayOrder.id);
+      
+      // Submit order to Google Sheets with Razorpay order ID
+      await submitOrderToGoogleSheets(code, razorpayOrder.id);
+      
+      // Initialize Razorpay payment
+      const options = {
+        key: RazorpayService.getKeyId(),
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: 'Gaming Community',
+        description: `Order ${code}`,
+        order_id: razorpayOrder.id,
+        handler: handlePaymentSuccess,
+        prefill: {
+          name: customerName,
+          contact: customerMobile,
+        },
+        theme: {
+          color: '#06b6d4'
+        },
+        modal: {
+          ondismiss: handlePaymentDismiss
+        }
+      };
+
+      RazorpayService.initializePayment(options);
+      setCurrentStep('payment');
+      
+    } catch (error) {
+      console.error('Error creating payment:', error);
+      toast.error('Failed to initialize payment. Please try again.');
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const handlePaymentSuccess = async (response: RazorpayResponse) => {
+    try {
+      setIsProcessingPayment(true);
+      
+      // Verify payment signature
+      const isValid = RazorpayService.verifyPaymentSignature(
+        response.razorpay_order_id,
+        response.razorpay_payment_id,
+        response.razorpay_signature
+      );
+
+      if (isValid) {
+        // Get payment details
+        const paymentInfo = await RazorpayService.getPaymentDetails(response.razorpay_payment_id);
+        
+        setPaymentDetails({
+          razorpayOrderId: response.razorpay_order_id,
+          razorpayPaymentId: response.razorpay_payment_id,
+          razorpaySignature: response.razorpay_signature,
+          paymentMethod: paymentInfo.method || 'Unknown',
+          paymentStatus: 'Completed'
+        });
+
+        // Update order status in Google Sheets
+        await GoogleSheetsService.updatePaymentDetails(orderCode, {
+          razorpayPaymentId: response.razorpay_payment_id,
+          razorpaySignature: response.razorpay_signature,
+          paymentMethod: paymentInfo.method || 'Unknown',
+          paymentStatus: 'Completed'
+        });
+
+        toast.success('Payment successful!');
+        setCurrentStep('confirmation');
+        
+        // Complete the order after a delay
+        setTimeout(() => {
+          handleOrderComplete();
+        }, 3000);
+        
+      } else {
+        toast.error('Payment verification failed. Please contact support.');
+      }
+    } catch (error) {
+      console.error('Error processing payment success:', error);
+      toast.error('Error processing payment. Please contact support.');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const handlePaymentDismiss = () => {
+    setIsProcessingPayment(false);
+    toast.info('Payment cancelled. You can try again.');
   };
 
   const copyToClipboard = (text: string) => {
@@ -204,7 +292,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleWhatsAppContact = () => {
     const phoneNumber = '9266514434';
-    let message = `Hi! I want to send payment screenshot for Order Code: ${orderCode}
+    let message = `Hi! I have a question about my order: ${orderCode}
 
 Customer Details:
 Name: ${customerName}
@@ -227,27 +315,32 @@ Subtotal: ₹${subtotal.toFixed(2)}`;
       }
     }
 
-    message += `\nTotal: ₹${total.toFixed(2)}
+    message += `\nTotal: ₹${total.toFixed(2)}`;
 
-I have made the payment via UPI. Please find the screenshot attached.`;
+    if (paymentDetails) {
+      message += `\n\nPayment Details:
+Payment ID: ${paymentDetails.razorpayPaymentId}
+Payment Status: ${paymentDetails.paymentStatus}`;
+    }
     
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
   const handleOrderComplete = () => {
-    setCurrentStep('confirmation');
-    setTimeout(() => {
-      onOrderComplete();
-      onClose();
-      setCurrentStep('summary');
-      setOrderCode('');
-      setCustomerName('');
-      setCustomerMobile('');
-      setAppliedCoupon('');
-      setCouponInput('');
-      setCouponError('');
-    }, 3000);
+    // Clear form data
+    setOrderCode('');
+    setCustomerName('');
+    setCustomerMobile('');
+    setAppliedCoupon('');
+    setCouponInput('');
+    setCouponError('');
+    setPaymentDetails(null);
+    setRazorpayOrderId('');
+    setCurrentStep('summary');
+    
+    onOrderComplete();
+    onClose();
   };
 
   const renderSummaryStep = () => (
@@ -433,18 +526,18 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         </button>
         <button
           onClick={handleProceedToPayment}
-          disabled={isSubmittingOrder || !customerName.trim() || !customerMobile.trim()}
+          disabled={isSubmittingOrder || isProcessingPayment || !customerName.trim() || !customerMobile.trim()}
           className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
         >
-          {isSubmittingOrder ? (
+          {isProcessingPayment ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               <span>Processing...</span>
             </>
           ) : (
             <>
-              <FileSpreadsheet className="w-4 h-4" />
-              <span>Proceed to Payment</span>
+              <CreditCard className="w-4 h-4" />
+              <span>Pay with Razorpay</span>
             </>
           )}
         </button>
@@ -456,9 +549,9 @@ I have made the payment via UPI. Please find the screenshot attached.`;
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
-          Complete Your Payment
+          Payment Processing
         </h2>
-        <p className="text-gray-600">Scan the QR code to pay via UPI</p>
+        <p className="text-gray-600">Complete your payment with Razorpay</p>
       </div>
 
       {/* Customer Details Display */}
@@ -476,6 +569,27 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         </div>
       </div>
 
+      {/* Order Code Display */}
+      <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200">
+        <div className="text-center">
+          <h3 className="text-lg font-bold text-gray-800 mb-3">Your Order Code</h3>
+          <div className="bg-white rounded-xl p-4 border-2 border-dashed border-cyan-400">
+            <div className="flex items-center justify-center space-x-3">
+              <span className="text-2xl font-mono font-bold text-cyan-600 tracking-wider">{orderCode}</span>
+              <button
+                onClick={() => copyToClipboard(orderCode)}
+                className="text-cyan-600 hover:text-cyan-700 transition-colors p-1 rounded hover:bg-cyan-50"
+              >
+                {copiedOrderCode ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mt-2">
+            Keep this order code for tracking your purchase
+          </p>
+        </div>
+      </div>
+
       {/* Applied Coupon Display */}
       {appliedCoupon && (
         <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-4 border border-purple-200">
@@ -490,132 +604,68 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         </div>
       )}
 
-      {/* Order Code Display */}
-      <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200">
-        <div className="text-center">
-          <h3 className="text-lg font-bold text-gray-800 mb-3">Your Unique Order Code</h3>
-          <div className="bg-white rounded-xl p-4 border-2 border-dashed border-cyan-400">
-            <div className="flex items-center justify-center space-x-3">
-              <span className="text-2xl font-mono font-bold text-cyan-600 tracking-wider">{orderCode}</span>
-              <button
-                onClick={() => copyToClipboard(orderCode)}
-                className="text-cyan-600 hover:text-cyan-700 transition-colors p-1 rounded hover:bg-cyan-50"
-              >
-                {copiedOrderCode ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-              </button>
-            </div>
+      {/* Payment Instructions */}
+      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
+        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
+          <CreditCard className="w-5 h-5 text-blue-500" />
+          <span>Secure Payment with Razorpay</span>
+        </h3>
+        <div className="space-y-3 text-gray-700">
+          <div className="flex items-center space-x-3">
+            <Shield className="w-5 h-5 text-green-500" />
+            <span>Your payment is secured with 256-bit SSL encryption</span>
           </div>
-          <p className="text-sm text-gray-600 mt-2">
-            <strong>IMPORTANT:</strong> Include this exact code in your UPI payment remarks
-          </p>
-        </div>
-      </div>
-
-      {/* Order Tracking Notice */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-200">
-        <div className="flex items-center space-x-3">
-          <div className="bg-green-500 rounded-full p-2">
-            <FileSpreadsheet className="w-4 h-4 text-white" />
+          <div className="flex items-center space-x-3">
+            <CreditCard className="w-5 h-5 text-blue-500" />
+            <span>Supports UPI, Cards, Net Banking, and Wallets</span>
           </div>
-          <div>
-            <h4 className="font-bold text-green-800">Order Recorded</h4>
-            <p className="text-sm text-green-700">Your order has been automatically saved to our tracking system</p>
+          <div className="flex items-center space-x-3">
+            <Smartphone className="w-5 h-5 text-purple-500" />
+            <span>Complete payment in the Razorpay popup window</span>
           </div>
         </div>
       </div>
 
-      {/* QR Code Section */}
-      <div className="bg-white rounded-2xl p-6 border border-gray-200 text-center">
-        <div className="flex items-center justify-center space-x-2 mb-4">
-          <QrCode className="w-6 h-6 text-cyan-600" />
-          <h3 className="text-lg font-bold text-gray-800">Scan to Pay</h3>
-        </div>
-        
-        <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4 mb-4">
-          <img
-            src="/UPI.jpg"
-            alt="UPI QR Code"
-            className="w-64 h-64 mx-auto object-contain rounded-lg shadow-lg"
-          />
-        </div>
-        
+      {/* Order Total */}
+      <div className="bg-white rounded-2xl p-6 border border-gray-200">
         <div className="text-center">
           <div className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent mb-2">
             ₹{total.toFixed(2)}
           </div>
           <p className="text-sm text-gray-600">
-            Scan with any UPI app (GPay, PhonePe, Paytm, etc.)
+            Total amount to be paid
           </p>
         </div>
       </div>
 
-      {/* Payment Instructions */}
-      <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-200">
-        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
-          <Smartphone className="w-5 h-5 text-orange-500" />
-          <span>Payment Instructions</span>
-        </h3>
-        <ol className="space-y-2 text-gray-700">
-          <li className="flex items-start space-x-2">
-            <span className="bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">1</span>
-            <span>Scan the QR code with your UPI app</span>
-          </li>
-          <li className="flex items-start space-x-2">
-            <span className="bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">2</span>
-            <span>Enter amount: <strong>₹{total.toFixed(2)}</strong></span>
-          </li>
-          <li className="flex items-start space-x-2">
-            <span className="bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">3</span>
+      {/* Processing Message */}
+      {isProcessingPayment && (
+        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-200">
+          <div className="flex items-center space-x-3">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500"></div>
             <div>
-              <span>Add order code in remarks/note:</span>
-              <div className="bg-white rounded px-2 py-1 mt-1 font-mono text-sm border border-orange-300">
-                {orderCode}
-              </div>
+              <h4 className="font-bold text-orange-800">Processing Payment</h4>
+              <p className="text-orange-700 text-sm">Please complete the payment in the Razorpay window</p>
             </div>
-          </li>
-          <li className="flex items-start space-x-2">
-            <span className="bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">4</span>
-            <span>Complete the payment</span>
-          </li>
-          <li className="flex items-start space-x-2">
-            <span className="bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">5</span>
-            <span>Take a screenshot of payment confirmation</span>
-          </li>
-        </ol>
-      </div>
-
-      {/* Contact Information */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200">
-        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
-          <MessageCircle className="w-5 h-5 text-green-500" />
-          <span>Send Payment Screenshot</span>
-        </h3>
-        <p className="text-gray-700 mb-4">
-          After payment, send your screenshot via WhatsApp:
-        </p>
-        
-        <button
-          onClick={handleWhatsAppContact}
-          className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
-        >
-          <MessageCircle className="w-5 h-5" />
-          <span>Send Payment Screenshot via WhatsApp</span>
-        </button>
-      </div>
+          </div>
+        </div>
+      )}
 
       {/* Action Buttons */}
       <div className="flex space-x-4">
         <button
           onClick={() => setCurrentStep('summary')}
-          className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-xl font-semibold transition-colors"
+          disabled={isProcessingPayment}
+          className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-xl font-semibold transition-colors disabled:opacity-50"
         >
           Back
         </button>
         <button
-          onClick={handleOrderComplete}
-          className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-3 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
+          onClick={handleWhatsAppContact}
+          className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center space-x-2"
         >
-          I've Sent Payment Screenshot
+          <MessageCircle className="w-4 h-4" />
+          <span>Contact Support</span>
         </button>
       </div>
     </div>
@@ -627,10 +677,21 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
           <Check className="w-8 h-8 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Order Submitted!</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Payment Successful!</h2>
         <p className="text-gray-600 mb-4">
-          Your order <strong className="font-mono text-cyan-600">{orderCode}</strong> has been submitted successfully.
+          Your order <strong className="font-mono text-cyan-600">{orderCode}</strong> has been confirmed.
         </p>
+        
+        {paymentDetails && (
+          <div className="bg-white rounded-xl p-4 border border-green-200 mb-4">
+            <h4 className="font-bold text-green-800 mb-2">Payment Details</h4>
+            <div className="text-sm text-gray-700 space-y-1">
+              <p><strong>Payment ID:</strong> {paymentDetails.razorpayPaymentId}</p>
+              <p><strong>Method:</strong> {paymentDetails.paymentMethod}</p>
+              <p><strong>Status:</strong> <span className="text-green-600 font-semibold">{paymentDetails.paymentStatus}</span></p>
+            </div>
+          </div>
+        )}
         
         {appliedCoupon && (
           <div className="bg-white rounded-xl p-4 border border-green-200 mb-4">
@@ -647,8 +708,8 @@ I have made the payment via UPI. Please find the screenshot attached.`;
         
         <div className="bg-white rounded-xl p-4 border border-green-200">
           <p className="text-sm text-gray-700">
-            We'll verify your payment and deliver your games within <strong>15 minutes</strong>.
-            You'll receive confirmation via WhatsApp.
+            Your games will be delivered within <strong>1 hour</strong>.
+            You'll receive delivery confirmation via WhatsApp.
           </p>
         </div>
       </div>
@@ -674,7 +735,8 @@ I have made the payment via UPI. Please find the screenshot attached.`;
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
+            disabled={isProcessingPayment}
+            className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
           >
             <X className="w-6 h-6" />
           </button>
