@@ -37,12 +37,35 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [razorpayOrderId, setRazorpayOrderId] = useState('');
   const [paymentDetails, setPaymentDetails] = useState<any>(null);
   const [paymentError, setPaymentError] = useState('');
+  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'failed'>('checking');
   
   // Customer details
   const [customerName, setCustomerName] = useState('');
   const [customerMobile, setCustomerMobile] = useState('');
 
   if (!isOpen) return null;
+
+  // Test connection on modal open
+  useEffect(() => {
+    if (isOpen) {
+      testBackendConnection();
+    }
+  }, [isOpen]);
+
+  const testBackendConnection = async () => {
+    try {
+      setConnectionStatus('checking');
+      const isConnected = await BackendService.testConnection();
+      setConnectionStatus(isConnected ? 'connected' : 'failed');
+      
+      if (!isConnected) {
+        console.warn('Backend connection failed, payment may use fallback mode');
+      }
+    } catch (error) {
+      console.error('Connection test error:', error);
+      setConnectionStatus('failed');
+    }
+  };
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   
@@ -103,7 +126,9 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         paymentStatus: 'Pending'
       };
 
+      console.log('Submitting order to backend:', orderData);
       const result = await BackendService.createOrder(orderData);
+      
       if (result.success) {
         toast.success('Order submitted to tracking system!');
       } else {
@@ -193,13 +218,19 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     try {
       setIsProcessingPayment(true);
       
-      // Test backend connection first
+      console.log('Starting payment process...');
+      
+      // Test Razorpay connection
       const connectionOk = await BackendService.testRazorpayConnection();
+      console.log('Razorpay connection status:', connectionOk);
+      
       if (!connectionOk) {
-        console.warn('Backend connection test failed, proceeding with mock order');
+        console.warn('Razorpay connection failed, proceeding with mock order');
+        toast.warning('Payment system in test mode');
       }
       
       // Create Razorpay order via backend
+      console.log('Creating Razorpay order...');
       const razorpayOrder = await BackendService.createRazorpayOrder({
         amount: Math.round(total * 100), // Convert to paise
         currency: 'INR',
@@ -212,6 +243,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       // Submit order to backend
       await submitOrderToBackend(code, razorpayOrder.id);
       
+      // Check if Razorpay SDK is loaded
+      if (typeof window.Razorpay === 'undefined') {
+        throw new Error('Razorpay SDK not loaded. Please check your internet connection.');
+      }
+
       // Initialize Razorpay payment
       const options = {
         key: BackendService.getKeyId(),
@@ -233,11 +269,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         }
       };
 
-      // Check if Razorpay is loaded
-      if (typeof window.Razorpay === 'undefined') {
-        throw new Error('Razorpay SDK not loaded. Please check your internet connection.');
-      }
-
+      console.log('Opening Razorpay with options:', options);
       const razorpay = new window.Razorpay(options);
       razorpay.open();
       setCurrentStep('payment');
@@ -262,6 +294,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         response.razorpay_payment_id,
         response.razorpay_signature
       );
+
+      console.log('Payment verification result:', isValid);
 
       if (isValid) {
         // Get payment details via backend
@@ -382,6 +416,26 @@ Payment Status: ${paymentDetails.paymentStatus}`;
           Order Summary
         </h2>
         <p className="text-gray-600">Review your order and enter your details</p>
+      </div>
+
+      {/* Connection Status */}
+      <div className={`rounded-xl p-4 border ${
+        connectionStatus === 'connected' ? 'bg-green-50 border-green-200' :
+        connectionStatus === 'failed' ? 'bg-yellow-50 border-yellow-200' :
+        'bg-blue-50 border-blue-200'
+      }`}>
+        <div className="flex items-center space-x-2">
+          <div className={`w-3 h-3 rounded-full ${
+            connectionStatus === 'connected' ? 'bg-green-500' :
+            connectionStatus === 'failed' ? 'bg-yellow-500' :
+            'bg-blue-500 animate-pulse'
+          }`}></div>
+          <span className="text-sm font-medium">
+            {connectionStatus === 'checking' && 'Checking payment system...'}
+            {connectionStatus === 'connected' && 'Payment system ready'}
+            {connectionStatus === 'failed' && 'Payment system in test mode'}
+          </span>
+        </div>
       </div>
 
       {/* Customer Details Form */}
@@ -562,7 +616,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
         </button>
         <button
           onClick={handleProceedToPayment}
-          disabled={isSubmittingOrder || isProcessingPayment || !customerName.trim() || !customerMobile.trim()}
+          disabled={isSubmittingOrder || isProcessingPayment || !customerName.trim() || !customerMobile.trim() || connectionStatus === 'checking'}
           className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
         >
           {isProcessingPayment ? (
