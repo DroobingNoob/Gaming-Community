@@ -9,6 +9,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export interface Game {
   id?: string;
   title: string;
+  base_title?: string; // For grouping different editions
+  edition?: string; // Standard, Premium, Deluxe, etc.
+  base_game_id?: string; // Links different editions of the same game
+  edition_features?: string[]; // Edition-specific features
   image: string;
   original_price: number;
   sale_price: number; // Keep for subscriptions compatibility
@@ -75,4 +79,44 @@ export const getGameDiscountPercentage = (game: Game, selectedType: string, sele
   // For games, calculate discount based on selected type vs original price
   const currentPrice = getGameDisplayPrice(game, selectedType, selectedRentDuration);
   return calculateGameDiscount(game.original_price, currentPrice);
+};
+
+// Helper function to group games by base title
+export const groupGamesByBaseTitle = (games: Game[]): { [baseTitle: string]: Game[] } => {
+  return games.reduce((groups, game) => {
+    const baseTitle = game.base_title || game.title;
+    if (!groups[baseTitle]) {
+      groups[baseTitle] = [];
+    }
+    groups[baseTitle].push(game);
+    return groups;
+  }, {} as { [baseTitle: string]: Game[] });
+};
+
+// Helper function to get available editions for a game
+export const getGameEditions = (games: Game[], baseGameId: string): Game[] => {
+  return games.filter(game => 
+    game.base_game_id === baseGameId || game.id === baseGameId
+  ).sort((a, b) => {
+    // Sort by edition: Standard first, then Premium, then Deluxe
+    const editionOrder = { 'Standard': 1, 'Premium': 2, 'Deluxe': 3, 'Ultimate': 4 };
+    const aOrder = editionOrder[a.edition as keyof typeof editionOrder] || 999;
+    const bOrder = editionOrder[b.edition as keyof typeof editionOrder] || 999;
+    return aOrder - bOrder;
+  });
+};
+
+// Helper function to get the cheapest edition of a game
+export const getCheapestEdition = (games: Game[], baseTitle: string): Game | null => {
+  const editions = games.filter(game => 
+    (game.base_title || game.title) === baseTitle
+  );
+  
+  if (editions.length === 0) return null;
+  
+  return editions.reduce((cheapest, current) => {
+    const cheapestPrice = getGameDisplayPrice(cheapest, 'Rent', '1_month');
+    const currentPrice = getGameDisplayPrice(current, 'Rent', '1_month');
+    return currentPrice < cheapestPrice ? current : cheapest;
+  });
 };
