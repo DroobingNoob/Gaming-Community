@@ -211,8 +211,25 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             edition_features: formData.edition_features || []
           };
 
+          // Set base_game_id for linking editions
+          if (crudOperation === 'create' && formData.edition === 'Premium') {
+            // Find the Standard edition of the same game
+            const standardEdition = games.find(game => 
+              game.title === formData.title && game.edition === 'Standard'
+            );
+            if (standardEdition) {
+              itemData.base_game_id = standardEdition.id;
+            }
+          }
+
           if (crudOperation === 'create') {
-            await gamesService.add(itemData);
+            const newGameId = await gamesService.add(itemData);
+            
+            // If this is a Standard edition, update its base_game_id to point to itself
+            if (formData.edition === 'Standard') {
+              await gamesService.update(newGameId, { base_game_id: newGameId });
+            }
+            
             toast.success('Game added successfully!');
             refetchGames();
           } else if (crudOperation === 'update' && selectedItem) {
@@ -728,7 +745,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
                 {/* Pricing Section */}
                 <div className="md:col-span-2">
-                  <h3 className="text-lg font-bold text-gray-800 mb-4">Pricing</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-4">
+                    Pricing {formData.edition && formData.edition !== 'Standard' ? `(${formData.edition} Edition)` : ''}
+                  </h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Original Price */}
