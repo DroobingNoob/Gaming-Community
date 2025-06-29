@@ -11,6 +11,7 @@ import CheckoutModal from './components/CheckoutModal';
 import NewsletterModal from './components/NewsletterModal';
 import NewsletterBanner from './components/NewsletterBanner';
 import WhatsAppButton from './components/WhatsAppButton';
+import FloatingCartButton from './components/FloatingCartButton';
 
 // Page Components
 import HomePage from './pages/HomePage';
@@ -476,6 +477,8 @@ function App() {
     }
   };
 
+  const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
@@ -493,7 +496,7 @@ function App() {
           onCartClick={handleCartClick}
           isLoggedIn={isLoggedIn}
           isAdmin={isAdmin}
-          cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+          cartItemCount={cartItemCount}
           onNavigation={handleNavigation}
           user={user}
           hasNewsletterDiscount={hasNewsletterDiscount}
@@ -547,6 +550,12 @@ function App() {
           onOrderComplete={handleOrderComplete}
           hasNewsletterDiscount={hasNewsletterDiscount}
           user={user}
+        />
+
+        {/* Floating Cart Button - Only shows when cart has items */}
+        <FloatingCartButton
+          cartItemCount={cartItemCount}
+          onCartClick={handleCartClick}
         />
 
         {/* WhatsApp Button */}
