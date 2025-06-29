@@ -9,14 +9,13 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export interface Game {
   id?: string;
   title: string;
-  base_title?: string; // For grouping different editions
-  edition?: string; // Standard, Premium, Deluxe, etc.
+  edition?: 'Standard' | 'Premium'; // Only Standard and Premium editions
   base_game_id?: string; // Links different editions of the same game
   edition_features?: string[]; // Edition-specific features
   image: string;
   original_price: number;
   sale_price: number; // Keep for subscriptions compatibility
-  // Rental pricing (removed rent_2_months)
+  // Rental pricing
   rent_1_month?: number;
   rent_3_months?: number;
   rent_6_months?: number;
@@ -81,25 +80,13 @@ export const getGameDiscountPercentage = (game: Game, selectedType: string, sele
   return calculateGameDiscount(game.original_price, currentPrice);
 };
 
-// Helper function to group games by base title
-export const groupGamesByBaseTitle = (games: Game[]): { [baseTitle: string]: Game[] } => {
-  return games.reduce((groups, game) => {
-    const baseTitle = game.base_title || game.title;
-    if (!groups[baseTitle]) {
-      groups[baseTitle] = [];
-    }
-    groups[baseTitle].push(game);
-    return groups;
-  }, {} as { [baseTitle: string]: Game[] });
-};
-
-// Helper function to get available editions for a game
+// Helper function to get available editions for a game (Standard and Premium only)
 export const getGameEditions = (games: Game[], baseGameId: string): Game[] => {
   return games.filter(game => 
     game.base_game_id === baseGameId || game.id === baseGameId
   ).sort((a, b) => {
-    // Sort by edition: Standard first, then Premium, then Deluxe
-    const editionOrder = { 'Standard': 1, 'Premium': 2, 'Deluxe': 3, 'Ultimate': 4 };
+    // Sort by edition: Standard first, then Premium
+    const editionOrder = { 'Standard': 1, 'Premium': 2 };
     const aOrder = editionOrder[a.edition as keyof typeof editionOrder] || 999;
     const bOrder = editionOrder[b.edition as keyof typeof editionOrder] || 999;
     return aOrder - bOrder;
@@ -107,10 +94,8 @@ export const getGameEditions = (games: Game[], baseGameId: string): Game[] => {
 };
 
 // Helper function to get the cheapest edition of a game
-export const getCheapestEdition = (games: Game[], baseTitle: string): Game | null => {
-  const editions = games.filter(game => 
-    (game.base_title || game.title) === baseTitle
-  );
+export const getCheapestEdition = (games: Game[], gameTitle: string): Game | null => {
+  const editions = games.filter(game => game.title === gameTitle);
   
   if (editions.length === 0) return null;
   
@@ -119,4 +104,15 @@ export const getCheapestEdition = (games: Game[], baseTitle: string): Game | nul
     const currentPrice = getGameDisplayPrice(current, 'Rent', '1_month');
     return currentPrice < cheapestPrice ? current : cheapest;
   });
+};
+
+// Helper function to group games by title (ignoring edition)
+export const groupGamesByTitle = (games: Game[]): { [title: string]: Game[] } => {
+  return games.reduce((groups, game) => {
+    if (!groups[game.title]) {
+      groups[game.title] = [];
+    }
+    groups[game.title].push(game);
+    return groups;
+  }, {} as { [title: string]: Game[] });
 };

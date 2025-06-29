@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, Save, X, Upload, Image as ImageIcon, Sparkles, Database, Settings, Copy } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Save, X, Upload, Image as ImageIcon, Sparkles, Database, Settings } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { 
   gamesService, 
@@ -22,24 +22,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [formData, setFormData] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [selectedBaseGame, setSelectedBaseGame] = useState<string>('');
 
   // Supabase data hooks
   const { games, refetch: refetchGames } = useGames();
   const { subscriptions, refetch: refetchSubscriptions } = useSubscriptions();
   const { testimonials, refetch: refetchTestimonials } = useTestimonials();
-
-  // Get unique base games for edition selection
-  const getUniqueBaseGames = () => {
-    const baseGames = new Map();
-    games.forEach(game => {
-      const baseTitle = game.base_title || game.title;
-      if (!baseGames.has(baseTitle)) {
-        baseGames.set(baseTitle, game);
-      }
-    });
-    return Array.from(baseGames.values());
-  };
 
   // Cloudinary upload function
   const uploadToCloudinary = async (file: File): Promise<string> => {
@@ -188,20 +175,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     }
   };
 
-  const handleCopyFromExisting = (sourceGame: Game) => {
-    setFormData({
-      ...formData,
-      base_title: sourceGame.base_title || sourceGame.title,
-      base_game_id: sourceGame.base_game_id || sourceGame.id,
-      platform: sourceGame.platform,
-      type: sourceGame.type,
-      description: sourceGame.description,
-      image: sourceGame.image,
-      // Don't copy pricing - let user set new prices for different edition
-    });
-    toast.success('Game data copied! Update the edition, pricing, and features.');
-  };
-
   const handleSaveItem = async () => {
     try {
       setLoading(true);
@@ -235,14 +208,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             type: Array.isArray(formData.type) ? formData.type : [formData.type],
             show_in_bestsellers: formData.show_in_bestsellers || false,
             edition: formData.edition || 'Standard',
-            base_title: formData.base_title || formData.title,
             edition_features: formData.edition_features || []
           };
-
-          // Set base_game_id for new editions
-          if (selectedBaseGame && crudOperation === 'create') {
-            itemData.base_game_id = selectedBaseGame;
-          }
 
           if (crudOperation === 'create') {
             await gamesService.add(itemData);
@@ -277,7 +244,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       setFormData({});
       setSelectedItem(null);
       setCrudOperation(null);
-      setSelectedBaseGame('');
     } catch (error) {
       toast.error('Failed to save item');
       console.error(error);
@@ -336,7 +302,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           </h2>
         </div>
         <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-          Manage your gaming community content with ease. Upload high-quality images, add games with multiple editions, and update testimonials.
+          Manage your gaming community content with ease. Upload high-quality images, add games, and update testimonials.
         </p>
       </div>
       
@@ -414,7 +380,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               Manage Stock
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Manage games with multiple editions (Standard, Premium, Deluxe) and subscription inventory with high-quality image processing.
+              Manage games and subscription inventory with high-quality image processing. Auto-cropping and optimization included.
             </p>
             <div className="mt-6 inline-flex items-center space-x-2 text-orange-600 font-medium">
               <span>Manage Inventory</span>
@@ -445,7 +411,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               <Database className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-purple-600 transition-colors">Games</h3>
-            <p className="text-gray-600">Manage PS4 & PS5 games with multiple editions</p>
+            <p className="text-gray-600">Manage PS4 & PS5 games</p>
           </div>
         </div>
         
@@ -505,7 +471,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const renderForm = () => {
     const isTestimonial = activeSection === 'testimonials';
     const isSubscription = stockType === 'subscriptions';
-    const uniqueBaseGames = getUniqueBaseGames();
     
     return (
       <div className="space-y-8">
@@ -592,112 +557,32 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     </div>
                   </div>
                 )}
+
+                {/* Cloudinary Setup Instructions */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                  <div className="flex items-start space-x-3">
+                    <div className="bg-blue-500 p-2 rounded-lg">
+                      <Upload className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-blue-800 mb-3">High-Quality Upload Features:</h4>
+                      <ul className="text-sm text-blue-700 space-y-2 list-disc list-inside">
+                        <li>Automatic image optimization and compression</li>
+                        <li>High-quality JPEG output (95% quality)</li>
+                        <li>Smart cropping for game images (perfect squares)</li>
+                        <li>Aspect ratio preservation for phone screenshots</li>
+                        <li>WebP format support for modern browsers</li>
+                        <li>Global CDN delivery for fast loading</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Form fields based on type */}
             {!isTestimonial && (
               <>
-                {/* Game Edition Management */}
-                {!isSubscription && (
-                  <div className="md:col-span-2">
-                    <h3 className="text-lg font-bold text-gray-800 mb-4">Game Edition Management</h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                      {/* Base Title */}
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-3">Base Game Title</label>
-                        <input
-                          type="text"
-                          value={formData.base_title || ''}
-                          onChange={(e) => setFormData({ ...formData, base_title: e.target.value })}
-                          className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                          placeholder="e.g., Spider-Man: Miles Morales"
-                        />
-                      </div>
-
-                      {/* Edition */}
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-3">Edition</label>
-                        <select
-                          value={formData.edition || 'Standard'}
-                          onChange={(e) => setFormData({ ...formData, edition: e.target.value })}
-                          className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                        >
-                          <option value="Standard">Standard</option>
-                          <option value="Premium">Premium</option>
-                          <option value="Deluxe">Deluxe</option>
-                          <option value="Ultimate">Ultimate</option>
-                          <option value="Collector's">Collector's</option>
-                        </select>
-                      </div>
-
-                      {/* Copy from existing game */}
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-3">Copy from Existing</label>
-                        <select
-                          value=""
-                          onChange={(e) => {
-                            const selectedGame = games.find(g => g.id === e.target.value);
-                            if (selectedGame) handleCopyFromExisting(selectedGame);
-                          }}
-                          className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                        >
-                          <option value="">Select game to copy...</option>
-                          {uniqueBaseGames.map((game) => (
-                            <option key={game.id} value={game.id}>
-                              {game.base_title || game.title}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Edition Features */}
-                    <div className="mb-6">
-                      <label className="block text-sm font-semibold text-gray-700 mb-3">Edition Features</label>
-                      <div className="space-y-2">
-                        {(formData.edition_features || []).map((feature: string, index: number) => (
-                          <div key={index} className="flex items-center space-x-2">
-                            <input
-                              type="text"
-                              value={feature}
-                              onChange={(e) => {
-                                const newFeatures = [...(formData.edition_features || [])];
-                                newFeatures[index] = e.target.value;
-                                setFormData({ ...formData, edition_features: newFeatures });
-                              }}
-                              className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                              placeholder="e.g., Season Pass, Exclusive Skins"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const newFeatures = (formData.edition_features || []).filter((_: any, i: number) => i !== index);
-                                setFormData({ ...formData, edition_features: newFeatures });
-                              }}
-                              className="text-red-500 hover:text-red-700 p-2"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newFeatures = [...(formData.edition_features || []), ''];
-                            setFormData({ ...formData, edition_features: newFeatures });
-                          }}
-                          className="text-cyan-600 hover:text-cyan-700 text-sm font-medium flex items-center space-x-1"
-                        >
-                          <Plus className="w-4 h-4" />
-                          <span>Add Feature</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Title</label>
                   <input
@@ -705,9 +590,69 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     value={formData.title || ''}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                    placeholder="Enter full title with edition"
+                    placeholder="Enter title"
                   />
                 </div>
+
+                {/* Edition Selection - Only for Games */}
+                {!isSubscription && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Edition</label>
+                    <select
+                      value={formData.edition || 'Standard'}
+                      onChange={(e) => setFormData({ ...formData, edition: e.target.value })}
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                    >
+                      <option value="Standard">Standard Edition</option>
+                      <option value="Premium">Premium Edition</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* Edition Features - Only for Premium Edition */}
+                {!isSubscription && formData.edition === 'Premium' && (
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Premium Edition Features</label>
+                    <div className="space-y-2">
+                      {(formData.edition_features || []).map((feature: string, index: number) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <input
+                            type="text"
+                            value={feature}
+                            onChange={(e) => {
+                              const newFeatures = [...(formData.edition_features || [])];
+                              newFeatures[index] = e.target.value;
+                              setFormData({ ...formData, edition_features: newFeatures });
+                            }}
+                            className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                            placeholder="Enter feature"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newFeatures = (formData.edition_features || []).filter((_: any, i: number) => i !== index);
+                              setFormData({ ...formData, edition_features: newFeatures });
+                            }}
+                            className="text-red-500 hover:text-red-700 p-2"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newFeatures = [...(formData.edition_features || []), ''];
+                          setFormData({ ...formData, edition_features: newFeatures });
+                        }}
+                        className="text-cyan-600 hover:text-cyan-700 text-sm font-medium flex items-center space-x-1"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Add Feature</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Platform Selection - Only for Games */}
                 {!isSubscription && (
@@ -914,7 +859,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 setFormData({});
                 setCrudOperation(null);
                 setSelectedItem(null);
-                setSelectedBaseGame('');
               }}
               className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
             >
@@ -966,7 +910,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                       <div className="flex items-center space-x-2">
                         <p className="text-gray-600">₹{item.sale_price} - {item.platform?.join(', ')}</p>
                         {item.edition && item.edition !== 'Standard' && (
-                          <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                          <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
                             {item.edition}
                           </span>
                         )}
@@ -1019,7 +963,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           setCrudOperation(null);
           setFormData({});
           setSelectedItem(null);
-          setSelectedBaseGame('');
         } else if (stockType) {
           setStockType(null);
         } else if (activeSection !== 'main') {
