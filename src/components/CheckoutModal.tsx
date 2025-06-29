@@ -701,44 +701,44 @@ Payment Status: ${paymentDetails.paymentStatus}`;
   }
 
   const renderSummaryStep = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
+        <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
           Order Summary
         </h2>
-        <p className="text-gray-600">Review your order and enter your details</p>
+        <p className="text-gray-600 text-sm sm:text-base">Review your order and enter your details</p>
       </div>
 
       {/* Newsletter Discount Banner */}
       {hasNewsletterDiscount && (
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-200">
-          <div className="flex items-center space-x-3">
-            <div className="bg-green-500 p-2 rounded-full">
-              <Gift className="w-5 h-5 text-white" />
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-green-200">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="bg-green-500 p-1.5 sm:p-2 rounded-full flex-shrink-0">
+              <Gift className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-green-800">Newsletter Subscriber Discount Active!</h3>
-              <p className="text-green-700 text-sm">You get 10% off your first order as a newsletter subscriber</p>
+              <h3 className="font-bold text-green-800 text-sm sm:text-base">Newsletter Subscriber Discount Active!</h3>
+              <p className="text-green-700 text-xs sm:text-sm">You get 10% off your first order as a newsletter subscriber</p>
             </div>
           </div>
         </div>
       )}
 
       {/* Connection Status */}
-      <div className={`rounded-xl p-4 border ${
+      <div className={`rounded-xl p-3 sm:p-4 border ${
         connectionStatus === 'connected' ? 'bg-green-50 border-green-200' :
         connectionStatus === 'mock' ? 'bg-yellow-50 border-yellow-200' :
         connectionStatus === 'failed' ? 'bg-red-50 border-red-200' :
         'bg-blue-50 border-blue-200'
       }`}>
         <div className="flex items-center space-x-2">
-          <div className={`w-3 h-3 rounded-full ${
+          <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${
             connectionStatus === 'connected' ? 'bg-green-500' :
             connectionStatus === 'mock' ? 'bg-yellow-500' :
             connectionStatus === 'failed' ? 'bg-red-500' :
             'bg-blue-500 animate-pulse'
           }`}></div>
-          <span className="text-sm font-medium">
+          <span className="text-xs sm:text-sm font-medium">
             {connectionStatus === 'checking' && 'Checking payment system...'}
             {connectionStatus === 'connected' && 'Payment system ready'}
             {connectionStatus === 'mock' && 'Demo mode - payments simulated'}
@@ -753,12 +753,12 @@ Payment Status: ${paymentDetails.paymentStatus}`;
       </div>
 
       {/* Customer Details Form */}
-      <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200">
-        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
-          <User className="w-5 h-5 text-cyan-600" />
+      <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-cyan-200">
+        <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center space-x-2">
+          <User className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600" />
           <span>Customer Details</span>
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Full Name <span className="text-red-500">*</span>
@@ -769,7 +769,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
                 type="text"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-sm sm:text-base"
                 placeholder="Enter your full name"
                 required
                 autoComplete="name"
@@ -786,7 +786,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
                 type="tel"
                 value={customerMobile}
                 onChange={handleMobileChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-sm sm:text-base"
                 placeholder="Enter 10-digit mobile number"
                 maxLength={10}
                 required
@@ -797,59 +797,59 @@ Payment Status: ${paymentDetails.paymentStatus}`;
             </div>
           </div>
         </div>
-        <p className="text-sm text-gray-600 mt-3">
+        <p className="text-xs sm:text-sm text-gray-600 mt-3">
           <span className="text-red-500">*</span> Required fields. This information will be used for order tracking and delivery.
         </p>
       </div>
 
       {/* Coupon Code Section */}
-      <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-200">
-        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
-          <Tag className="w-5 h-5 text-orange-600" />
+      <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-orange-200">
+        <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center space-x-2">
+          <Tag className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
           <span>Coupon Code</span>
         </h3>
         
         {!appliedCoupon ? (
-          <div className="space-y-4">
-            <div className="flex space-x-3">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
               <input
                 type="text"
                 value={couponInput}
                 onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-sm sm:text-base"
                 placeholder="Enter coupon code"
               />
               <button
                 onClick={handleApplyCoupon}
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 sm:px-6 py-3 rounded-xl font-semibold transition-colors text-sm sm:text-base touch-manipulation"
               >
                 Apply
               </button>
             </div>
             
             {couponError && (
-              <div className="flex items-center space-x-2 text-red-600 text-sm">
-                <AlertCircle className="w-4 h-4" />
+              <div className="flex items-center space-x-2 text-red-600 text-xs sm:text-sm">
+                <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 <span>{couponError}</span>
               </div>
             )}
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="bg-white/70 rounded-lg p-3 border border-orange-300">
-                <div className="font-bold text-orange-800 text-sm">GAMINGCOMMUNITY50</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              <div className="bg-white/70 rounded-lg p-2 sm:p-3 border border-orange-300">
+                <div className="font-bold text-orange-800 text-xs sm:text-sm">GAMINGCOMMUNITY50</div>
                 <div className="text-orange-700 text-xs">50% off all games</div>
               </div>
-              <div className="bg-white/70 rounded-lg p-3 border border-purple-300">
-                <div className="font-bold text-purple-800 text-sm">MYSTERYBOX</div>
+              <div className="bg-white/70 rounded-lg p-2 sm:p-3 border border-purple-300">
+                <div className="font-bold text-purple-800 text-xs sm:text-sm">MYSTERYBOX</div>
                 <div className="text-purple-700 text-xs">Free mystery game (₹3000+ orders)</div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-bold text-green-800 flex items-center space-x-2">
+                <div className="font-bold text-green-800 flex items-center space-x-2 text-sm sm:text-base">
                   <span>Coupon Applied: {appliedCoupon}</span>
                   {appliedCoupon === 'NEWSLETTER10' && (
                     <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs flex items-center space-x-1">
@@ -858,7 +858,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
                     </div>
                   )}
                 </div>
-                <div className="text-green-700 text-sm">
+                <div className="text-green-700 text-xs sm:text-sm">
                   {appliedCoupon === 'NEWSLETTER10' && `10% newsletter discount: -₹${discount.toFixed(2)}`}
                   {appliedCoupon === 'GAMINGCOMMUNITY50' && `50% discount: -₹${discount.toFixed(2)}`}
                   {appliedCoupon === 'MYSTERYBOX' && 'Free mystery game included!'}
@@ -867,7 +867,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
               {appliedCoupon !== 'NEWSLETTER10' && (
                 <button
                   onClick={handleRemoveCoupon}
-                  className="text-red-600 hover:text-red-700 text-sm font-medium"
+                  className="text-red-600 hover:text-red-700 text-xs sm:text-sm font-medium touch-manipulation"
                 >
                   Remove
                 </button>
@@ -878,24 +878,24 @@ Payment Status: ${paymentDetails.paymentStatus}`;
       </div>
 
       {/* Order Items */}
-      <div className="space-y-4 max-h-64 overflow-y-auto">
+      <div className="space-y-3 sm:space-y-4 max-h-48 sm:max-h-64 overflow-y-auto">
         {cartItems.map((item) => (
-          <div key={item.id} className="flex items-center space-x-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4">
+          <div key={item.id} className="flex items-center space-x-3 sm:space-x-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-3 sm:p-4">
             <img
               src={item.image}
               alt={item.title}
-              className="w-16 h-16 object-cover rounded-lg"
+              className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg flex-shrink-0"
             />
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-800">{item.title}</h3>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <span className="bg-cyan-400 text-white px-2 py-1 rounded text-xs">{item.platform}</span>
-                <span className="bg-orange-500 text-white px-2 py-1 rounded text-xs">{item.type}</span>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-gray-800 text-sm sm:text-base line-clamp-2">{item.title}</h3>
+              <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-600">
+                <span className="bg-cyan-400 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs">{item.platform}</span>
+                <span className="bg-orange-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs">{item.type}</span>
               </div>
-              <div className="flex items-center justify-between mt-2">
-                <span className="text-cyan-600 font-bold">₹{item.price}</span>
-                <span className="text-gray-600">Qty: {item.quantity}</span>
-                <span className="font-bold text-gray-800">₹{(item.price * item.quantity).toFixed(2)}</span>
+              <div className="flex items-center justify-between mt-1 sm:mt-2">
+                <span className="text-cyan-600 font-bold text-sm sm:text-base">₹{item.price}</span>
+                <span className="text-gray-600 text-xs sm:text-sm">Qty: {item.quantity}</span>
+                <span className="font-bold text-gray-800 text-sm sm:text-base">₹{(item.price * item.quantity).toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -903,46 +903,46 @@ Payment Status: ${paymentDetails.paymentStatus}`;
       </div>
 
       {/* Order Summary */}
-      <div className="border-t border-gray-200 pt-4 space-y-2">
-        <div className="flex justify-between items-center text-lg">
+      <div className="border-t border-gray-200 pt-3 sm:pt-4 space-y-2">
+        <div className="flex justify-between items-center text-base sm:text-lg">
           <span className="text-gray-700">Subtotal:</span>
           <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
         </div>
         
         {appliedCoupon && discount > 0 && (
-          <div className="flex justify-between items-center text-green-600">
+          <div className="flex justify-between items-center text-green-600 text-sm sm:text-base">
             <span>Discount ({appliedCoupon}):</span>
             <span className="font-semibold">-₹{discount.toFixed(2)}</span>
           </div>
         )}
         
         {appliedCoupon === 'MYSTERYBOX' && subtotal >= 3000 && (
-          <div className="flex justify-between items-center text-purple-600">
+          <div className="flex justify-between items-center text-purple-600 text-sm sm:text-base">
             <span>Mystery Box:</span>
             <span className="font-semibold">FREE</span>
           </div>
         )}
         
-        <div className="flex justify-between items-center text-xl font-bold border-t pt-2">
+        <div className="flex justify-between items-center text-lg sm:text-xl font-bold border-t pt-2">
           <span className="text-gray-800">Total Amount:</span>
-          <span className="text-2xl bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+          <span className="text-xl sm:text-2xl bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
             ₹{total.toFixed(2)}
           </span>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex space-x-4">
+      <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
         <button
           onClick={onClose}
-          className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-xl font-semibold transition-colors"
+          className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 sm:py-4 rounded-xl font-semibold transition-colors text-sm sm:text-base touch-manipulation"
         >
           Cancel
         </button>
         <button
           onClick={handleProceedToPayment}
           disabled={isSubmittingOrder || isProcessingPayment || !customerName.trim() || !customerMobile.trim() || connectionStatus === 'checking'}
-          className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-xl font-semibol transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+          className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 sm:py-4 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base touch-manipulation"
         >
           {isProcessingPayment ? (
             <>
@@ -961,47 +961,47 @@ Payment Status: ${paymentDetails.paymentStatus}`;
   );
 
   const renderPaymentStep = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
+        <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
           {isMockMode ? 'Demo Payment Processing' : 'Payment Processing'}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 text-sm sm:text-base">
           {isMockMode ? 'Simulating payment for demonstration' : 'Complete your payment with Razorpay'}
         </p>
       </div>
 
       {/* Customer Details Display */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-200">
-        <h3 className="font-bold text-green-800 mb-3">Customer Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-green-700">
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-green-200">
+        <h3 className="font-bold text-green-800 mb-2 sm:mb-3 text-sm sm:text-base">Customer Information</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-green-700 text-sm sm:text-base">
           <div className="flex items-center space-x-2">
-            <User className="w-4 h-4" />
+            <User className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
             <span><strong>Name:</strong> {customerName}</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Phone className="w-4 h-4" />
+            <Phone className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
             <span><strong>Mobile:</strong> {customerMobile}</span>
           </div>
         </div>
       </div>
 
       {/* Order Code Display */}
-      <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200">
+      <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-cyan-200">
         <div className="text-center">
-          <h3 className="text-lg font-bold text-gray-800 mb-3">Your Order Code</h3>
-          <div className="bg-white rounded-xl p-4 border-2 border-dashed border-cyan-400">
-            <div className="flex items-center justify-center space-x-3">
-              <span className="text-2xl font-mono font-bold text-cyan-600 tracking-wider">{orderCode}</span>
+          <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-3">Your Order Code</h3>
+          <div className="bg-white rounded-xl p-3 sm:p-4 border-2 border-dashed border-cyan-400">
+            <div className="flex items-center justify-center space-x-2 sm:space-x-3">
+              <span className="text-lg sm:text-2xl font-mono font-bold text-cyan-600 tracking-wider break-all">{orderCode}</span>
               <button
                 onClick={() => copyToClipboard(orderCode)}
-                className="text-cyan-600 hover:text-cyan-700 transition-colors p-1 rounded hover:bg-cyan-50"
+                className="text-cyan-600 hover:text-cyan-700 transition-colors p-1 rounded hover:bg-cyan-50 flex-shrink-0 touch-manipulation"
               >
-                {copiedOrderCode ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                {copiedOrderCode ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : <Copy className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
             </div>
           </div>
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-xs sm:text-sm text-gray-600 mt-2">
             Keep this order code for tracking your purchase
           </p>
         </div>
@@ -1009,9 +1009,9 @@ Payment Status: ${paymentDetails.paymentStatus}`;
 
       {/* Applied Coupon Display */}
       {appliedCoupon && (
-        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-4 border border-purple-200">
-          <h3 className="font-bold text-purple-800 mb-3">Applied Coupon</h3>
-          <div className="text-purple-700">
+        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-purple-200">
+          <h3 className="font-bold text-purple-800 mb-2 sm:mb-3 text-sm sm:text-base">Applied Coupon</h3>
+          <div className="text-purple-700 text-sm sm:text-base">
             <div className="font-semibold flex items-center space-x-2">
               <span>{appliedCoupon}</span>
               {appliedCoupon === 'NEWSLETTER10' && (
@@ -1021,7 +1021,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
                 </div>
               )}
             </div>
-            <div className="text-sm">
+            <div className="text-xs sm:text-sm">
               {appliedCoupon === 'NEWSLETTER10' && `10% newsletter discount: -₹${discount.toFixed(2)}`}
               {appliedCoupon === 'GAMINGCOMMUNITY50' && `50% discount applied: -₹${discount.toFixed(2)}`}
               {appliedCoupon === 'MYSTERYBOX' && 'You will receive a FREE mystery game!'}
@@ -1031,39 +1031,39 @@ Payment Status: ${paymentDetails.paymentStatus}`;
       )}
 
       {/* Payment Instructions */}
-      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
-        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
-          <CreditCard className="w-5 h-5 text-blue-500" />
+      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-blue-200">
+        <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center space-x-2">
+          <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
           <span>{isMockMode ? 'Demo Payment Mode' : 'Secure Payment with Razorpay'}</span>
         </h3>
-        <div className="space-y-3 text-gray-700">
+        <div className="space-y-2 sm:space-y-3 text-gray-700 text-sm sm:text-base">
           {isMockMode ? (
             <>
-              <div className="flex items-center space-x-3">
-                <AlertCircle className="w-5 h-5 text-yellow-500" />
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 flex-shrink-0" />
                 <span>This is a demonstration - no real payment will be processed</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <FileSpreadsheet className="w-5 h-5 text-blue-500" />
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0" />
                 <span>Your order will still be tracked in our system</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <MessageCircle className="w-5 h-5 text-green-500" />
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
                 <span>Contact support for real payment processing</span>
               </div>
             </>
           ) : (
             <>
-              <div className="flex items-center space-x-3">
-                <Shield className="w-5 h-5 text-green-500" />
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
                 <span>Your payment is secured with 256-bit SSL encryption</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <CreditCard className="w-5 h-5 text-blue-500" />
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0" />
                 <span>Supports UPI, Cards, Net Banking, and Wallets</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <Smartphone className="w-5 h-5 text-purple-500" />
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <Smartphone className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 flex-shrink-0" />
                 <span>Complete payment in the Razorpay popup window</span>
               </div>
             </>
@@ -1072,12 +1072,12 @@ Payment Status: ${paymentDetails.paymentStatus}`;
       </div>
 
       {/* Order Total */}
-      <div className="bg-white rounded-2xl p-6 border border-gray-200">
+      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200">
         <div className="text-center">
-          <div className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent mb-2">
+          <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent mb-2">
             ₹{total.toFixed(2)}
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-xs sm:text-sm text-gray-600">
             {isMockMode ? 'Demo amount (no charge)' : 'Total amount to be paid'}
           </p>
         </div>
@@ -1085,14 +1085,14 @@ Payment Status: ${paymentDetails.paymentStatus}`;
 
       {/* Processing Message */}
       {isProcessingPayment && (
-        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-200">
-          <div className="flex items-center space-x-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500"></div>
+        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-yellow-200">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-orange-500 flex-shrink-0"></div>
             <div>
-              <h4 className="font-bold text-orange-800">
+              <h4 className="font-bold text-orange-800 text-sm sm:text-base">
                 {isMockMode ? 'Processing Demo Payment' : 'Processing Payment'}
               </h4>
-              <p className="text-orange-700 text-sm">
+              <p className="text-orange-700 text-xs sm:text-sm">
                 {isMockMode 
                   ? 'Demo payment will complete automatically in a few seconds'
                   : 'Please complete the payment in the Razorpay window'
@@ -1105,29 +1105,29 @@ Payment Status: ${paymentDetails.paymentStatus}`;
 
       {/* Payment Error */}
       {paymentError && (
-        <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-6 border border-red-200">
-          <div className="flex items-center space-x-3">
-            <AlertCircle className="w-6 h-6 text-red-500" />
+        <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-red-200">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 flex-shrink-0" />
             <div>
-              <h4 className="font-bold text-red-800">Payment Error</h4>
-              <p className="text-red-700 text-sm">{paymentError}</p>
+              <h4 className="font-bold text-red-800 text-sm sm:text-base">Payment Error</h4>
+              <p className="text-red-700 text-xs sm:text-sm">{paymentError}</p>
             </div>
           </div>
         </div>
       )}
 
       {/* Action Buttons */}
-      <div className="flex space-x-4">
+      <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
         <button
           onClick={() => setCurrentStep('summary')}
           disabled={isProcessingPayment}
-          className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-xl font-semibold transition-colors disabled:opacity-50"
+          className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 sm:py-4 rounded-xl font-semibold transition-colors disabled:opacity-50 text-sm sm:text-base touch-manipulation"
         >
           Back
         </button>
         <button
           onClick={handleWhatsAppContact}
-          className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center space-x-2"
+          className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 sm:py-4 rounded-xl font-semibold transition-colors flex items-center justify-center space-x-2 text-sm sm:text-base touch-manipulation"
         >
           <MessageCircle className="w-4 h-4" />
           <span>Contact Support</span>
@@ -1137,22 +1137,22 @@ Payment Status: ${paymentDetails.paymentStatus}`;
   );
 
   const renderConfirmationStep = () => (
-    <div className="text-center space-y-6">
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-200">
-        <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Check className="w-8 h-8 text-white" />
+    <div className="text-center space-y-4 sm:space-y-6">
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-green-200">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+          <Check className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
           {isMockMode ? 'Demo Order Completed!' : 'Payment Successful!'}
         </h2>
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base">
           Your order <strong className="font-mono text-cyan-600">{orderCode}</strong> has been confirmed.
         </p>
         
         {paymentDetails && (
-          <div className="bg-white rounded-xl p-4 border border-green-200 mb-4">
-            <h4 className="font-bold text-green-800 mb-2">Payment Details</h4>
-            <div className="text-sm text-gray-700 space-y-1">
+          <div className="bg-white rounded-xl p-3 sm:p-4 border border-green-200 mb-3 sm:mb-4">
+            <h4 className="font-bold text-green-800 mb-2 text-sm sm:text-base">Payment Details</h4>
+            <div className="text-xs sm:text-sm text-gray-700 space-y-1">
               <p><strong>Payment ID:</strong> {paymentDetails.razorpayPaymentId}</p>
               <p><strong>Method:</strong> {paymentDetails.paymentMethod}</p>
               <p><strong>Status:</strong> <span className="text-green-600 font-semibold">{paymentDetails.paymentStatus}</span></p>
@@ -1161,8 +1161,8 @@ Payment Status: ${paymentDetails.paymentStatus}`;
         )}
         
         {appliedCoupon && (
-          <div className="bg-white rounded-xl p-4 border border-green-200 mb-4">
-            <p className="text-sm text-gray-700">
+          <div className="bg-white rounded-xl p-3 sm:p-4 border border-green-200 mb-3 sm:mb-4">
+            <p className="text-xs sm:text-sm text-gray-700">
               <strong>Coupon Applied:</strong> {appliedCoupon}
               {appliedCoupon === 'NEWSLETTER10' && (
                 <span className="block text-green-600 font-semibold mt-1">
@@ -1200,8 +1200,8 @@ Payment Status: ${paymentDetails.paymentStatus}`;
           </div>
         )}
         
-        <div className="bg-white rounded-xl p-4 border border-green-200">
-          <p className="text-sm text-gray-700">
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-green-200">
+          <p className="text-xs sm:text-sm text-gray-700">
             {isMockMode ? (
               <>
                 This was a <strong>demonstration order</strong>. For real purchases, contact our support team.
@@ -1221,17 +1221,17 @@ Payment Status: ${paymentDetails.paymentStatus}`;
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white/95 backdrop-blur-sm rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-white/20">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="bg-white/95 backdrop-blur-sm rounded-t-3xl sm:rounded-3xl w-full sm:max-w-2xl sm:w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-white/20">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-white/90 backdrop-blur-sm">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-xs sm:text-sm">
                 {currentStep === 'summary' ? '1' : currentStep === 'payment' ? '2' : '3'}
               </span>
             </div>
-            <h2 className="text-xl font-bold text-gray-800">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800">
               {currentStep === 'summary' && 'Order Summary'}
               {currentStep === 'payment' && (isMockMode ? 'Demo Payment' : 'Payment')}
               {currentStep === 'confirmation' && 'Confirmation'}
@@ -1240,14 +1240,14 @@ Payment Status: ${paymentDetails.paymentStatus}`;
           <button
             onClick={onClose}
             disabled={isProcessingPayment}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
+            className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 touch-manipulation"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {currentStep === 'summary' && renderSummaryStep()}
           {currentStep === 'payment' && renderPaymentStep()}
           {currentStep === 'confirmation' && renderConfirmationStep()}
