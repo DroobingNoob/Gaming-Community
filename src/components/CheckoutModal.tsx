@@ -44,6 +44,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'failed' | 'mock'>('checking');
   const [hasError, setHasError] = useState(false);
   const [isMockMode, setIsMockMode] = useState(false);
+  const [redirectCountdown, setRedirectCountdown] = useState(0);
   
   // Customer details
   const [customerName, setCustomerName] = useState('');
@@ -65,6 +66,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setPaymentError('');
       setHasError(false);
       setIsMockMode(false);
+      setRedirectCountdown(0);
       
       // Pre-fill customer details if user is logged in
       if (user) {
@@ -80,6 +82,19 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       testBackendConnection();
     }
   }, [isOpen, user, hasNewsletterDiscount]);
+
+  // Countdown effect for WhatsApp redirect
+  useEffect(() => {
+    if (redirectCountdown > 0) {
+      const timer = setTimeout(() => {
+        setRedirectCountdown(redirectCountdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (redirectCountdown === 0 && currentStep === 'confirmation' && paymentDetails) {
+      // Redirect to WhatsApp when countdown reaches 0
+      redirectToWhatsAppWithOrderDetails();
+    }
+  }, [redirectCountdown, currentStep, paymentDetails]);
 
   // Error boundary effect
   useEffect(() => {
@@ -213,6 +228,96 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       toast.error('Failed to submit order to tracking system');
     } finally {
       setIsSubmittingOrder(false);
+    }
+  };
+
+  // WhatsApp redirect function
+  const redirectToWhatsAppWithOrderDetails = () => {
+    try {
+      const phoneNumber = '9266514434';
+      
+      // Format order details message
+      let message = `🎮 *Gaming Community - Order Confirmation* 🎮
+
+*Order ID:* ${orderCode}
+
+*Customer Details:*
+👤 Name: ${customerName}
+📱 Mobile: ${customerMobile}
+
+*Items Ordered:*`;
+
+      // Add each item to the message
+      cartItems.forEach((item, index) => {
+        message += `
+${index + 1}. *${item.title}*
+   📱 Platform: ${item.platform}
+   🎯 Type: ${item.type}
+   💰 Price: ₹${item.price}
+   📦 Quantity: ${item.quantity}
+   💵 Subtotal: ₹${(item.price * item.quantity).toFixed(2)}`;
+      });
+
+      // Add pricing summary
+      message += `
+
+*Order Summary:*
+💰 Subtotal: ₹${subtotal.toFixed(2)}`;
+
+      if (appliedCoupon && discount > 0) {
+        message += `
+🎟️ Coupon (${appliedCoupon}): -₹${discount.toFixed(2)}`;
+      }
+
+      if (appliedCoupon === 'MYSTERYBOX' && subtotal >= 3000) {
+        message += `
+🎁 Mystery Box: FREE mystery game included!`;
+      }
+
+      if (appliedCoupon === 'NEWSLETTER10') {
+        message += `
+📧 Newsletter Discount: 10% off first order`;
+      }
+
+      message += `
+💳 *Total Paid: ₹${total.toFixed(2)}*`;
+
+      if (paymentDetails) {
+        message += `
+
+*Payment Details:*
+🆔 Payment ID: ${paymentDetails.razorpayPaymentId}
+✅ Status: ${paymentDetails.paymentStatus}
+💳 Method: ${paymentDetails.paymentMethod}`;
+      }
+
+      if (isMockMode) {
+        message += `
+
+⚠️ *Note:* This was a demo order for testing purposes.`;
+      } else {
+        message += `
+
+🚀 *Delivery:* Your games will be delivered within 1 hour!
+📞 *Support:* Available 24/7 for any assistance
+
+Thank you for choosing Gaming Community! 🎮✨`;
+      }
+
+      // Create WhatsApp URL and redirect
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+      
+      console.log('Redirecting to WhatsApp with order details');
+      window.open(whatsappUrl, '_blank');
+      
+      // Close the modal and complete the order after redirect
+      setTimeout(() => {
+        handleOrderComplete();
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error redirecting to WhatsApp:', error);
+      toast.error('Failed to redirect to WhatsApp. Please contact support manually.');
     }
   };
 
@@ -448,10 +553,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         toast.success(isMockMode ? 'Demo payment completed!' : 'Payment successful!');
         setCurrentStep('confirmation');
         
-        // Complete the order after a delay
-        setTimeout(() => {
-          handleOrderComplete();
-        }, 3000);
+        // Start countdown for WhatsApp redirect
+        setRedirectCountdown(5); // 5 second countdown
         
       } else {
         toast.error('Payment verification failed. Please contact support.');
@@ -554,6 +657,7 @@ Payment Status: ${paymentDetails.paymentStatus}`;
       setRazorpayOrderId('');
       setPaymentError('');
       setCurrentStep('summary');
+      setRedirectCountdown(0);
       
       onOrderComplete();
       onClose();
@@ -1071,6 +1175,28 @@ Payment Status: ${paymentDetails.paymentStatus}`;
                 </span>
               )}
             </p>
+          </div>
+        )}
+        
+        {/* WhatsApp Redirect Countdown */}
+        {redirectCountdown > 0 && (
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200 mb-4">
+            <div className="flex items-center justify-center space-x-3">
+              <MessageCircle className="w-6 h-6 text-blue-500 animate-pulse" />
+              <div>
+                <h4 className="font-bold text-blue-800">Redirecting to WhatsApp</h4>
+                <p className="text-blue-700 text-sm">
+                  Redirecting in {redirectCountdown} seconds with your order details...
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={redirectToWhatsAppWithOrderDetails}
+              className="mt-3 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 mx-auto"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>Go to WhatsApp Now</span>
+            </button>
           </div>
         )}
         
