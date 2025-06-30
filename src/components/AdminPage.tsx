@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, Save, X, Upload, Image as ImageIcon, Sparkles, Database, Settings } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Save, X, Upload, Image as ImageIcon, Sparkles, Database, Settings, Star } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { 
   gamesService, 
@@ -14,12 +14,56 @@ interface AdminPageProps {
   onBackToHome: () => void;
 }
 
+interface EditionFormData {
+  edition: 'Standard' | 'Premium';
+  platform: string[];
+  type: string[];
+  original_price: number;
+  sale_price: number;
+  rent_1_month?: number;
+  rent_3_months?: number;
+  rent_6_months?: number;
+  permanent_offline_price?: number;
+  permanent_online_price?: number;
+  edition_features?: string[];
+}
+
+interface GameFormData {
+  title: string;
+  image: string;
+  description: string;
+  show_in_bestsellers: boolean;
+  availableEditions: ('Standard' | 'Premium')[];
+  editions: {
+    Standard?: EditionFormData;
+    Premium?: EditionFormData;
+  };
+}
+
 const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [activeSection, setActiveSection] = useState<'main' | 'testimonials' | 'stock'>('main');
   const [stockType, setStockType] = useState<'games' | 'subscriptions' | null>(null);
   const [crudOperation, setCrudOperation] = useState<'create' | 'read' | 'update' | 'delete' | null>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [formData, setFormData] = useState<any>({});
+  const [gameFormData, setGameFormData] = useState<GameFormData>({
+    title: '',
+    image: '',
+    description: '',
+    show_in_bestsellers: false,
+    availableEditions: ['Standard'],
+    editions: {
+      Standard: {
+        edition: 'Standard',
+        platform: ['PS5'],
+        type: ['Rent'],
+        original_price: 0,
+        sale_price: 0
+      }
+    }
+  });
+  const [subscriptionFormData, setSubscriptionFormData] = useState<any>({});
+  const [testimonialFormData, setTestimonialFormData] = useState<any>({});
+  const [currentEdition, setCurrentEdition] = useState<'Standard' | 'Premium'>('Standard');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -32,13 +76,13 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const uploadToCloudinary = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'gaming_community'); // You'll need to create this preset
-    formData.append('quality', 'auto:best'); // Cloudinary auto quality optimization
-    formData.append('fetch_format', 'auto'); // Auto format selection
+    formData.append('upload_preset', 'gaming_community');
+    formData.append('quality', 'auto:best');
+    formData.append('fetch_format', 'auto');
     
     try {
       const response = await fetch(
-        'https://api.cloudinary.com/v1_1/dcodirzsc/image/upload', // Replace with your cloud name
+        'https://api.cloudinary.com/v1_1/dcodirzsc/image/upload',
         {
           method: 'POST',
           body: formData,
@@ -67,13 +111,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       img.onload = () => {
         try {
           if (isTestimonial) {
-            // For testimonials (phone screenshots), maintain original aspect ratio but optimize quality
             const maxWidth = 600;
             const maxHeight = 1200;
             
             let { width, height } = img;
             
-            // Scale down if too large while maintaining aspect ratio
             if (width > maxWidth || height > maxHeight) {
               const ratio = Math.min(maxWidth / width, maxHeight / height);
               width *= ratio;
@@ -83,36 +125,28 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             canvas.width = width;
             canvas.height = height;
             
-            // Use high-quality rendering
             ctx!.imageSmoothingEnabled = true;
             ctx!.imageSmoothingQuality = 'high';
-            
-            // Draw the image
             ctx!.drawImage(img, 0, 0, width, height);
           } else {
-            // For game images, create perfect square with high quality
-            const targetSize = 600; // Increased from 400 for better quality
+            const targetSize = 600;
             canvas.width = targetSize;
             canvas.height = targetSize;
             
-            // Use high-quality rendering
             ctx!.imageSmoothingEnabled = true;
             ctx!.imageSmoothingQuality = 'high';
             
-            // Calculate crop dimensions to maintain aspect ratio
             const minDimension = Math.min(img.width, img.height);
             const cropX = (img.width - minDimension) / 2;
             const cropY = (img.height - minDimension) / 2;
             
-            // Draw cropped and resized image with high quality
             ctx!.drawImage(
               img,
-              cropX, cropY, minDimension, minDimension, // Source crop
-              0, 0, targetSize, targetSize // Destination size
+              cropX, cropY, minDimension, minDimension,
+              0, 0, targetSize, targetSize
             );
           }
           
-          // Convert canvas to blob with high quality
           canvas.toBlob((blob) => {
             if (blob) {
               const processedFile = new File([blob], file.name, { 
@@ -123,7 +157,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             } else {
               reject(new Error('Failed to process image'));
             }
-          }, 'image/jpeg', 0.95); // High quality JPEG (95%)
+          }, 'image/jpeg', 0.95);
         } catch (error) {
           reject(error);
         }
@@ -139,13 +173,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file');
       return;
     }
 
-    // Validate file size (max 20MB for better quality support)
     if (file.size > 20 * 1024 * 1024) {
       toast.error('Image size should be less than 20MB');
       return;
@@ -156,16 +188,19 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       toast.info('Processing and optimizing image...');
       
       const isTestimonial = activeSection === 'testimonials';
-      
-      // Process the image for optimal quality
       const processedFile = await processImage(file, isTestimonial);
       
       toast.info('Uploading to Cloudinary...');
-      
-      // Upload to Cloudinary
       const imageUrl = await uploadToCloudinary(processedFile);
       
-      setFormData({ ...formData, [fieldName]: imageUrl });
+      if (activeSection === 'testimonials') {
+        setTestimonialFormData({ ...testimonialFormData, [fieldName]: imageUrl });
+      } else if (stockType === 'games') {
+        setGameFormData({ ...gameFormData, [fieldName]: imageUrl });
+      } else {
+        setSubscriptionFormData({ ...subscriptionFormData, [fieldName]: imageUrl });
+      }
+      
       toast.success('Image uploaded successfully with optimal quality!');
     } catch (error) {
       toast.error('Failed to process and upload image. Please try again.');
@@ -175,97 +210,179 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     }
   };
 
-  const handleSaveItem = async () => {
+  const handleSaveGame = async () => {
     try {
       setLoading(true);
       
-      if (activeSection === 'testimonials') {
-        if (crudOperation === 'create') {
-          await testimonialsService.add(formData);
-          toast.success('Screenshot added successfully!');
-          refetchTestimonials();
-        } else if (crudOperation === 'update' && selectedItem) {
-          await testimonialsService.update(selectedItem.id, formData);
-          toast.success('Screenshot updated successfully!');
-          refetchTestimonials();
+      // Validate that at least one edition is selected
+      if (gameFormData.availableEditions.length === 0) {
+        toast.error('Please select at least one edition');
+        return;
+      }
+
+      // Validate that all selected editions have data
+      for (const edition of gameFormData.availableEditions) {
+        const editionData = gameFormData.editions[edition];
+        if (!editionData) {
+          toast.error(`Please fill in data for ${edition} edition`);
+          return;
         }
-      } else if (activeSection === 'stock') {
-        // Calculate discount
-        const discount = formData.original_price && formData.sale_price 
-          ? Math.round(((formData.original_price - formData.sale_price) / formData.original_price) * 100)
-          : 0;
+        if (!editionData.platform.length || !editionData.type.length) {
+          toast.error(`Please select platform and type for ${edition} edition`);
+          return;
+        }
+      }
+
+      let baseGameId: string | null = null;
+
+      // Create/update each edition
+      for (const edition of gameFormData.availableEditions) {
+        const editionData = gameFormData.editions[edition]!;
         
-        let itemData: any = {
-          ...formData,
-          discount
+        // Calculate discount
+        const discount = editionData.original_price && editionData.sale_price 
+          ? Math.round(((editionData.original_price - editionData.sale_price) / editionData.original_price) * 100)
+          : 0;
+
+        const gameData = {
+          title: gameFormData.title,
+          image: gameFormData.image,
+          description: gameFormData.description,
+          edition: edition,
+          base_game_id: baseGameId,
+          platform: editionData.platform,
+          type: editionData.type,
+          original_price: editionData.original_price,
+          sale_price: editionData.sale_price,
+          rent_1_month: editionData.rent_1_month,
+          rent_3_months: editionData.rent_3_months,
+          rent_6_months: editionData.rent_6_months,
+          permanent_offline_price: editionData.permanent_offline_price,
+          permanent_online_price: editionData.permanent_online_price,
+          discount: discount,
+          show_in_bestsellers: gameFormData.show_in_bestsellers && edition === 'Standard', // Only Standard can be bestseller
+          edition_features: edition === 'Premium' ? editionData.edition_features || [] : [],
+          category: 'game'
         };
 
-        if (stockType === 'games') {
-          // For games, handle platform and type arrays
-          itemData = {
-            ...itemData,
-            platform: Array.isArray(formData.platform) ? formData.platform : [formData.platform],
-            type: Array.isArray(formData.type) ? formData.type : [formData.type],
-            show_in_bestsellers: formData.show_in_bestsellers || false,
-            edition: formData.edition || 'Standard',
-            edition_features: formData.edition_features || []
-          };
-
-          // Set base_game_id for linking editions
-          if (crudOperation === 'create' && formData.edition === 'Premium') {
-            // Find the Standard edition of the same game
-            const standardEdition = games.find(game => 
-              game.title === formData.title && game.edition === 'Standard'
-            );
-            if (standardEdition) {
-              itemData.base_game_id = standardEdition.id;
-            }
+        if (crudOperation === 'create') {
+          const newGameId = await gamesService.add(gameData);
+          
+          // If this is the Standard edition, use its ID as base_game_id for Premium
+          if (edition === 'Standard') {
+            baseGameId = newGameId;
+            await gamesService.update(newGameId, { base_game_id: newGameId });
+          } else if (baseGameId) {
+            await gamesService.update(newGameId, { base_game_id: baseGameId });
           }
-
-          if (crudOperation === 'create') {
-            const newGameId = await gamesService.add(itemData);
-            
-            // If this is a Standard edition, update its base_game_id to point to itself
-            if (formData.edition === 'Standard') {
-              await gamesService.update(newGameId, { base_game_id: newGameId });
-            }
-            
-            toast.success('Game added successfully!');
-            refetchGames();
-          } else if (crudOperation === 'update' && selectedItem) {
-            await gamesService.update(selectedItem.id, itemData);
-            toast.success('Game updated successfully!');
-            refetchGames();
+        } else if (crudOperation === 'update' && selectedItem) {
+          // For updates, find the existing edition or create new one
+          const existingEdition = games.find(game => 
+            (game.base_game_id === selectedItem.base_game_id || game.id === selectedItem.base_game_id) && 
+            game.edition === edition
+          );
+          
+          if (existingEdition) {
+            await gamesService.update(existingEdition.id!, gameData);
+          } else {
+            // Create new edition
+            const newGameId = await gamesService.add({
+              ...gameData,
+              base_game_id: selectedItem.base_game_id || selectedItem.id
+            });
           }
-        } else if (stockType === 'subscriptions') {
-          // For subscriptions, set default values and remove platform/type restrictions
-          itemData = {
-            ...itemData,
-            platform: ['Multi-Platform'], // Default platform for subscriptions
-            type: ['Permanent'], // Subscriptions are always permanent
-            show_in_bestsellers: false // Subscriptions don't appear in bestsellers
-          };
+        }
+      }
 
-          if (crudOperation === 'create') {
-            await subscriptionsService.add(itemData);
-            toast.success('Subscription added successfully!');
-            refetchSubscriptions();
-          } else if (crudOperation === 'update' && selectedItem) {
-            await subscriptionsService.update(selectedItem.id, itemData);
-            toast.success('Subscription updated successfully!');
-            refetchSubscriptions();
+      // If updating, remove editions that are no longer selected
+      if (crudOperation === 'update' && selectedItem) {
+        const baseId = selectedItem.base_game_id || selectedItem.id;
+        const existingEditions = games.filter(game => 
+          game.base_game_id === baseId || game.id === baseId
+        );
+        
+        for (const existingGame of existingEditions) {
+          if (!gameFormData.availableEditions.includes(existingGame.edition as 'Standard' | 'Premium')) {
+            await gamesService.delete(existingGame.id!);
           }
         }
       }
       
-      setFormData({});
-      setSelectedItem(null);
-      setCrudOperation(null);
+      toast.success(crudOperation === 'create' ? 'Game added successfully!' : 'Game updated successfully!');
+      refetchGames();
+      resetGameForm();
     } catch (error) {
-      toast.error('Failed to save item');
+      toast.error('Failed to save game');
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveSubscription = async () => {
+    try {
+      setLoading(true);
+      
+      const discount = subscriptionFormData.original_price && subscriptionFormData.sale_price 
+        ? Math.round(((subscriptionFormData.original_price - subscriptionFormData.sale_price) / subscriptionFormData.original_price) * 100)
+        : 0;
+
+      const itemData = {
+        ...subscriptionFormData,
+        discount,
+        platform: ['Multi-Platform'],
+        type: ['Permanent'],
+        show_in_bestsellers: false,
+        category: 'subscription'
+      };
+
+      if (crudOperation === 'create') {
+        await subscriptionsService.add(itemData);
+        toast.success('Subscription added successfully!');
+      } else if (crudOperation === 'update' && selectedItem) {
+        await subscriptionsService.update(selectedItem.id, itemData);
+        toast.success('Subscription updated successfully!');
+      }
+      
+      refetchSubscriptions();
+      resetSubscriptionForm();
+    } catch (error) {
+      toast.error('Failed to save subscription');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveTestimonial = async () => {
+    try {
+      setLoading(true);
+      
+      if (crudOperation === 'create') {
+        await testimonialsService.add(testimonialFormData);
+        toast.success('Screenshot added successfully!');
+      } else if (crudOperation === 'update' && selectedItem) {
+        await testimonialsService.update(selectedItem.id, testimonialFormData);
+        toast.success('Screenshot updated successfully!');
+      }
+      
+      refetchTestimonials();
+      resetTestimonialForm();
+    } catch (error) {
+      toast.error('Failed to save screenshot');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveItem = async () => {
+    if (activeSection === 'testimonials') {
+      await handleSaveTestimonial();
+    } else if (stockType === 'games') {
+      await handleSaveGame();
+    } else if (stockType === 'subscriptions') {
+      await handleSaveSubscription();
     }
   };
 
@@ -281,16 +398,23 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         await testimonialsService.delete(id);
         toast.success('Screenshot deleted successfully!');
         refetchTestimonials();
-      } else if (activeSection === 'stock') {
-        if (stockType === 'games') {
-          await gamesService.delete(id);
-          toast.success('Game deleted successfully!');
-          refetchGames();
-        } else if (stockType === 'subscriptions') {
-          await subscriptionsService.delete(id);
-          toast.success('Subscription deleted successfully!');
-          refetchSubscriptions();
+      } else if (stockType === 'games') {
+        // For games, we need to delete all editions
+        const gameToDelete = games.find(g => g.id === id);
+        if (gameToDelete) {
+          const baseId = gameToDelete.base_game_id || gameToDelete.id;
+          const allEditions = games.filter(g => g.base_game_id === baseId || g.id === baseId);
+          
+          for (const edition of allEditions) {
+            await gamesService.delete(edition.id!);
+          }
         }
+        toast.success('Game deleted successfully!');
+        refetchGames();
+      } else if (stockType === 'subscriptions') {
+        await subscriptionsService.delete(id);
+        toast.success('Subscription deleted successfully!');
+        refetchSubscriptions();
       }
     } catch (error) {
       toast.error('Failed to delete item');
@@ -300,10 +424,135 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     }
   };
 
-  const handleEditItem = (item: any) => {
-    setSelectedItem(item);
-    setFormData(item);
+  const handleEditGame = (game: Game) => {
+    setSelectedItem(game);
+    
+    // Find all editions of this game
+    const baseId = game.base_game_id || game.id;
+    const allEditions = games.filter(g => g.base_game_id === baseId || g.id === baseId);
+    
+    const formData: GameFormData = {
+      title: game.title,
+      image: game.image,
+      description: game.description,
+      show_in_bestsellers: game.show_in_bestsellers || false,
+      availableEditions: allEditions.map(e => e.edition as 'Standard' | 'Premium'),
+      editions: {}
+    };
+
+    // Populate edition data
+    for (const edition of allEditions) {
+      formData.editions[edition.edition as 'Standard' | 'Premium'] = {
+        edition: edition.edition as 'Standard' | 'Premium',
+        platform: edition.platform,
+        type: edition.type,
+        original_price: edition.original_price,
+        sale_price: edition.sale_price,
+        rent_1_month: edition.rent_1_month,
+        rent_3_months: edition.rent_3_months,
+        rent_6_months: edition.rent_6_months,
+        permanent_offline_price: edition.permanent_offline_price,
+        permanent_online_price: edition.permanent_online_price,
+        edition_features: edition.edition_features || []
+      };
+    }
+
+    setGameFormData(formData);
+    setCurrentEdition(allEditions[0].edition as 'Standard' | 'Premium');
     setCrudOperation('update');
+  };
+
+  const handleEditItem = (item: any) => {
+    if (stockType === 'games') {
+      handleEditGame(item);
+    } else if (stockType === 'subscriptions') {
+      setSelectedItem(item);
+      setSubscriptionFormData(item);
+      setCrudOperation('update');
+    } else if (activeSection === 'testimonials') {
+      setSelectedItem(item);
+      setTestimonialFormData(item);
+      setCrudOperation('update');
+    }
+  };
+
+  const resetGameForm = () => {
+    setGameFormData({
+      title: '',
+      image: '',
+      description: '',
+      show_in_bestsellers: false,
+      availableEditions: ['Standard'],
+      editions: {
+        Standard: {
+          edition: 'Standard',
+          platform: ['PS5'],
+          type: ['Rent'],
+          original_price: 0,
+          sale_price: 0
+        }
+      }
+    });
+    setCurrentEdition('Standard');
+    setSelectedItem(null);
+    setCrudOperation(null);
+  };
+
+  const resetSubscriptionForm = () => {
+    setSubscriptionFormData({});
+    setSelectedItem(null);
+    setCrudOperation(null);
+  };
+
+  const resetTestimonialForm = () => {
+    setTestimonialFormData({});
+    setSelectedItem(null);
+    setCrudOperation(null);
+  };
+
+  const updateEditionData = (field: string, value: any) => {
+    const currentEditionData = gameFormData.editions[currentEdition] || {
+      edition: currentEdition,
+      platform: ['PS5'],
+      type: ['Rent'],
+      original_price: 0,
+      sale_price: 0
+    };
+
+    setGameFormData({
+      ...gameFormData,
+      editions: {
+        ...gameFormData.editions,
+        [currentEdition]: {
+          ...currentEditionData,
+          [field]: value
+        }
+      }
+    });
+  };
+
+  const addEditionFeature = () => {
+    const currentEditionData = gameFormData.editions[currentEdition];
+    if (currentEditionData) {
+      updateEditionData('edition_features', [...(currentEditionData.edition_features || []), '']);
+    }
+  };
+
+  const updateEditionFeature = (index: number, value: string) => {
+    const currentEditionData = gameFormData.editions[currentEdition];
+    if (currentEditionData) {
+      const newFeatures = [...(currentEditionData.edition_features || [])];
+      newFeatures[index] = value;
+      updateEditionData('edition_features', newFeatures);
+    }
+  };
+
+  const removeEditionFeature = (index: number) => {
+    const currentEditionData = gameFormData.editions[currentEdition];
+    if (currentEditionData) {
+      const newFeatures = (currentEditionData.edition_features || []).filter((_, i) => i !== index);
+      updateEditionData('edition_features', newFeatures);
+    }
   };
 
   const renderMainMenu = () => (
@@ -397,7 +646,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               Manage Stock
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Manage games and subscription inventory with high-quality image processing. Auto-cropping and optimization included.
+              Manage games and subscription inventory with edition-based pricing. Auto-cropping and optimization included.
             </p>
             <div className="mt-6 inline-flex items-center space-x-2 text-orange-600 font-medium">
               <span>Manage Inventory</span>
@@ -428,7 +677,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               <Database className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-purple-600 transition-colors">Games</h3>
-            <p className="text-gray-600">Manage PS4 & PS5 games</p>
+            <p className="text-gray-600">Manage PS4 & PS5 games with edition support</p>
           </div>
         </div>
         
@@ -485,400 +734,459 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     </div>
   );
 
-  const renderForm = () => {
-    const isTestimonial = activeSection === 'testimonials';
-    const isSubscription = stockType === 'subscriptions';
+  const renderGameForm = () => {
+    const currentEditionData = gameFormData.editions[currentEdition];
     
     return (
       <div className="space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
-            {crudOperation === 'create' ? 'Add New' : 'Edit'} {isTestimonial ? 'Screenshot' : stockType === 'games' ? 'Game' : 'Subscription'}
+            {crudOperation === 'create' ? 'Add New' : 'Edit'} Game
           </h2>
-          <p className="text-gray-600 text-lg">Fill in the details below</p>
+          <p className="text-gray-600 text-lg">Fill in the game details and configure editions</p>
         </div>
         
-        <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Image Upload Section */}
-            <div className={isTestimonial ? "md:col-span-2" : "md:col-span-2"}>
-              <label className="block text-lg font-semibold text-gray-700 mb-4">
-                {isTestimonial ? 'Phone Screenshot Upload (High Quality)' : 'Game Image Upload (Auto-cropped to 600x600px)'}
-              </label>
-              
-              {/* File Upload Option */}
-              <div className="space-y-6">
-                <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-cyan-400 transition-colors bg-gradient-to-br from-gray-50 to-blue-50">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileUpload(e, 'image')}
-                    className="hidden"
-                    id="file-upload"
-                    disabled={uploading}
-                  />
-                  <label
-                    htmlFor="file-upload"
-                    className={`cursor-pointer flex flex-col items-center space-y-4 ${uploading ? 'opacity-50' : ''}`}
-                  >
-                    <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-4 rounded-2xl">
-                      <Upload className="w-10 h-10 text-white" />
-                    </div>
-                    <div className="text-center">
-                      <span className="text-lg font-medium text-gray-700 block mb-2">
-                        {uploading ? 'Processing & Uploading...' : `Click to upload ${isTestimonial ? 'phone screenshot' : 'game image'}`}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {isTestimonial 
-                          ? 'Phone resolution optimized automatically (max 600x1200px)' 
-                          : 'Will be auto-cropped to square format (600x600px) with high quality'
-                        }
-                      </span>
-                      <div className="mt-2 text-xs text-gray-400">
-                        Supports: JPG, PNG, WebP • Max size: 20MB • Auto-optimized for web
-                      </div>
-                    </div>
-                  </label>
-                </div>
-
-                {/* Manual URL Input (Fallback) */}
-                <div className="relative">
-                  <span className="text-sm text-gray-500 mb-3 block">Or paste image URL manually:</span>
-                  <input
-                    type="url"
-                    value={formData.image || ''}
-                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                    placeholder="https://res.cloudinary.com/your-cloud-name/image/upload/..."
-                  />
-                </div>
-
-                {/* Image Preview */}
-                {formData.image && (
-                  <div className="relative">
-                    <img 
-                      src={formData.image} 
-                      alt="Preview" 
-                      className={`mx-auto rounded-2xl border shadow-xl ${
-                        isTestimonial 
-                          ? 'w-48 h-auto max-h-96' // Phone screenshot dimensions
-                          : 'w-64 h-64 object-cover' // Square game image dimensions
-                      }`}
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        toast.error('Invalid image URL');
-                      }}
-                    />
-                    <div className="mt-2 text-center text-sm text-gray-500">
-                      {isTestimonial ? 'Phone Screenshot Preview' : 'Game Image Preview (600x600px when uploaded)'}
-                    </div>
-                  </div>
-                )}
-
-                {/* Cloudinary Setup Instructions */}
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-blue-500 p-2 rounded-lg">
-                      <Upload className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-blue-800 mb-3">High-Quality Upload Features:</h4>
-                      <ul className="text-sm text-blue-700 space-y-2 list-disc list-inside">
-                        <li>Automatic image optimization and compression</li>
-                        <li>High-quality JPEG output (95% quality)</li>
-                        <li>Smart cropping for game images (perfect squares)</li>
-                        <li>Aspect ratio preservation for phone screenshots</li>
-                        <li>WebP format support for modern browsers</li>
-                        <li>Global CDN delivery for fast loading</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+        <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
+          {/* Basic Game Information */}
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-6">Basic Game Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Game Title */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Game Title</label>
+                <input
+                  type="text"
+                  value={gameFormData.title}
+                  onChange={(e) => setGameFormData({ ...gameFormData, title: e.target.value })}
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                  placeholder="Enter game title"
+                />
               </div>
-            </div>
 
-            {/* Form fields based on type */}
-            {!isTestimonial && (
-              <>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Title</label>
-                  <input
-                    type="text"
-                    value={formData.title || ''}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                    placeholder="Enter title"
-                  />
-                </div>
-
-                {/* Edition Selection - Only for Games */}
-                {!isSubscription && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Edition</label>
-                    <select
-                      value={formData.edition || 'Standard'}
-                      onChange={(e) => setFormData({ ...formData, edition: e.target.value })}
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+              {/* Image Upload */}
+              <div className="md:col-span-2">
+                <label className="block text-lg font-semibold text-gray-700 mb-4">
+                  Game Image Upload (Auto-cropped to 600x600px)
+                </label>
+                
+                <div className="space-y-6">
+                  <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-cyan-400 transition-colors bg-gradient-to-br from-gray-50 to-blue-50">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(e, 'image')}
+                      className="hidden"
+                      id="game-image-upload"
+                      disabled={uploading}
+                    />
+                    <label
+                      htmlFor="game-image-upload"
+                      className={`cursor-pointer flex flex-col items-center space-y-4 ${uploading ? 'opacity-50' : ''}`}
                     >
-                      <option value="Standard">Standard Edition</option>
-                      <option value="Premium">Premium Edition</option>
-                    </select>
-                  </div>
-                )}
-
-                {/* Edition Features - Only for Premium Edition */}
-                {!isSubscription && formData.edition === 'Premium' && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Premium Edition Features</label>
-                    <div className="space-y-2">
-                      {(formData.edition_features || []).map((feature: string, index: number) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <input
-                            type="text"
-                            value={feature}
-                            onChange={(e) => {
-                              const newFeatures = [...(formData.edition_features || [])];
-                              newFeatures[index] = e.target.value;
-                              setFormData({ ...formData, edition_features: newFeatures });
-                            }}
-                            className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                            placeholder="Enter feature"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newFeatures = (formData.edition_features || []).filter((_: any, i: number) => i !== index);
-                              setFormData({ ...formData, edition_features: newFeatures });
-                            }}
-                            className="text-red-500 hover:text-red-700 p-2"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newFeatures = [...(formData.edition_features || []), ''];
-                          setFormData({ ...formData, edition_features: newFeatures });
-                        }}
-                        className="text-cyan-600 hover:text-cyan-700 text-sm font-medium flex items-center space-x-1"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>Add Feature</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Platform Selection - Only for Games */}
-                {!isSubscription && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
-                    <div className="space-y-3">
-                      {['PS4', 'PS5'].map((platform) => (
-                        <label key={platform} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                          <input
-                            type="checkbox"
-                            checked={formData.platform?.includes(platform) || false}
-                            onChange={(e) => {
-                              const platforms = formData.platform || [];
-                              if (e.target.checked) {
-                                setFormData({ ...formData, platform: [...platforms, platform] });
-                              } else {
-                                setFormData({ ...formData, platform: platforms.filter((p: string) => p !== platform) });
-                              }
-                            }}
-                            className="rounded w-5 h-5 text-cyan-600"
-                          />
-                          <span className="font-medium">{platform}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Type Selection - Only for Games */}
-                {!isSubscription && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
-                    <div className="space-y-3">
-                      {['Rent', 'Permanent Offline', 'Permanent Offline + Online'].map((type) => (
-                        <label key={type} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                          <input
-                            type="checkbox"
-                            checked={formData.type?.includes(type) || false}
-                            onChange={(e) => {
-                              const types = formData.type || [];
-                              if (e.target.checked) {
-                                setFormData({ ...formData, type: [...types, type] });
-                              } else {
-                                setFormData({ ...formData, type: types.filter((t: string) => t !== type) });
-                              }
-                            }}
-                            className="rounded w-5 h-5 text-orange-600"
-                          />
-                          <span className="font-medium">{type}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Show in Bestsellers - Only for Games */}
-                {!isSubscription && (
-                  <div className="md:col-span-2">
-                    <label className="flex items-center space-x-3 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
-                      <input
-                        type="checkbox"
-                        checked={formData.show_in_bestsellers || false}
-                        onChange={(e) => setFormData({ ...formData, show_in_bestsellers: e.target.checked })}
-                        className="rounded w-5 h-5 text-purple-600"
-                      />
-                      <div>
-                        <span className="font-semibold text-purple-800">Show in Bestsellers on Homepage</span>
-                        <p className="text-sm text-purple-600">Check this to display the game in the bestsellers section</p>
+                      <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-4 rounded-2xl">
+                        <Upload className="w-10 h-10 text-white" />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-lg font-medium text-gray-700 block mb-2">
+                          {uploading ? 'Processing & Uploading...' : 'Click to upload game image'}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          Will be auto-cropped to square format (600x600px) with high quality
+                        </span>
                       </div>
                     </label>
                   </div>
-                )}
 
-                {/* Pricing Section */}
-                <div className="md:col-span-2">
-                  <h3 className="text-lg font-bold text-gray-800 mb-4">
-                    Pricing {formData.edition && formData.edition !== 'Standard' ? `(${formData.edition} Edition)` : ''}
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Original Price */}
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-3">Original Price (₹)</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={formData.original_price || ''}
-                        onChange={(e) => setFormData({ ...formData, original_price: parseFloat(e.target.value) })}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                        placeholder="0.00"
-                      />
-                    </div>
-
-                    {/* Sale Price */}
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-3">Sale Price (₹)</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={formData.sale_price || ''}
-                        onChange={(e) => setFormData({ ...formData, sale_price: parseFloat(e.target.value) })}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                        placeholder="0.00"
-                      />
-                    </div>
-
-                    {/* Rental Prices - Only show if Rent type is selected for games */}
-                    {!isSubscription && formData.type?.includes('Rent') && (
-                      <>
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-3">1 Month Rent (₹)</label>
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={formData.rent_1_month || ''}
-                            onChange={(e) => setFormData({ ...formData, rent_1_month: parseFloat(e.target.value) })}
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                            placeholder="0.00"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-3">3 Months Rent (₹)</label>
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={formData.rent_3_months || ''}
-                            onChange={(e) => setFormData({ ...formData, rent_3_months: parseFloat(e.target.value) })}
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                            placeholder="0.00"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-3">6 Months Rent (₹)</label>
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={formData.rent_6_months || ''}
-                            onChange={(e) => setFormData({ ...formData, rent_6_months: parseFloat(e.target.value) })}
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                            placeholder="0.00"
-                          />
-                        </div>
-                      </>
-                    )}
-
-                    {/* Permanent Offline Price - Only show if Permanent Offline type is selected for games */}
-                    {!isSubscription && formData.type?.includes('Permanent Offline') && (
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-3">Permanent Offline Price (₹)</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={formData.permanent_offline_price || ''}
-                          onChange={(e) => setFormData({ ...formData, permanent_offline_price: parseFloat(e.target.value) })}
-                          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                          placeholder="0.00"
-                        />
-                      </div>
-                    )}
-
-                    {/* Permanent Offline + Online Price - Only show if Permanent Offline + Online type is selected for games */}
-                    {!isSubscription && formData.type?.includes('Permanent Offline + Online') && (
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-3">Permanent Offline + Online Price (₹)</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={formData.permanent_online_price || ''}
-                          onChange={(e) => setFormData({ ...formData, permanent_online_price: parseFloat(e.target.value) })}
-                          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                          placeholder="0.00"
-                        />
-                      </div>
-                    )}
+                  <div className="relative">
+                    <span className="text-sm text-gray-500 mb-3 block">Or paste image URL manually:</span>
+                    <input
+                      type="url"
+                      value={gameFormData.image}
+                      onChange={(e) => setGameFormData({ ...gameFormData, image: e.target.value })}
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                      placeholder="https://res.cloudinary.com/your-cloud-name/image/upload/..."
+                    />
                   </div>
-                </div>
 
-                {/* Description */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Description</label>
-                  <textarea
-                    value={formData.description || ''}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={4}
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                    placeholder="Enter description"
-                  />
+                  {gameFormData.image && (
+                    <div className="relative">
+                      <img 
+                        src={gameFormData.image} 
+                        alt="Preview" 
+                        className="mx-auto rounded-2xl border shadow-xl w-64 h-64 object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          toast.error('Invalid image URL');
+                        }}
+                      />
+                      <div className="mt-2 text-center text-sm text-gray-500">
+                        Game Image Preview (600x600px when uploaded)
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </>
-            )}
+              </div>
+
+              {/* Description */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Description</label>
+                <textarea
+                  value={gameFormData.description}
+                  onChange={(e) => setGameFormData({ ...gameFormData, description: e.target.value })}
+                  rows={4}
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                  placeholder="Enter game description"
+                />
+              </div>
+
+              {/* Show in Bestsellers */}
+              <div className="md:col-span-2">
+                <label className="flex items-center space-x-3 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+                  <input
+                    type="checkbox"
+                    checked={gameFormData.show_in_bestsellers}
+                    onChange={(e) => setGameFormData({ ...gameFormData, show_in_bestsellers: e.target.checked })}
+                    className="rounded w-5 h-5 text-purple-600"
+                  />
+                  <div>
+                    <span className="font-semibold text-purple-800">Show in Bestsellers on Homepage</span>
+                    <p className="text-sm text-purple-600">Check this to display the game in the bestsellers section (Standard edition only)</p>
+                  </div>
+                </label>
+              </div>
+            </div>
           </div>
 
-          <div className="flex space-x-4 mt-8">
+          {/* Edition Selection */}
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-6">Available Editions</h3>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={gameFormData.availableEditions.includes('Standard')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setGameFormData({
+                          ...gameFormData,
+                          availableEditions: [...gameFormData.availableEditions, 'Standard'],
+                          editions: {
+                            ...gameFormData.editions,
+                            Standard: {
+                              edition: 'Standard',
+                              platform: ['PS5'],
+                              type: ['Rent'],
+                              original_price: 0,
+                              sale_price: 0
+                            }
+                          }
+                        });
+                      } else {
+                        const newEditions = gameFormData.availableEditions.filter(e => e !== 'Standard');
+                        const newEditionData = { ...gameFormData.editions };
+                        delete newEditionData.Standard;
+                        setGameFormData({
+                          ...gameFormData,
+                          availableEditions: newEditions,
+                          editions: newEditionData
+                        });
+                        if (currentEdition === 'Standard' && newEditions.length > 0) {
+                          setCurrentEdition(newEditions[0]);
+                        }
+                      }
+                    }}
+                    className="rounded w-5 h-5 text-cyan-600"
+                  />
+                  <span className="font-medium text-gray-800">Standard Edition</span>
+                </label>
+
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={gameFormData.availableEditions.includes('Premium')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setGameFormData({
+                          ...gameFormData,
+                          availableEditions: [...gameFormData.availableEditions, 'Premium'],
+                          editions: {
+                            ...gameFormData.editions,
+                            Premium: {
+                              edition: 'Premium',
+                              platform: ['PS5'],
+                              type: ['Rent'],
+                              original_price: 0,
+                              sale_price: 0,
+                              edition_features: []
+                            }
+                          }
+                        });
+                      } else {
+                        const newEditions = gameFormData.availableEditions.filter(e => e !== 'Premium');
+                        const newEditionData = { ...gameFormData.editions };
+                        delete newEditionData.Premium;
+                        setGameFormData({
+                          ...gameFormData,
+                          availableEditions: newEditions,
+                          editions: newEditionData
+                        });
+                        if (currentEdition === 'Premium' && newEditions.length > 0) {
+                          setCurrentEdition(newEditions[0]);
+                        }
+                      }
+                    }}
+                    className="rounded w-5 h-5 text-purple-600"
+                  />
+                  <span className="font-medium text-gray-800">Premium Edition</span>
+                </label>
+              </div>
+
+              {gameFormData.availableEditions.length === 0 && (
+                <p className="text-red-600 text-sm">Please select at least one edition</p>
+              )}
+            </div>
+          </div>
+
+          {/* Edition Configuration */}
+          {gameFormData.availableEditions.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-xl font-bold text-gray-800 mb-6">Edition Configuration</h3>
+              
+              {/* Edition Tabs */}
+              <div className="flex space-x-2 mb-6">
+                {gameFormData.availableEditions.map((edition) => (
+                  <button
+                    key={edition}
+                    onClick={() => setCurrentEdition(edition)}
+                    className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+                      currentEdition === edition
+                        ? edition === 'Standard'
+                          ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-lg'
+                          : 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {edition} Edition
+                  </button>
+                ))}
+              </div>
+
+              {/* Edition Form */}
+              {currentEditionData && (
+                <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-6 border border-gray-200">
+                  <h4 className="text-lg font-bold text-gray-800 mb-6">
+                    {currentEdition} Edition Settings
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Platform Selection */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
+                      <div className="space-y-3">
+                        {['PS4', 'PS5'].map((platform) => (
+                          <label key={platform} className="flex items-center space-x-3 p-3 bg-white rounded-lg hover:bg-gray-50 transition-colors">
+                            <input
+                              type="checkbox"
+                              checked={currentEditionData.platform.includes(platform)}
+                              onChange={(e) => {
+                                const platforms = currentEditionData.platform;
+                                if (e.target.checked) {
+                                  updateEditionData('platform', [...platforms, platform]);
+                                } else {
+                                  updateEditionData('platform', platforms.filter(p => p !== platform));
+                                }
+                              }}
+                              className="rounded w-5 h-5 text-cyan-600"
+                            />
+                            <span className="font-medium">{platform}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Type Selection */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
+                      <div className="space-y-3">
+                        {['Rent', 'Permanent Offline', 'Permanent Offline + Online'].map((type) => (
+                          <label key={type} className="flex items-center space-x-3 p-3 bg-white rounded-lg hover:bg-gray-50 transition-colors">
+                            <input
+                              type="checkbox"
+                              checked={currentEditionData.type.includes(type)}
+                              onChange={(e) => {
+                                const types = currentEditionData.type;
+                                if (e.target.checked) {
+                                  updateEditionData('type', [...types, type]);
+                                } else {
+                                  updateEditionData('type', types.filter(t => t !== type));
+                                }
+                              }}
+                              className="rounded w-5 h-5 text-orange-600"
+                            />
+                            <span className="font-medium">{type}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Premium Edition Features */}
+                    {currentEdition === 'Premium' && (
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">Premium Edition Features</label>
+                        <div className="space-y-2">
+                          {(currentEditionData.edition_features || []).map((feature: string, index: number) => (
+                            <div key={index} className="flex items-center space-x-2">
+                              <Star className="w-4 h-4 text-purple-500 flex-shrink-0" />
+                              <input
+                                type="text"
+                                value={feature}
+                                onChange={(e) => updateEditionFeature(index, e.target.value)}
+                                className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
+                                placeholder="Enter feature"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeEditionFeature(index)}
+                                className="text-red-500 hover:text-red-700 p-2"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={addEditionFeature}
+                            className="text-purple-600 hover:text-purple-700 text-sm font-medium flex items-center space-x-1"
+                          >
+                            <Plus className="w-4 h-4" />
+                            <span>Add Feature</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Pricing */}
+                    <div className="md:col-span-2">
+                      <h5 className="text-md font-bold text-gray-800 mb-4">Pricing</h5>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Original Price */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">Original Price (₹)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={currentEditionData.original_price || ''}
+                            onChange={(e) => updateEditionData('original_price', parseFloat(e.target.value) || 0)}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                            placeholder="0.00"
+                          />
+                        </div>
+
+                        {/* Sale Price */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">Sale Price (₹)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={currentEditionData.sale_price || ''}
+                            onChange={(e) => updateEditionData('sale_price', parseFloat(e.target.value) || 0)}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                            placeholder="0.00"
+                          />
+                        </div>
+
+                        {/* Rental Prices - Only show if Rent type is selected */}
+                        {currentEditionData.type.includes('Rent') && (
+                          <>
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">1 Month Rent (₹)</label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={currentEditionData.rent_1_month || ''}
+                                onChange={(e) => updateEditionData('rent_1_month', parseFloat(e.target.value) || undefined)}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                                placeholder="0.00"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">3 Months Rent (₹)</label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={currentEditionData.rent_3_months || ''}
+                                onChange={(e) => updateEditionData('rent_3_months', parseFloat(e.target.value) || undefined)}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                                placeholder="0.00"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">6 Months Rent (₹)</label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={currentEditionData.rent_6_months || ''}
+                                onChange={(e) => updateEditionData('rent_6_months', parseFloat(e.target.value) || undefined)}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                                placeholder="0.00"
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {/* Permanent Offline Price */}
+                        {currentEditionData.type.includes('Permanent Offline') && (
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Permanent Offline Price (₹)</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={currentEditionData.permanent_offline_price || ''}
+                              onChange={(e) => updateEditionData('permanent_offline_price', parseFloat(e.target.value) || undefined)}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                              placeholder="0.00"
+                            />
+                          </div>
+                        )}
+
+                        {/* Permanent Offline + Online Price */}
+                        {currentEditionData.type.includes('Permanent Offline + Online') && (
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Permanent Offline + Online Price (₹)</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={currentEditionData.permanent_online_price || ''}
+                              onChange={(e) => updateEditionData('permanent_online_price', parseFloat(e.target.value) || undefined)}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                              placeholder="0.00"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Save/Cancel Buttons */}
+          <div className="flex space-x-4">
             <button
               onClick={handleSaveItem}
               disabled={loading || uploading}
               className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-3 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <Save className="w-5 h-5" />
-              <span>{loading ? 'Saving...' : uploading ? 'Processing...' : 'Save'}</span>
+              <span>{loading ? 'Saving...' : uploading ? 'Processing...' : 'Save Game'}</span>
             </button>
             <button
-              onClick={() => {
-                setFormData({});
-                setCrudOperation(null);
-                setSelectedItem(null);
-              }}
+              onClick={resetGameForm}
               className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Cancel
@@ -889,13 +1197,268 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     );
   };
 
+  const renderSubscriptionForm = () => (
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
+          {crudOperation === 'create' ? 'Add New' : 'Edit'} Subscription
+        </h2>
+        <p className="text-gray-600 text-lg">Fill in the subscription details</p>
+      </div>
+      
+      <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Image Upload Section */}
+          <div className="md:col-span-2">
+            <label className="block text-lg font-semibold text-gray-700 mb-4">
+              Subscription Image Upload (Auto-cropped to 600x600px)
+            </label>
+            
+            <div className="space-y-6">
+              <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-cyan-400 transition-colors bg-gradient-to-br from-gray-50 to-blue-50">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, 'image')}
+                  className="hidden"
+                  id="subscription-image-upload"
+                  disabled={uploading}
+                />
+                <label
+                  htmlFor="subscription-image-upload"
+                  className={`cursor-pointer flex flex-col items-center space-y-4 ${uploading ? 'opacity-50' : ''}`}
+                >
+                  <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-4 rounded-2xl">
+                    <Upload className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="text-center">
+                    <span className="text-lg font-medium text-gray-700 block mb-2">
+                      {uploading ? 'Processing & Uploading...' : 'Click to upload subscription image'}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      Will be auto-cropped to square format (600x600px) with high quality
+                    </span>
+                  </div>
+                </label>
+              </div>
+
+              <div className="relative">
+                <span className="text-sm text-gray-500 mb-3 block">Or paste image URL manually:</span>
+                <input
+                  type="url"
+                  value={subscriptionFormData.image || ''}
+                  onChange={(e) => setSubscriptionFormData({ ...subscriptionFormData, image: e.target.value })}
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                  placeholder="https://res.cloudinary.com/your-cloud-name/image/upload/..."
+                />
+              </div>
+
+              {subscriptionFormData.image && (
+                <div className="relative">
+                  <img 
+                    src={subscriptionFormData.image} 
+                    alt="Preview" 
+                    className="mx-auto rounded-2xl border shadow-xl w-64 h-64 object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      toast.error('Invalid image URL');
+                    }}
+                  />
+                  <div className="mt-2 text-center text-sm text-gray-500">
+                    Subscription Image Preview (600x600px when uploaded)
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Title */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Title</label>
+            <input
+              type="text"
+              value={subscriptionFormData.title || ''}
+              onChange={(e) => setSubscriptionFormData({ ...subscriptionFormData, title: e.target.value })}
+              className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+              placeholder="Enter title"
+            />
+          </div>
+
+          {/* Pricing */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Original Price (₹)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={subscriptionFormData.original_price || ''}
+              onChange={(e) => setSubscriptionFormData({ ...subscriptionFormData, original_price: parseFloat(e.target.value) })}
+              className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+              placeholder="0.00"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Sale Price (₹)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={subscriptionFormData.sale_price || ''}
+              onChange={(e) => setSubscriptionFormData({ ...subscriptionFormData, sale_price: parseFloat(e.target.value) })}
+              className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+              placeholder="0.00"
+            />
+          </div>
+
+          {/* Description */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Description</label>
+            <textarea
+              value={subscriptionFormData.description || ''}
+              onChange={(e) => setSubscriptionFormData({ ...subscriptionFormData, description: e.target.value })}
+              rows={4}
+              className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+              placeholder="Enter description"
+            />
+          </div>
+        </div>
+
+        <div className="flex space-x-4 mt-8">
+          <button
+            onClick={handleSaveItem}
+            disabled={loading || uploading}
+            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-3 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            <Save className="w-5 h-5" />
+            <span>{loading ? 'Saving...' : uploading ? 'Processing...' : 'Save'}</span>
+          </button>
+          <button
+            onClick={resetSubscriptionForm}
+            className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderTestimonialForm = () => (
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
+          {crudOperation === 'create' ? 'Add New' : 'Edit'} Screenshot
+        </h2>
+        <p className="text-gray-600 text-lg">Upload customer phone screenshot</p>
+      </div>
+      
+      <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
+        {/* Image Upload Section */}
+        <div className="md:col-span-2">
+          <label className="block text-lg font-semibold text-gray-700 mb-4">
+            Phone Screenshot Upload (High Quality)
+          </label>
+          
+          <div className="space-y-6">
+            <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-cyan-400 transition-colors bg-gradient-to-br from-gray-50 to-blue-50">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileUpload(e, 'image')}
+                className="hidden"
+                id="testimonial-image-upload"
+                disabled={uploading}
+              />
+              <label
+                htmlFor="testimonial-image-upload"
+                className={`cursor-pointer flex flex-col items-center space-y-4 ${uploading ? 'opacity-50' : ''}`}
+              >
+                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-4 rounded-2xl">
+                  <Upload className="w-10 h-10 text-white" />
+                </div>
+                <div className="text-center">
+                  <span className="text-lg font-medium text-gray-700 block mb-2">
+                    {uploading ? 'Processing & Uploading...' : 'Click to upload phone screenshot'}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    Phone resolution optimized automatically (max 600x1200px)
+                  </span>
+                </div>
+              </label>
+            </div>
+
+            <div className="relative">
+              <span className="text-sm text-gray-500 mb-3 block">Or paste image URL manually:</span>
+              <input
+                type="url"
+                value={testimonialFormData.image || ''}
+                onChange={(e) => setTestimonialFormData({ ...testimonialFormData, image: e.target.value })}
+                className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                placeholder="https://res.cloudinary.com/your-cloud-name/image/upload/..."
+              />
+            </div>
+
+            {testimonialFormData.image && (
+              <div className="relative">
+                <img 
+                  src={testimonialFormData.image} 
+                  alt="Preview" 
+                  className="mx-auto rounded-2xl border shadow-xl w-48 h-auto max-h-96"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    toast.error('Invalid image URL');
+                  }}
+                />
+                <div className="mt-2 text-center text-sm text-gray-500">
+                  Phone Screenshot Preview
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex space-x-4 mt-8">
+          <button
+            onClick={handleSaveItem}
+            disabled={loading || uploading}
+            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-3 disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            <Save className="w-5 h-5" />
+            <span>{loading ? 'Saving...' : uploading ? 'Processing...' : 'Save'}</span>
+          </button>
+          <button
+            onClick={resetTestimonialForm}
+            className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderItemsList = () => {
     let items: any[] = [];
     
     if (activeSection === 'testimonials') {
       items = testimonials;
     } else if (stockType === 'games') {
-      items = games;
+      // Group games by title and show only one entry per game (with edition info)
+      const gameGroups = games.reduce((groups, game) => {
+        if (!groups[game.title]) {
+          groups[game.title] = [];
+        }
+        groups[game.title].push(game);
+        return groups;
+      }, {} as { [title: string]: Game[] });
+
+      items = Object.values(gameGroups).map(group => {
+        const standardEdition = group.find(g => g.edition === 'Standard') || group[0];
+        return {
+          ...standardEdition,
+          editions: group.map(g => g.edition).join(', '),
+          editionCount: group.length
+        };
+      });
     } else if (stockType === 'subscriptions') {
       items = subscriptions;
     }
@@ -928,12 +1491,15 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                       <h3 className="font-bold text-gray-800 text-lg">{item.title}</h3>
                       <div className="flex items-center space-x-2">
                         <p className="text-gray-600">₹{item.sale_price} - {item.platform?.join(', ')}</p>
-                        {item.edition && item.edition !== 'Standard' && (
-                          <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-                            {item.edition}
+                        {stockType === 'games' && item.editionCount > 1 && (
+                          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                            {item.editionCount} editions
                           </span>
                         )}
                       </div>
+                      {stockType === 'games' && item.editions && (
+                        <p className="text-sm text-gray-500">Editions: {item.editions}</p>
+                      )}
                       {stockType === 'games' && item.show_in_bestsellers && (
                         <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full mt-1">
                           Bestseller
@@ -980,8 +1546,13 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       onClick={() => {
         if (crudOperation) {
           setCrudOperation(null);
-          setFormData({});
-          setSelectedItem(null);
+          if (stockType === 'games') {
+            resetGameForm();
+          } else if (stockType === 'subscriptions') {
+            resetSubscriptionForm();
+          } else {
+            resetTestimonialForm();
+          }
         } else if (stockType) {
           setStockType(null);
         } else if (activeSection !== 'main') {
@@ -1019,7 +1590,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         {activeSection === 'testimonials' && (
           <>
             {!crudOperation && renderCrudOperations()}
-            {(crudOperation === 'create' || crudOperation === 'update') && renderForm()}
+            {(crudOperation === 'create' || crudOperation === 'update') && renderTestimonialForm()}
             {crudOperation === 'read' && renderItemsList()}
           </>
         )}
@@ -1028,7 +1599,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           <>
             {!stockType && renderStockTypeSelection()}
             {stockType && !crudOperation && renderCrudOperations()}
-            {stockType && (crudOperation === 'create' || crudOperation === 'update') && renderForm()}
+            {stockType === 'games' && (crudOperation === 'create' || crudOperation === 'update') && renderGameForm()}
+            {stockType === 'subscriptions' && (crudOperation === 'create' || crudOperation === 'update') && renderSubscriptionForm()}
             {stockType && crudOperation === 'read' && renderItemsList()}
           </>
         )}
