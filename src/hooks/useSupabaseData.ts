@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { gamesService, subscriptionsService, testimonialsService } from '../services/supabaseService';
-import { Game, Testimonial, getUniqueGamesForCustomer } from '../config/supabase';
+import { Game, Testimonial } from '../config/supabase';
 
-// Hook for games data (returns unique games for customer view)
+// Hook for games data
 export const useGames = () => {
   const [games, setGames] = useState<Game[]>([]);
-  const [allGames, setAllGames] = useState<Game[]>([]); // All games including all editions
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,11 +12,7 @@ export const useGames = () => {
     try {
       setLoading(true);
       const gamesData = await gamesService.getAll();
-      setAllGames(gamesData); // Store all games for admin/detailed views
-      
-      // For customer view, show only unique games (primary editions)
-      const uniqueGames = getUniqueGamesForCustomer(gamesData);
-      setGames(uniqueGames);
+      setGames(gamesData);
       setError(null);
     } catch (err) {
       setError('Failed to fetch games');
@@ -31,10 +26,10 @@ export const useGames = () => {
     fetchGames();
   }, []);
 
-  return { games, allGames, loading, error, refetch: fetchGames };
+  return { games, loading, error, refetch: fetchGames };
 };
 
-// Hook for bestseller games (returns unique games for customer view)
+// Hook for bestseller games
 export const useBestsellers = (limit: number = 6) => {
   const [bestsellers, setBestsellers] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,11 +38,8 @@ export const useBestsellers = (limit: number = 6) => {
   const fetchBestsellers = async () => {
     try {
       setLoading(true);
-      const bestsellersData = await gamesService.getBestsellers(limit * 2); // Get more to account for filtering
-      
-      // Filter to show only unique games (primary editions)
-      const uniqueBestsellers = getUniqueGamesForCustomer(bestsellersData).slice(0, limit);
-      setBestsellers(uniqueBestsellers);
+      const bestsellersData = await gamesService.getBestsellers(limit);
+      setBestsellers(bestsellersData);
       setError(null);
     } catch (err) {
       setError('Failed to fetch bestsellers');
@@ -62,33 +54,6 @@ export const useBestsellers = (limit: number = 6) => {
   }, [limit]);
 
   return { bestsellers, loading, error, refetch: fetchBestsellers };
-};
-
-// Hook for all games data (for admin use - includes all editions)
-export const useAllGames = () => {
-  const [allGames, setAllGames] = useState<Game[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchAllGames = async () => {
-    try {
-      setLoading(true);
-      const gamesData = await gamesService.getAll();
-      setAllGames(gamesData);
-      setError(null);
-    } catch (err) {
-      setError('Failed to fetch all games');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAllGames();
-  }, []);
-
-  return { allGames, loading, error, refetch: fetchAllGames };
 };
 
 // Hook for subscriptions data

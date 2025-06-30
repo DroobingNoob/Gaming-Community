@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, Edit, Trash2, Upload, X, Save, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useAllGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
+import { useGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
 import { gamesService, subscriptionsService, testimonialsService } from '../services/supabaseService';
 import { Game, Testimonial } from '../config/supabase';
 
@@ -10,7 +10,7 @@ interface AdminPageProps {
 }
 
 const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
-  const { allGames, loading: gamesLoading, refetch: refetchGames } = useAllGames();
+  const { games, loading: gamesLoading, refetch: refetchGames } = useGames();
   const { subscriptions, loading: subscriptionsLoading, refetch: refetchSubscriptions } = useSubscriptions();
   const { testimonials, loading: testimonialsLoading, refetch: refetchTestimonials } = useTestimonials();
   
@@ -237,7 +237,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const getCurrentData = () => {
     switch (activeTab) {
       case 'games':
-        return allGames;
+        return games;
       case 'subscriptions':
         return subscriptions;
       case 'testimonials':
@@ -245,13 +245,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       default:
         return [];
     }
-  };
-
-  const getAvailableBaseGames = () => {
-    return allGames.filter(game => game.edition === 'Standard').map(game => ({
-      id: game.id!,
-      title: game.title
-    }));
   };
 
   const getEditionBadgeColor = (edition: string) => {
@@ -295,7 +288,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           <div className="border-b border-gray-200">
             <nav className="flex space-x-8 px-6 py-4">
               {[
-                { id: 'games', label: 'Games', count: allGames.length },
+                { id: 'games', label: 'Games', count: games.length },
                 { id: 'subscriptions', label: 'Subscriptions', count: subscriptions.length },
                 { id: 'testimonials', label: 'Screenshots', count: testimonials.length }
               ].map((tab) => (
@@ -486,38 +479,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                         </select>
                       </div>
                     </div>
-
-                    {formData.edition !== 'Standard' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">Base Game</label>
-                          <select
-                            value={formData.base_game_id || ''}
-                            onChange={(e) => setFormData(prev => ({ ...prev, base_game_id: e.target.value }))}
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                          >
-                            <option value="">Select base game...</option>
-                            {getAvailableBaseGames().map((game) => (
-                              <option key={game.id} value={game.id}>
-                                {game.title}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">Edition Features</label>
-                          <input
-                            type="text"
-                            placeholder="Feature 1, Feature 2, Feature 3"
-                            value={formData.edition_features?.join(', ') || ''}
-                            onChange={(e) => handleArrayInput('edition_features', e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                          />
-                          <p className="text-xs text-gray-500 mt-1">Separate features with commas</p>
-                        </div>
-                      </div>
-                    )}
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Image *</label>
