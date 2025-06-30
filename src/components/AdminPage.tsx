@@ -254,6 +254,17 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     }));
   };
 
+  const getEditionBadgeColor = (edition: string) => {
+    switch (edition) {
+      case 'Premium':
+        return 'from-purple-500 to-indigo-500';
+      case 'Deluxe':
+        return 'from-yellow-500 to-orange-500';
+      default:
+        return 'from-gray-500 to-gray-600';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
@@ -340,7 +351,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                         <>
                           <h3 className="font-bold text-gray-800 mb-2 line-clamp-2">{item.title}</h3>
                           {item.edition && item.edition !== 'Standard' && (
-                            <span className="inline-block bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-2 py-1 rounded-full text-xs font-medium mb-2">
+                            <span className={`inline-block bg-gradient-to-r ${getEditionBadgeColor(item.edition)} text-white px-2 py-1 rounded-full text-xs font-medium mb-2`}>
                               {item.edition} Edition
                             </span>
                           )}
