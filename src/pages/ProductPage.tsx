@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shield, Clock, Headphones, Share2, ChevronDown, ChevronUp, ShoppingCart, Star } from 'lucide-react';
+import { ArrowLeft, Shield, Clock, Headphones, Share2, ChevronDown, ChevronUp, ShoppingCart, Star, Crown, Gem } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { Game, getGameDisplayPrice, getGameDiscountPercentage, getGameEditions } from '../config/supabase';
+import { Game, getGameDisplayPrice, getGameDiscountPercentage, getGameEditions, getEditionDisplayInfo } from '../config/supabase';
 import { useAllGames, useSubscriptions } from '../hooks/useSupabaseData';
 import CustomerScreenshots from '../components/CustomerScreenshots';
 import Loader from '../components/Loader';
@@ -273,6 +273,17 @@ This option is best suited for single-player games or customers who prefer offli
     }
   };
 
+  const getEditionIcon = (edition: string) => {
+    switch (edition) {
+      case 'Premium':
+        return <Crown className="w-4 h-4 text-purple-500" />;
+      case 'Deluxe':
+        return <Gem className="w-4 h-4 text-yellow-500" />;
+      default:
+        return <Star className="w-4 h-4 text-gray-500" />;
+    }
+  };
+
   const currentPrice = calculatePrice();
   const discountPercentage = getDiscountPercentage();
 
@@ -315,8 +326,9 @@ This option is best suited for single-player games or customers who prefer offli
                     {currentProduct.platform.join(', ')}
                   </span>
                   {currentProduct.edition && currentProduct.edition !== 'Standard' && (
-                    <span className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-3 xl:px-4 py-1 xl:py-2 rounded-full text-xs xl:text-sm font-medium shadow-lg">
-                      {currentProduct.edition} Edition
+                    <span className={`bg-gradient-to-r ${getEditionDisplayInfo(currentProduct.edition).color} text-white px-3 xl:px-4 py-1 xl:py-2 rounded-full text-xs xl:text-sm font-medium shadow-lg flex items-center space-x-1`}>
+                      {getEditionIcon(currentProduct.edition)}
+                      <span>{currentProduct.edition} Edition</span>
                     </span>
                   )}
                 </div>
@@ -326,37 +338,42 @@ This option is best suited for single-player games or customers who prefer offli
                   <div className="mb-4 xl:mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-3">Choose Edition</label>
                     <div className="grid grid-cols-1 gap-3">
-                      {availableEditions.map((edition) => (
-                        <button
-                          key={edition.id}
-                          onClick={() => handleEditionChange(edition)}
-                          className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                            selectedEdition?.id === edition.id
-                              ? 'border-purple-500 bg-purple-50'
-                              : 'border-gray-200 bg-white hover:border-purple-300'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h4 className="font-bold text-gray-800">{edition.edition} Edition</h4>
-                              <p className="text-sm text-gray-600">₹{getGameDisplayPrice(edition, 'Rent', '1_month')}</p>
+                      {availableEditions.map((edition) => {
+                        const editionInfo = getEditionDisplayInfo(edition.edition || 'Standard');
+                        return (
+                          <button
+                            key={edition.id}
+                            onClick={() => handleEditionChange(edition)}
+                            className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
+                              selectedEdition?.id === edition.id
+                                ? `border-${edition.edition === 'Premium' ? 'purple' : edition.edition === 'Deluxe' ? 'yellow' : 'gray'}-500 bg-gradient-to-r ${editionInfo.bgColor}`
+                                : 'border-gray-200 bg-white hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                {getEditionIcon(edition.edition || 'Standard')}
+                                <div>
+                                  <h4 className="font-bold text-gray-800">{edition.edition} Edition</h4>
+                                  <p className="text-sm text-gray-600">₹{getGameDisplayPrice(edition, 'Rent', '1_month')}</p>
+                                </div>
+                              </div>
                             </div>
-                             
-                          </div>
-                          {edition.edition_features && edition.edition_features.length > 0 && (
-                            <div className="mt-2 flex flex-wrap gap-1">
-                              {edition.edition_features.slice(0, 3).map((feature, index) => (
-                                <span key={index} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                                  {feature}
-                                </span>
-                              ))}
-                              {edition.edition_features.length > 3 && (
-                                <span className="text-xs text-gray-500">+{edition.edition_features.length - 3} more</span>
-                              )}
-                            </div>
-                          )}
-                        </button>
-                      ))}
+                            {edition.edition_features && edition.edition_features.length > 0 && (
+                              <div className="mt-2 flex flex-wrap gap-1">
+                                {edition.edition_features.slice(0, 3).map((feature, index) => (
+                                  <span key={index} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                                    {feature}
+                                  </span>
+                                ))}
+                                {edition.edition_features.length > 3 && (
+                                  <span className="text-xs text-gray-500">+{edition.edition_features.length - 3} more</span>
+                                )}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -430,13 +447,20 @@ This option is best suited for single-player games or customers who prefer offli
 
                 {/* Edition Features - Show if current edition has features */}
                 {currentProduct.edition_features && currentProduct.edition_features.length > 0 && (
-                  <div className="mb-4 xl:mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 xl:p-6 border border-purple-200">
-                    <h4 className="font-bold text-purple-800 mb-3 text-sm xl:text-base">{currentProduct.edition} Edition Features</h4>
+                  <div className={`mb-4 xl:mb-6 bg-gradient-to-r ${getEditionDisplayInfo(currentProduct.edition || 'Standard').bgColor} rounded-xl p-4 xl:p-6 border border-${currentProduct.edition === 'Premium' ? 'purple' : currentProduct.edition === 'Deluxe' ? 'yellow' : 'gray'}-200`}>
+                    <div className="flex items-center space-x-2 mb-3">
+                      {getEditionIcon(currentProduct.edition || 'Standard')}
+                      <h4 className={`font-bold text-${currentProduct.edition === 'Premium' ? 'purple' : currentProduct.edition === 'Deluxe' ? 'yellow' : 'gray'}-800 text-sm xl:text-base`}>
+                        {currentProduct.edition} Edition Features
+                      </h4>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {currentProduct.edition_features.map((feature, index) => (
                         <div key={index} className="flex items-center space-x-2">
-                          <Star className="w-4 h-4 text-purple-600 flex-shrink-0" />
-                          <span className="text-purple-700 text-xs xl:text-sm">{feature}</span>
+                          <Star className={`w-4 h-4 text-${currentProduct.edition === 'Premium' ? 'purple' : currentProduct.edition === 'Deluxe' ? 'yellow' : 'gray'}-600 flex-shrink-0`} />
+                          <span className={`text-${currentProduct.edition === 'Premium' ? 'purple' : currentProduct.edition === 'Deluxe' ? 'yellow' : 'gray'}-700 text-xs xl:text-sm`}>
+                            {feature}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -627,8 +651,9 @@ This option is best suited for single-player games or customers who prefer offli
                   {currentProduct.platform.join(', ')}
                 </span>
                 {currentProduct.edition && currentProduct.edition !== 'Standard' && (
-                  <span className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-3 py-1 rounded-full text-xs sm:text-sm font-medium shadow-lg">
-                    {currentProduct.edition}
+                  <span className={`bg-gradient-to-r ${getEditionDisplayInfo(currentProduct.edition).color} text-white px-3 py-1 rounded-full text-xs sm:text-sm font-medium shadow-lg flex items-center space-x-1`}>
+                    {getEditionIcon(currentProduct.edition)}
+                    <span>{currentProduct.edition}</span>
                   </span>
                 )}
               </div>
@@ -638,25 +663,30 @@ This option is best suited for single-player games or customers who prefer offli
                 <div className="mb-4 sm:mb-6">
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Choose Edition</label>
                   <div className="space-y-2">
-                    {availableEditions.map((edition) => (
-                      <button
-                        key={edition.id}
-                        onClick={() => handleEditionChange(edition)}
-                        className={`w-full p-3 rounded-lg border-2 transition-all duration-300 text-left ${
-                          selectedEdition?.id === edition.id
-                            ? 'border-purple-500 bg-purple-50'
-                            : 'border-gray-200 bg-white hover:border-purple-300'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-bold text-gray-800 text-sm">{edition.edition} Edition</h4>
-                            <p className="text-xs text-gray-600">₹{getGameDisplayPrice(edition, 'Rent', '1_month')}</p>
+                    {availableEditions.map((edition) => {
+                      const editionInfo = getEditionDisplayInfo(edition.edition || 'Standard');
+                      return (
+                        <button
+                          key={edition.id}
+                          onClick={() => handleEditionChange(edition)}
+                          className={`w-full p-3 rounded-lg border-2 transition-all duration-300 text-left ${
+                            selectedEdition?.id === edition.id
+                              ? `border-${edition.edition === 'Premium' ? 'purple' : edition.edition === 'Deluxe' ? 'yellow' : 'gray'}-500 bg-gradient-to-r ${editionInfo.bgColor}`
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              {getEditionIcon(edition.edition || 'Standard')}
+                              <div>
+                                <h4 className="font-bold text-gray-800 text-sm">{edition.edition} Edition</h4>
+                                <p className="text-xs text-gray-600">₹{getGameDisplayPrice(edition, 'Rent', '1_month')}</p>
+                              </div>
+                            </div>
                           </div>
-                         
-                        </div>
-                      </button>
-                    ))}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -730,13 +760,20 @@ This option is best suited for single-player games or customers who prefer offli
 
               {/* Edition Features - Show if current edition has features */}
               {currentProduct.edition_features && currentProduct.edition_features.length > 0 && (
-                <div className="mb-4 sm:mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-3 sm:p-4 border border-purple-200">
-                  <h4 className="font-bold text-purple-800 mb-2 sm:mb-3 text-sm">{currentProduct.edition} Edition Features</h4>
+                <div className={`mb-4 sm:mb-6 bg-gradient-to-r ${getEditionDisplayInfo(currentProduct.edition || 'Standard').bgColor} rounded-xl p-3 sm:p-4 border border-${currentProduct.edition === 'Premium' ? 'purple' : currentProduct.edition === 'Deluxe' ? 'yellow' : 'gray'}-200`}>
+                  <div className="flex items-center space-x-2 mb-2 sm:mb-3">
+                    {getEditionIcon(currentProduct.edition || 'Standard')}
+                    <h4 className={`font-bold text-${currentProduct.edition === 'Premium' ? 'purple' : currentProduct.edition === 'Deluxe' ? 'yellow' : 'gray'}-800 text-sm`}>
+                      {currentProduct.edition} Edition Features
+                    </h4>
+                  </div>
                   <div className="grid grid-cols-1 gap-1 sm:gap-2">
                     {currentProduct.edition_features.map((feature, index) => (
                       <div key={index} className="flex items-center space-x-2">
-                        <Star className="w-3 h-3 text-purple-600 flex-shrink-0" />
-                        <span className="text-purple-700 text-xs">{feature}</span>
+                        <Star className={`w-3 h-3 text-${currentProduct.edition === 'Premium' ? 'purple' : currentProduct.edition === 'Deluxe' ? 'yellow' : 'gray'}-600 flex-shrink-0`} />
+                        <span className={`text-${currentProduct.edition === 'Premium' ? 'purple' : currentProduct.edition === 'Deluxe' ? 'yellow' : 'gray'}-700 text-xs`}>
+                          {feature}
+                        </span>
                       </div>
                     ))}
                   </div>
