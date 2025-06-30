@@ -341,12 +341,7 @@ This option is best suited for single-player games or customers who prefer offli
                               <h4 className="font-bold text-gray-800">{edition.edition} Edition</h4>
                               <p className="text-sm text-gray-600">₹{getGameDisplayPrice(edition, 'Rent', '1_month')}</p>
                             </div>
-                            {edition.edition_features && edition.edition_features.length > 0 && (
-                              <div className="flex items-center space-x-1">
-                                <Star className="w-4 h-4 text-yellow-500" />
-                                <span className="text-xs text-gray-500">{edition.edition_features.length} extras</span>
-                              </div>
-                            )}
+                            
                           </div>
                           {edition.edition_features && edition.edition_features.length > 0 && (
                             <div className="mt-2 flex flex-wrap gap-1">
