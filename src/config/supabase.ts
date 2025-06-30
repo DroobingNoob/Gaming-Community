@@ -9,7 +9,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export interface Game {
   id?: string;
   title: string;
-  edition?: 'Standard' | 'Premium' | 'Deluxe'; // Updated to include Deluxe
+  edition?: 'Standard' | 'Premium'; // Only Standard and Premium editions
   base_game_id?: string; // Links different editions of the same game
   edition_features?: string[]; // Edition-specific features
   image: string;
@@ -80,13 +80,13 @@ export const getGameDiscountPercentage = (game: Game, selectedType: string, sele
   return calculateGameDiscount(game.original_price, currentPrice);
 };
 
-// Helper function to get available editions for a game (Standard, Premium, and Deluxe)
+// Helper function to get available editions for a game (Standard and Premium only)
 export const getGameEditions = (games: Game[], baseGameId: string): Game[] => {
   return games.filter(game => 
     game.base_game_id === baseGameId || game.id === baseGameId
   ).sort((a, b) => {
-    // Sort by edition: Standard first, then Premium, then Deluxe
-    const editionOrder = { 'Standard': 1, 'Premium': 2, 'Deluxe': 3 };
+    // Sort by edition: Standard first, then Premium
+    const editionOrder = { 'Standard': 1, 'Premium': 2 };
     const aOrder = editionOrder[a.edition as keyof typeof editionOrder] || 999;
     const bOrder = editionOrder[b.edition as keyof typeof editionOrder] || 999;
     return aOrder - bOrder;
@@ -145,34 +145,4 @@ export const groupGamesByTitle = (games: Game[]): { [title: string]: Game[] } =>
     groups[game.title].push(game);
     return groups;
   }, {} as { [title: string]: Game[] });
-};
-
-// Helper function to get edition display name with appropriate styling
-export const getEditionDisplayInfo = (edition: string) => {
-  switch (edition) {
-    case 'Standard':
-      return {
-        name: 'Standard',
-        color: 'from-gray-500 to-gray-600',
-        bgColor: 'from-gray-100 to-gray-200'
-      };
-    case 'Premium':
-      return {
-        name: 'Premium',
-        color: 'from-purple-500 to-indigo-500',
-        bgColor: 'from-purple-100 to-indigo-100'
-      };
-    case 'Deluxe':
-      return {
-        name: 'Deluxe',
-        color: 'from-yellow-500 to-orange-500',
-        bgColor: 'from-yellow-100 to-orange-100'
-      };
-    default:
-      return {
-        name: edition,
-        color: 'from-gray-500 to-gray-600',
-        bgColor: 'from-gray-100 to-gray-200'
-      };
-  }
 };
