@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield, Clock, Headphones, Share2, ChevronDown, ChevronUp, ShoppingCart, Star } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Game, getGameDisplayPrice, getGameDiscountPercentage, getGameEditions } from '../config/supabase';
-import { useGames, useSubscriptions } from '../hooks/useSupabaseData';
+import { useAllGames, useSubscriptions } from '../hooks/useSupabaseData';
 import CustomerScreenshots from '../components/CustomerScreenshots';
 import Loader from '../components/Loader';
 
@@ -15,7 +15,7 @@ interface ProductPageProps {
 const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { games, loading: gamesLoading } = useGames();
+  const { allGames, loading: gamesLoading } = useAllGames(); // Use allGames to get all editions
   const { subscriptions, loading: subscriptionsLoading } = useSubscriptions();
   
   const [product, setProduct] = useState<Game | null>(null);
@@ -33,7 +33,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
   // Find the product by ID and set up editions
   useEffect(() => {
     if (id && !isLoading) {
-      const allProducts = [...games, ...subscriptions];
+      const allProducts = [...allGames, ...subscriptions];
       const foundProduct = allProducts.find(p => p.id === id);
       
       if (foundProduct) {
@@ -43,7 +43,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
         
         // Get all editions of this game
         if (foundProduct.category === 'game') {
-          const editions = getGameEditions(games, foundProduct.base_game_id || foundProduct.id!);
+          const editions = getGameEditions(allGames, foundProduct.base_game_id || foundProduct.id!);
           setAvailableEditions(editions);
           setSelectedEdition(foundProduct);
         } else {
@@ -51,17 +51,23 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
           setSelectedEdition(foundProduct);
         }
         
-        // Set related products (different base games)
-        const related = foundProduct.category === 'game' 
-          ? games.filter(game => 
-              (game.base_title || game.title) !== (foundProduct.base_title || foundProduct.title) &&
-              game.id !== foundProduct.id
-            ).slice(0, 4)
-          : subscriptions.filter(sub => sub.id !== foundProduct.id).slice(0, 4);
-        setRelatedProducts(related);
+        // Set related products (different base games, show only primary editions)
+        if (foundProduct.category === 'game') {
+          // For games, get other games with different titles
+          const related = allGames.filter(game => 
+            game.title !== foundProduct.title &&
+            game.id !== foundProduct.id &&
+            (game.edition === 'Standard' || !allGames.some(g => g.title === game.title && g.edition === 'Standard'))
+          ).slice(0, 4);
+          setRelatedProducts(related);
+        } else {
+          // For subscriptions, get other subscriptions
+          const related = subscriptions.filter(sub => sub.id !== foundProduct.id).slice(0, 4);
+          setRelatedProducts(related);
+        }
       }
     }
-  }, [id, games, subscriptions, isLoading]);
+  }, [id, allGames, subscriptions, isLoading]);
 
   useEffect(() => {
     const handleScroll = () => {

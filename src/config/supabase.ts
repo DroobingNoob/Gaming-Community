@@ -93,6 +93,36 @@ export const getGameEditions = (games: Game[], baseGameId: string): Game[] => {
   });
 };
 
+// Helper function to get the primary edition of a game (for display in listings)
+export const getPrimaryEdition = (games: Game[], gameTitle: string): Game | null => {
+  const editions = games.filter(game => game.title === gameTitle);
+  
+  if (editions.length === 0) return null;
+  
+  // Always return Standard edition first, or the first available edition
+  const standardEdition = editions.find(game => game.edition === 'Standard');
+  return standardEdition || editions[0];
+};
+
+// Helper function to get unique games (only primary editions for customer view)
+export const getUniqueGamesForCustomer = (games: Game[]): Game[] => {
+  const gameGroups = groupGamesByTitle(games);
+  const uniqueGames: Game[] = [];
+  
+  Object.keys(gameGroups).forEach(title => {
+    const primaryEdition = getPrimaryEdition(games, title);
+    if (primaryEdition) {
+      uniqueGames.push(primaryEdition);
+    }
+  });
+  
+  return uniqueGames.sort((a, b) => {
+    const aDate = new Date(a.created_at || 0);
+    const bDate = new Date(b.created_at || 0);
+    return bDate.getTime() - aDate.getTime(); // Newest first
+  });
+};
+
 // Helper function to get the cheapest edition of a game
 export const getCheapestEdition = (games: Game[], gameTitle: string): Game | null => {
   const editions = games.filter(game => game.title === gameTitle);

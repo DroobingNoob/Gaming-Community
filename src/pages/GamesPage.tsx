@@ -7,7 +7,7 @@ import Loader from '../components/Loader';
 
 const GamesPage: React.FC = () => {
   const navigate = useNavigate();
-  const { games, loading, error } = useGames();
+  const { games, loading, error } = useGames(); // This now returns unique games only
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [priceRange, setPriceRange] = useState([0, 10000]);
@@ -264,6 +264,11 @@ const GamesPage: React.FC = () => {
                         <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium shadow-lg">
                           {game.platform.join(', ')}
                         </div>
+                        {game.edition && game.edition !== 'Standard' && (
+                          <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium shadow-lg">
+                            {game.edition}
+                          </div>
+                        )}
                       </div>
                       <div className="p-3 sm:p-4">
                         <h3 className="font-bold text-gray-800 text-xs sm:text-sm mb-2 line-clamp-2">
@@ -314,6 +319,11 @@ const GamesPage: React.FC = () => {
                                 <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
                                   {game.platform.join(', ')}
                                 </span>
+                                {game.edition && game.edition !== 'Standard' && (
+                                  <span className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-2 py-1 rounded text-xs font-medium">
+                                    {game.edition}
+                                  </span>
+                                )}
                               </div>
                             </div>
                             <div className="text-left sm:text-right">
