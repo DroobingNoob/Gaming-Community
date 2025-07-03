@@ -938,7 +938,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     }}
                     className="rounded w-5 h-5 text-purple-600"
                   />
-                  <span className="font-medium text-gray-800">Premium Edition</span>
+                  <span className="font-medium text-gray-800">Deluxe Edition</span>
                 </label>
               </div>
 
