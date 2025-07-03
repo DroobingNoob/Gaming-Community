@@ -303,7 +303,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         );
         
         for (const existingGame of existingEditions) {
-          if (!gameFormData.availableEditions.includes(existingGame.edition as 'Standard' | 'Premium')) {
+          if (!gameFormData.availableEditions.includes(existingGame.edition as 'Standard' | 'Premium' | 'Deluxe')) {
             await gamesService.delete(existingGame.id!);
           }
         }
