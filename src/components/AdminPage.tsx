@@ -437,7 +437,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       image: game.image,
       description: game.description,
       show_in_bestsellers: game.show_in_bestsellers || false,
-      availableEditions: allEditions.map(e => e.edition as 'Standard' | 'Premium'),
+      availableEditions: allEditions.map(e => e.edition as 'Standard' | 'Premium' | 'Deluxe'),
       editions: {}
     };
 
