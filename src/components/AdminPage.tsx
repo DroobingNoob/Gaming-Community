@@ -443,8 +443,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
     // Populate edition data
     for (const edition of allEditions) {
-      formData.editions[edition.edition as 'Standard' | 'Premium'] = {
-        edition: edition.edition as 'Standard' | 'Premium',
+      formData.editions[edition.edition as 'Standard' | 'Premium' | 'Deluxe'] = {
+        edition: edition.edition as 'Standard' | 'Premium' | 'Deluxe',
         platform: edition.platform,
         type: edition.type,
         original_price: edition.original_price,
