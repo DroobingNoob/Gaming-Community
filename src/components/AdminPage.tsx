@@ -459,7 +459,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     }
 
     setGameFormData(formData);
-    setCurrentEdition(allEditions[0].edition as 'Standard' | 'Premium');
+    setCurrentEdition(allEditions[0].edition as 'Standard' | 'Premium' | 'Deluxe');
     setCrudOperation('update');
   };
 
