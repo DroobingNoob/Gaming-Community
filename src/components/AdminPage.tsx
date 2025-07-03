@@ -15,7 +15,7 @@ interface AdminPageProps {
 }
 
 interface EditionFormData {
-  edition: 'Standard' | 'Premium';
+  edition: 'Standard' | 'Premium' | 'Deluxe';
   platform: string[];
   type: string[];
   original_price: number;
@@ -33,10 +33,11 @@ interface GameFormData {
   image: string;
   description: string;
   show_in_bestsellers: boolean;
-  availableEditions: ('Standard' | 'Premium')[];
+  availableEditions: ('Standard' | 'Premium' | 'Deluxe')[];
   editions: {
     Standard?: EditionFormData;
     Premium?: EditionFormData;
+    Deluxe?: EditionFormData;
   };
 }
 
@@ -63,7 +64,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   });
   const [subscriptionFormData, setSubscriptionFormData] = useState<any>({});
   const [testimonialFormData, setTestimonialFormData] = useState<any>({});
-  const [currentEdition, setCurrentEdition] = useState<'Standard' | 'Premium'>('Standard');
+  const [currentEdition, setCurrentEdition] = useState<'Standard' | 'Premium' | 'Deluxe'>('Standard');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
