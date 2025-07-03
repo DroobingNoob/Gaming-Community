@@ -1033,7 +1033,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     {/* Premium Edition Features */}
                     {currentEdition === 'Premium' && (
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-semibold text-gray-700 mb-3">Premium Edition Features</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">Deluxe Edition Features</label>
                         <div className="space-y-2">
                           {(currentEditionData.edition_features || []).map((feature: string, index: number) => (
                             <div key={index} className="flex items-center space-x-2">
