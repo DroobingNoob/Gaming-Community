@@ -15,7 +15,7 @@ interface AdminPageProps {
 }
 
 interface EditionFormData {
-  edition: 'Standard' | 'Premium' | 'Deluxe';
+  edition: 'Standard' | 'Deluxe';
   platform: string[];
   type: string[];
   original_price: number;
@@ -33,10 +33,9 @@ interface GameFormData {
   image: string;
   description: string;
   show_in_bestsellers: boolean;
-  availableEditions: ('Standard' | 'Premium' | 'Deluxe')[];
+  availableEditions: ('Standard' | 'Deluxe')[];
   editions: {
     Standard?: EditionFormData;
-    Premium?: EditionFormData;
     Deluxe?: EditionFormData;
   };
 }
@@ -64,7 +63,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   });
   const [subscriptionFormData, setSubscriptionFormData] = useState<any>({});
   const [testimonialFormData, setTestimonialFormData] = useState<any>({});
-  const [currentEdition, setCurrentEdition] = useState<'Standard' | 'Premium' | 'Deluxe'>('Standard');
+  const [currentEdition, setCurrentEdition] = useState<'Standard' | 'Deluxe'>('Standard');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -262,14 +261,14 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           permanent_online_price: editionData.permanent_online_price,
           discount: discount,
           show_in_bestsellers: gameFormData.show_in_bestsellers && edition === 'Standard', // Only Standard can be bestseller
-          edition_features: edition === 'Premium' || edition === 'Deluxe' ? editionData.edition_features || [] : [],
+          edition_features: edition === 'Deluxe' ? editionData.edition_features || [] : [],
           category: 'game'
         };
 
         if (crudOperation === 'create') {
           const newGameId = await gamesService.add(gameData);
           
-          // If this is the Standard edition, use its ID as base_game_id for Premium
+          // If this is the Standard edition, use its ID as base_game_id for Deluxe
           if (edition === 'Standard') {
             baseGameId = newGameId;
             await gamesService.update(newGameId, { base_game_id: newGameId });
@@ -303,7 +302,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         );
         
         for (const existingGame of existingEditions) {
-          if (!gameFormData.availableEditions.includes(existingGame.edition as 'Standard' | 'Premium' | 'Deluxe')) {
+          if (!gameFormData.availableEditions.includes(existingGame.edition as 'Standard' | 'Deluxe')) {
             await gamesService.delete(existingGame.id!);
           }
         }
@@ -437,14 +436,14 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       image: game.image,
       description: game.description,
       show_in_bestsellers: game.show_in_bestsellers || false,
-      availableEditions: allEditions.map(e => e.edition as 'Standard' | 'Premium' | 'Deluxe'),
+      availableEditions: allEditions.map(e => e.edition as 'Standard' | 'Deluxe'),
       editions: {}
     };
 
     // Populate edition data
     for (const edition of allEditions) {
-      formData.editions[edition.edition as 'Standard' | 'Premium' | 'Deluxe'] = {
-        edition: edition.edition as 'Standard' | 'Premium' | 'Deluxe',
+      formData.editions[edition.edition as 'Standard' | 'Deluxe'] = {
+        edition: edition.edition as 'Standard' | 'Deluxe',
         platform: edition.platform,
         type: edition.type,
         original_price: edition.original_price,
@@ -459,7 +458,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     }
 
     setGameFormData(formData);
-    setCurrentEdition(allEditions[0].edition as 'Standard' | 'Premium' | 'Deluxe');
+    setCurrentEdition(allEditions[0].edition as 'Standard' | 'Deluxe');
     setCrudOperation('update');
   };
 
@@ -905,16 +904,16 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    checked={gameFormData.availableEditions.includes('Premium')}
+                    checked={gameFormData.availableEditions.includes('Deluxe')}
                     onChange={(e) => {
                       if (e.target.checked) {
                         setGameFormData({
                           ...gameFormData,
-                          availableEditions: [...gameFormData.availableEditions, 'Premium'],
+                          availableEditions: [...gameFormData.availableEditions, 'Deluxe'],
                           editions: {
                             ...gameFormData.editions,
-                            Premium: {
-                              edition: 'Premium',
+                            Deluxe: {
+                              edition: 'Deluxe',
                               platform: ['PS5'],
                               type: ['Rent'],
                               original_price: 0,
@@ -924,15 +923,15 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                           }
                         });
                       } else {
-                        const newEditions = gameFormData.availableEditions.filter(e => e !== 'Premium');
+                        const newEditions = gameFormData.availableEditions.filter(e => e !== 'Deluxe');
                         const newEditionData = { ...gameFormData.editions };
-                        delete newEditionData.Premium;
+                        delete newEditionData.Deluxe;
                         setGameFormData({
                           ...gameFormData,
                           availableEditions: newEditions,
                           editions: newEditionData
                         });
-                        if (currentEdition === 'Premium' && newEditions.length > 0) {
+                        if (currentEdition === 'Deluxe' && newEditions.length > 0) {
                           setCurrentEdition(newEditions[0]);
                         }
                       }
@@ -1031,8 +1030,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                       </div>
                     </div>
 
-                    {/* Premium Edition Features */}
-                    {currentEdition === 'Premium' && (
+                    {/* Deluxe Edition Features */}
+                    {currentEdition === 'Deluxe' && (
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-700 mb-3">Deluxe Edition Features</label>
                         <div className="space-y-2">
