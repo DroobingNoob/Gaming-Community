@@ -262,7 +262,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           permanent_online_price: editionData.permanent_online_price,
           discount: discount,
           show_in_bestsellers: gameFormData.show_in_bestsellers && edition === 'Standard', // Only Standard can be bestseller
-          edition_features: edition === 'Premium' ? editionData.edition_features || [] : [],
+          edition_features: edition === 'Premium' || edition === 'Deluxe' ? editionData.edition_features || [] : [],
           category: 'game'
         };
 
