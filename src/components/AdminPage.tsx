@@ -984,7 +984,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
                       <div className="space-y-3">
-                        {['PS4', 'PS5'].map((platform) => (
+                        {['PS4', 'PS5', 'PSVR2'].map((platform) => (
                           <label key={platform} className="flex items-center space-x-3 p-3 bg-white rounded-lg hover:bg-gray-50 transition-colors">
                             <input
                               type="checkbox"
