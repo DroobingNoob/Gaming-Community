@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield, Clock, Headphones, Share2, ChevronDown, ChevronUp, ShoppingCart, Star } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Game, getGameDisplayPrice, getGameDiscountPercentage, getGameEditions } from '../config/supabase';
+import { findAllEditionsByGameId } from '../config/supabase';
 import { useAllGames, useSubscriptions } from '../hooks/useSupabaseData';
 import CustomerScreenshots from '../components/CustomerScreenshots';
 import Loader from '../components/Loader';
@@ -41,9 +42,11 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
         setSelectedPlatform(foundProduct.platform[0] || '');
         setSelectedType(foundProduct.type[0] || '');
         
-        // Get all editions of this game
+        // Get all editions of this game - improved logic
         if (foundProduct.category === 'game') {
-          const editions = getGameEditions(allGames, foundProduct.base_game_id || foundProduct.id!);
+          // Use the improved helper function to find all editions
+          const editions = findAllEditionsByGameId(allGames, foundProduct.id!);
+          
           setAvailableEditions(editions);
           setSelectedEdition(foundProduct);
         } else {
@@ -51,14 +54,19 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
           setSelectedEdition(foundProduct);
         }
         
-        // Set related products (different base games, show only primary editions)
+        // Set related products (different games entirely)
         if (foundProduct.category === 'game') {
-          // For games, get other games with different titles
-          const related = allGames.filter(game => 
-            game.title !== foundProduct.title &&
-            game.id !== foundProduct.id &&
-            (game.edition === 'Standard' || !allGames.some(g => g.title === game.title && g.edition === 'Standard'))
-          ).slice(0, 4);
+          // Get unique games (different titles) for related products
+          const uniqueGameTitles = [...new Set(allGames.map(game => game.title))];
+          const related = uniqueGameTitles
+            .filter(title => title !== foundProduct.title)
+            .map(title => {
+              // Get the primary edition (Standard first, or first available)
+              const gameEditions = allGames.filter(game => game.title === title);
+              return gameEditions.find(game => game.edition === 'Standard') || gameEditions[0];
+            })
+            .filter(Boolean)
+            .slice(0, 4);
           setRelatedProducts(related);
         } else {
           // For subscriptions, get other subscriptions
@@ -265,12 +273,13 @@ This option is best suited for single-player games or customers who prefer offli
 
   const handleEditionChange = (edition: Game) => {
     setSelectedEdition(edition);
-    // Update URL to reflect the new edition
-    if (edition.category === 'game') {
-      navigate(`/games/${edition.id}`, { replace: true });
-    } else {
-      navigate(`/subscriptions/${edition.id}`, { replace: true });
-    }
+    // Update URL to reflect the new edition without replacing history
+    const newUrl = edition.category === 'game' 
+      ? `/games/${edition.id}` 
+      : `/subscriptions/${edition.id}`;
+    
+    // Use replace to avoid creating too many history entries
+    window.history.replaceState(null, '', newUrl);
   };
 
   const currentPrice = calculatePrice();
@@ -324,7 +333,9 @@ This option is best suited for single-player games or customers who prefer offli
                 {/* Edition Selection - Only for games with multiple editions */}
                 {availableEditions.length > 1 && (
                   <div className="mb-4 xl:mb-6">
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Choose Edition</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                      Choose Edition ({availableEditions.length} available)
+                    </label>
                     <div className="grid grid-cols-1 gap-3">
                       {availableEditions.map((edition) => (
                         <button
@@ -339,9 +350,15 @@ This option is best suited for single-player games or customers who prefer offli
                           <div className="flex items-center justify-between">
                             <div>
                               <h4 className="font-bold text-gray-800">{edition.edition} Edition</h4>
-                              <p className="text-sm text-gray-600">₹{getGameDisplayPrice(edition, 'Rent', '1_month')}</p>
+                              <p className="text-sm text-gray-600">
+                                Starting from ₹{getGameDisplayPrice(edition, 'Rent', '1_month')}
+                              </p>
                             </div>
-                             
+                            {selectedEdition?.id === edition.id && (
+                              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                                <div className="w-2 h-2 bg-white rounded-full"></div>
+                              </div>
+                            )}
                           </div>
                           {edition.edition_features && edition.edition_features.length > 0 && (
                             <div className="mt-2 flex flex-wrap gap-1">
@@ -636,7 +653,9 @@ This option is best suited for single-player games or customers who prefer offli
               {/* Edition Selection - Only for games with multiple editions */}
               {availableEditions.length > 1 && (
                 <div className="mb-4 sm:mb-6">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Choose Edition</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Choose Edition ({availableEditions.length} available)
+                  </label>
                   <div className="space-y-2">
                     {availableEditions.map((edition) => (
                       <button
@@ -651,10 +670,29 @@ This option is best suited for single-player games or customers who prefer offli
                         <div className="flex items-center justify-between">
                           <div>
                             <h4 className="font-bold text-gray-800 text-sm">{edition.edition} Edition</h4>
-                            <p className="text-xs text-gray-600">₹{getGameDisplayPrice(edition, 'Rent', '1_month')}</p>
+                            <p className="text-xs text-gray-600">
+                              Starting from ₹{getGameDisplayPrice(edition, 'Rent', '1_month')}
+                            </p>
                           </div>
+                          {selectedEdition?.id === edition.id && (
+                            <div className="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                          )}
                          
                         </div>
+                        {edition.edition_features && edition.edition_features.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {edition.edition_features.slice(0, 2).map((feature, index) => (
+                              <span key={index} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                                {feature}
+                              </span>
+                            ))}
+                            {edition.edition_features.length > 2 && (
+                              <span className="text-xs text-gray-500">+{edition.edition_features.length - 2} more</span>
+                            )}
+                          </div>
+                        )}
                       </button>
                     ))}
                   </div>

@@ -82,9 +82,22 @@ export const getGameDiscountPercentage = (game: Game, selectedType: string, sele
 
 // Helper function to get available editions for a game (Standard and Premium only)
 export const getGameEditions = (games: Game[], baseGameId: string): Game[] => {
-  return games.filter(game => 
-    game.base_game_id === baseGameId || game.id === baseGameId
-  ).sort((a, b) => {
+  // First try to find by base_game_id relationship
+  let editions = games.filter(game => 
+    game.base_game_id === baseGameId || 
+    game.id === baseGameId ||
+    (game.base_game_id && game.base_game_id === baseGameId)
+  );
+  
+  // If no editions found by base_game_id, try to find by title
+  if (editions.length <= 1) {
+    const baseGame = games.find(game => game.id === baseGameId);
+    if (baseGame) {
+      editions = games.filter(game => game.title === baseGame.title);
+    }
+  }
+  
+  return editions.sort((a, b) => {
     // Sort by edition: Standard first, then Premium
     const editionOrder = { 'Standard': 1, 'Premium': 2 };
     const aOrder = editionOrder[a.edition as keyof typeof editionOrder] || 999;
@@ -145,4 +158,31 @@ export const groupGamesByTitle = (games: Game[]): { [title: string]: Game[] } =>
     groups[game.title].push(game);
     return groups;
   }, {} as { [title: string]: Game[] });
+};
+
+// Helper function to find all editions of a game by any edition ID
+export const findAllEditionsByGameId = (games: Game[], gameId: string): Game[] => {
+  const targetGame = games.find(game => game.id === gameId);
+  if (!targetGame) return [];
+  
+  // Find all games with the same title
+  const sameTitle = games.filter(game => game.title === targetGame.title);
+  
+  // If we have base_game_id relationships, use those
+  const baseGameId = targetGame.base_game_id || targetGame.id;
+  const relatedByBaseId = games.filter(game => 
+    game.base_game_id === baseGameId || 
+    game.id === baseGameId ||
+    (game.base_game_id && game.base_game_id === targetGame.base_game_id)
+  );
+  
+  // Return the larger set (more comprehensive)
+  const editions = relatedByBaseId.length > sameTitle.length ? relatedByBaseId : sameTitle;
+  
+  return editions.sort((a, b) => {
+    const editionOrder = { 'Standard': 1, 'Premium': 2, 'Deluxe': 3 };
+    const aOrder = editionOrder[a.edition as keyof typeof editionOrder] || 999;
+    const bOrder = editionOrder[b.edition as keyof typeof editionOrder] || 999;
+    return aOrder - bOrder;
+  });
 };
