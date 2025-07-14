@@ -1,4 +1,5 @@
 import { supabase, Game, Testimonial } from '../config/supabase';
+import type { PaymentSettings } from '../config/supabase';
 
 // Games Service
 export const gamesService = {
@@ -257,6 +258,85 @@ export const testimonialsService = {
       }
     } catch (error) {
       console.error('Error deleting testimonial:', error);
+      throw error;
+    }
+  }
+};
+
+// Payment Settings Service
+export const paymentSettingsService = {
+  // Get payment settings
+  async get(): Promise<PaymentSettings | null> {
+    try {
+      const { data, error } = await supabase
+        .from('payment_settings')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) {
+        console.error('Error fetching payment settings:', error);
+        // Return default settings if none exist
+        return {
+          razorpay_enabled: true,
+          upi_qr_image: '/UPI.jpg',
+          upi_id: 'gamingcommunity@paytm'
+        };
+      }
+      return data;
+    } catch (error) {
+      console.error('Error fetching payment settings:', error);
+      return {
+        razorpay_enabled: true,
+        upi_qr_image: '/UPI.jpg',
+        upi_id: 'gamingcommunity@paytm'
+      };
+    }
+  },
+
+  // Update payment settings
+  async update(settings: Partial<PaymentSettings>): Promise<void> {
+    try {
+      // First try to update existing settings
+      const { data: existingData } = await supabase
+        .from('payment_settings')
+        .select('id')
+        .limit(1)
+        .single();
+
+      if (existingData) {
+        // Update existing record
+        const { error } = await supabase
+          .from('payment_settings')
+          .update({
+            ...settings,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingData.id);
+
+        if (error) {
+          console.error('Supabase error updating payment settings:', error);
+          throw error;
+        }
+      } else {
+        // Insert new record
+        const { error } = await supabase
+          .from('payment_settings')
+          .insert([{
+            razorpay_enabled: true,
+            upi_qr_image: '/UPI.jpg',
+            upi_id: 'gamingcommunity@paytm',
+            ...settings
+          }]);
+
+        if (error) {
+          console.error('Supabase error inserting payment settings:', error);
+          throw error;
+        }
+      }
+    } catch (error) {
+      console.error('Error updating payment settings:', error);
       throw error;
     }
   }

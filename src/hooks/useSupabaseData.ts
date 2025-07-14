@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { gamesService, subscriptionsService, testimonialsService } from '../services/supabaseService';
+import { paymentSettingsService } from '../services/supabaseService';
 import { Game, Testimonial, getUniqueGamesForCustomer } from '../config/supabase';
+import type { PaymentSettings } from '../config/supabase';
 
 // Hook for games data (returns unique games for customer view)
 export const useGames = () => {
@@ -143,4 +145,31 @@ export const useTestimonials = () => {
   }, []);
 
   return { testimonials, loading, error, refetch: fetchTestimonials };
+};
+
+// Hook for payment settings data
+export const usePaymentSettings = () => {
+  const [paymentSettings, setPaymentSettings] = useState<PaymentSettings | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchPaymentSettings = async () => {
+    try {
+      setLoading(true);
+      const settingsData = await paymentSettingsService.get();
+      setPaymentSettings(settingsData);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch payment settings');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPaymentSettings();
+  }, []);
+
+  return { paymentSettings, loading, error, refetch: fetchPaymentSettings };
 };
