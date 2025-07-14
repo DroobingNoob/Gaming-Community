@@ -7,7 +7,7 @@ import {
   testimonialsService
 } from '../services/supabaseService';
 import { Game, Testimonial } from '../config/supabase';
-import { useGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
+import { useGames, useSubscriptions, useTestimonials, usePaymentSettings } from '../hooks/useSupabaseData';
 import Loader from './Loader';
 
 interface AdminPageProps {
@@ -71,6 +71,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const { games, refetch: refetchGames } = useGames();
   const { subscriptions, refetch: refetchSubscriptions } = useSubscriptions();
   const { testimonials, refetch: refetchTestimonials } = useTestimonials();
+  const { paymentSettings } = usePaymentSettings();
 
   // Cloudinary upload function
   const uploadToCloudinary = async (file: File): Promise<string> => {
