@@ -3,6 +3,7 @@ import { X, Copy, Check, CreditCard, Smartphone, MessageCircle, Download, FileSp
 import { toast } from 'react-toastify';
 import { usePaymentSettings } from '../hooks/useSupabaseData';
 import { BackendService } from '../services/backendService';
+import { usePaymentSettings } from '../hooks/useSupabaseData';
 
 interface CartItem {
   id: string;
@@ -34,6 +35,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [currentStep, setCurrentStep] = useState<'summary' | 'payment' | 'confirmation'>('summary');
   const [orderCode, setOrderCode] = useState('');
   const [copiedOrderCode, setCopiedOrderCode] = useState(false);
+  const { paymentSettings } = usePaymentSettings();
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState('');
@@ -444,6 +446,7 @@ Thank you for choosing Gaming Community! 🎮✨`;
           amount: Math.round(total * 100), // Convert to paise
           currency: 'INR',
           receipt: code
+        paymentMethod: paymentSettings?.razorpay_enabled ? 'Razorpay' : 'UPI'
         });
 
         // Initialize Razorpay payment
@@ -561,7 +564,12 @@ Thank you for choosing Gaming Community! 🎮✨`;
         // Start countdown for WhatsApp redirect
         setRedirectCountdown(5); // 5 second countdown
         
-      } else {
+        if (paymentSettings?.razorpay_enabled) {
+          setShowPaymentOptions(true);
+        } else {
+          // Direct UPI payment flow
+          handleUPIPayment(generatedOrderCode);
+        }
         toast.error('Payment verification failed. Please contact support.');
         setPaymentError('Payment verification failed');
       }
