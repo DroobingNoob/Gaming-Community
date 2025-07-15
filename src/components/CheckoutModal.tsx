@@ -3,7 +3,6 @@ import { X, Copy, Check, CreditCard, Smartphone, MessageCircle, Download, FileSp
 import { toast } from 'react-toastify';
 import { usePaymentSettings } from '../hooks/useSupabaseData';
 import { BackendService } from '../services/backendService';
-import { usePaymentSettings } from '../hooks/useSupabaseData';
 
 interface CartItem {
   id: string;
