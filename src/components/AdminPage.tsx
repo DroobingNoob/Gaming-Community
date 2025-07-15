@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, Edit, Trash2, Save, X, Upload, Image as ImageIcon, Sparkles, Database, Settings, Star } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { 
   gamesService, 
   subscriptionsService, 
-  testimonialsService
+  testimonialsService,
+  paymentSettingsService
 } from '../services/supabaseService';
 import { Game, Testimonial } from '../config/supabase';
 import { useGames, useSubscriptions, useTestimonials, usePaymentSettings } from '../hooks/useSupabaseData';
@@ -66,12 +67,24 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [currentEdition, setCurrentEdition] = useState<'Standard' | 'Deluxe'>('Standard');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [paymentSettings, setPaymentSettings] = useState({
+    razorpay_enabled: true,
+    upi_qr_image: '/UPI.jpg',
+    upi_id: 'gamingcommunity@paytm'
+  });
 
   // Supabase data hooks
   const { games, refetch: refetchGames } = useGames();
   const { subscriptions, refetch: refetchSubscriptions } = useSubscriptions();
   const { testimonials, refetch: refetchTestimonials } = useTestimonials();
-  const { paymentSettings } = usePaymentSettings();
+  const { paymentSettings: dbPaymentSettings, loading: paymentLoading } = usePaymentSettings();
+
+  // Load payment settings
+  useEffect(() => {
+    if (dbPaymentSettings) {
+      setPaymentSettings(dbPaymentSettings);
+    }
+  }, [dbPaymentSettings]);
 
   // Cloudinary upload function
   const uploadToCloudinary = async (file: File): Promise<string> => {
@@ -553,6 +566,26 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     if (currentEditionData) {
       const newFeatures = (currentEditionData.edition_features || []).filter((_, i) => i !== index);
       updateEditionData('edition_features', newFeatures);
+    }
+  };
+
+  const handlePaymentToggle = async () => {
+    try {
+      setLoading(true);
+      const newSettings = {
+        ...paymentSettings,
+        razorpay_enabled: !paymentSettings.razorpay_enabled
+      };
+      
+      await paymentSettingsService.update(newSettings);
+      setPaymentSettings(newSettings);
+      
+      toast.success(`Payment method switched to ${newSettings.razorpay_enabled ? 'Razorpay' : 'Direct UPI'}`);
+    } catch (error) {
+      console.error('Error updating payment settings:', error);
+      toast.error('Failed to update payment settings');
+    } finally {
+      setLoading(false);
     }
   };
 
