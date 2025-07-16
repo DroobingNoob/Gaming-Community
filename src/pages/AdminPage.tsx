@@ -8,7 +8,7 @@ const AdminPage: React.FC = () => {
     navigate('/');
   };
 
-  return <AdminPageComponent onBackToHome={handleBackToHome} />;
+  return <AdminPage onBackToHome={handleBackToHome} />;
 };
 
 export default AdminPage;
