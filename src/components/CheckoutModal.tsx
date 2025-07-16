@@ -443,7 +443,7 @@ Thank you for choosing Gaming Community! 🎮✨`;
         const razorpayOrder = await BackendService.createRazorpayOrder({
           amount: Math.round(total * 100), // Convert to paise
           currency: 'INR',
-          receipt: code
+          receipt: code,
         paymentMethod: paymentSettings?.razorpay_enabled ? 'Razorpay' : 'UPI'
         });
 
