@@ -47,7 +47,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [hasError, setHasError] = useState(false);
   const [isMockMode, setIsMockMode] = useState(false);
   const [redirectCountdown, setRedirectCountdown] = useState(0);
-  const { paymentSettings } = usePaymentSettings();
   
   // Customer details
   const [customerName, setCustomerName] = useState('');
