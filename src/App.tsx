@@ -510,32 +510,7 @@ function App() {
             <Route path="/games/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
             <Route path="/subscriptions" element={<SubscriptionsPage />} />
             <Route path="/subscriptions/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
-            <Route 
-              path="/admin" 
-              element={
-                isAdmin ? (
-                  <AdminPage />
-                ) : (
-                  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50 flex items-center justify-center">
-                    <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20 text-center max-w-md">
-                      <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span className="text-white text-2xl">🚫</span>
-                      </div>
-                      <h1 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h1>
-                      <p className="text-gray-600 mb-6">
-                        You don't have permission to access the admin panel.
-                      </p>
-                      <button
-                        onClick={() => navigate('/')}
-                        className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
-                      >
-                        Go to Home
-                      </button>
-                    </div>
-                  </div>
-                )
-              } 
-            />
+            <Route path="/admin" element={isAdmin ? <AdminPage /> : <HomePage onNavigation={handleNavigation} />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/refund-policy" element={<RefundPolicyPage />} />
             <Route path="/faq" element={<FAQPage />} />

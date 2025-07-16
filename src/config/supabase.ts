@@ -39,16 +39,6 @@ export interface Testimonial {
   updated_at?: string;
 }
 
-// Payment Settings interface
-export interface PaymentSettings {
-  id?: string;
-  razorpay_enabled: boolean;
-  upi_qr_image: string;
-  upi_id: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
 // Helper function to calculate discount percentage for games
 export const calculateGameDiscount = (originalPrice: number, currentPrice: number): number => {
   if (originalPrice <= 0 || currentPrice <= 0) return 0;

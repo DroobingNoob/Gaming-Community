@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Copy, Check, CreditCard, Smartphone, MessageCircle, Download, FileSpreadsheet, User, Phone, Tag, AlertCircle, Shield, Gift } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { usePaymentSettings } from '../hooks/useSupabaseData';
 import { BackendService } from '../services/backendService';
 
 interface CartItem {
@@ -34,7 +33,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [currentStep, setCurrentStep] = useState<'summary' | 'payment' | 'confirmation'>('summary');
   const [orderCode, setOrderCode] = useState('');
   const [copiedOrderCode, setCopiedOrderCode] = useState(false);
-  const { paymentSettings } = usePaymentSettings();
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState('');
@@ -437,50 +435,6 @@ Thank you for choosing Gaming Community! 🎮✨`;
       // Submit order to backend first
       await submitOrderToBackend(code);
       
-      // Check if Razorpay is enabled
-      if (paymentSettings?.razorpay_enabled) {
-        // Create Razorpay order
-        const razorpayOrder = await BackendService.createRazorpayOrder({
-          amount: Math.round(total * 100), // Convert to paise
-          currency: 'INR',
-          receipt: code,
-        paymentMethod: paymentSettings?.razorpay_enabled ? 'Razorpay' : 'UPI'
-        });
-
-        // Initialize Razorpay payment
-        const options = {
-          key: BackendService.getKeyId(),
-          amount: razorpayOrder.amount,
-          currency: razorpayOrder.currency,
-          name: 'Gaming Community',
-          description: `Order ${code}`,
-          order_id: razorpayOrder.id,
-          handler: async function (response: any) {
-            await handlePaymentSuccess(response, code);
-          },
-          prefill: {
-            name: customerName,
-            contact: customerMobile
-          },
-          theme: {
-            color: '#06b6d4'
-          },
-          modal: {
-            ondismiss: function() {
-              setIsProcessingPayment(false);
-              toast.error('Payment cancelled');
-            }
-          }
-        };
-
-        const razorpay = new (window as any).Razorpay(options);
-        razorpay.open();
-      } else {
-        // Show UPI payment method
-        setCurrentStep('confirmation');
-        setIsProcessingPayment(false);
-      }
-      
       if (isMockMode) {
         // In mock mode, simulate the payment process
         console.log('Running in mock mode - simulating payment');
@@ -511,6 +465,46 @@ Thank you for choosing Gaming Community! 🎮✨`;
         return;
       }
       
+      // Real Razorpay flow
+      console.log('Creating Razorpay order...');
+      const razorpayOrder = await BackendService.createRazorpayOrder({
+        amount: Math.round(total * 100), // Convert to paise
+        currency: 'INR',
+        receipt: code
+      });
+
+      console.log('Razorpay order created:', razorpayOrder);
+      setRazorpayOrderId(razorpayOrder.id);
+      
+      // Check if Razorpay SDK is loaded
+      if (typeof window.Razorpay === 'undefined') {
+        throw new Error('Razorpay SDK not loaded. Please check your internet connection.');
+      }
+
+      // Initialize Razorpay payment
+      const options = {
+        key: BackendService.getKeyId(),
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: 'Gaming Community',
+        description: `Order ${code}`,
+        order_id: razorpayOrder.id,
+        handler: handlePaymentSuccess,
+        prefill: {
+          name: customerName,
+          contact: customerMobile,
+        },
+        theme: {
+          color: '#06b6d4'
+        },
+        modal: {
+          ondismiss: handlePaymentDismiss
+        }
+      };
+
+      console.log('Opening Razorpay with options:', options);
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
       setCurrentStep('payment');
       
     } catch (error) {
@@ -562,12 +556,7 @@ Thank you for choosing Gaming Community! 🎮✨`;
         // Start countdown for WhatsApp redirect
         setRedirectCountdown(5); // 5 second countdown
         
-        if (paymentSettings?.razorpay_enabled) {
-          setShowPaymentOptions(true);
-        } else {
-          // Direct UPI payment flow
-          handleUPIPayment(generatedOrderCode);
-        }
+      } else {
         toast.error('Payment verification failed. Please contact support.');
         setPaymentError('Payment verification failed');
       }
@@ -1186,50 +1175,6 @@ Payment Status: ${paymentDetails.paymentStatus}`;
                 </span>
               )}
             </p>
-          </div>
-        )}
-
-        {/* Payment Method Display */}
-        {!paymentSettings?.razorpay_enabled && (
-          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
-            <h4 className="font-bold text-gray-800 mb-4">Complete Your Payment</h4>
-            
-            {/* UPI QR Code */}
-            <div className="flex justify-center mb-4">
-              <div className="bg-white p-4 rounded-xl shadow-lg">
-                <img
-                  src={paymentSettings?.upi_qr_image || '/UPI.jpg'}
-                  alt="UPI QR Code"
-                  className="w-48 h-48 object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-3 text-sm text-gray-700">
-              <div className="flex items-center justify-between bg-white/50 rounded-lg p-3">
-                <span>Amount to Pay:</span>
-                <span className="font-bold text-lg text-green-600">₹{total.toFixed(2)}</span>
-              </div>
-              
-              <div className="flex items-center justify-between bg-white/50 rounded-lg p-3">
-                <span>UPI ID:</span>
-                <span className="font-mono font-semibold">{paymentSettings?.upi_id || 'gamingcommunity@paytm'}</span>
-              </div>
-              
-              <div className="flex items-center justify-between bg-white/50 rounded-lg p-3">
-                <span>Order Code:</span>
-                <span className="font-mono font-semibold text-cyan-600">{orderCode}</span>
-              </div>
-            </div>
-
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-xs text-yellow-800">
-                <strong>Important:</strong> Please include your order code "{orderCode}" in the payment remarks/description.
-              </p>
-            </div>
           </div>
         )}
         
