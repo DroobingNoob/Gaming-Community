@@ -144,3 +144,28 @@ export const useTestimonials = () => {
 
   return { testimonials, loading, error, refetch: fetchTestimonials };
 };
+
+//Hook for Payment Settings
+export const paymentSettingsService = {
+  async getSettings() {
+    const { data, error } = await supabase
+      .from('payment_settings')
+      .select('*')
+      .single(); // assuming only one row
+
+    if (error) throw error;
+    return data;
+  },
+
+  async toggleRazorpayEnabled(currentValue: boolean) {
+    const { data, error } = await supabase
+      .from('payment_settings')
+      .update({ razorpay_enabled: !currentValue })
+      .eq('id', 1) // adjust if your row uses a different ID or key
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+};
