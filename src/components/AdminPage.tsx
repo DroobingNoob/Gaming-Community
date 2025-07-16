@@ -9,6 +9,7 @@ import {
 import { Game, Testimonial } from '../config/supabase';
 import { useGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
 import Loader from './Loader';
+import { paymentSettingsService } from '../services/supabaseService';
 
 interface AdminPageProps {
   onBackToHome: () => void;
