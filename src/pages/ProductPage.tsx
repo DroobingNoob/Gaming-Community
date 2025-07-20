@@ -750,7 +750,6 @@ This option is best suited for single-player games or customers who prefer offli
     </div>
   </div>
 )}
-
               {/* Rent Duration Selection - Only show if Rent is selected (removed 2 months) */}
               {selectedType === 'Rent' && (
                 <div className="mb-4 sm:mb-6">
