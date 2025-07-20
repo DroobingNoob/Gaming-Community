@@ -397,25 +397,32 @@ This option is best suited for single-player games or customers who prefer offli
                     ))}
                   </div>
                 </div>
-                {/* Type Selection */}
-                <div className="mb-4 xl:mb-6">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
-                  <div className="space-y-2 xl:space-y-3">
-                    {currentProduct.type.map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => setSelectedType(type)}
-                        className={`w-full px-4 xl:px-6 py-2 xl:py-3 rounded-lg xl:rounded-xl font-medium transition-all duration-300 text-left text-sm xl:text-base ${
-                          selectedType === type
-                            ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+            {/* Type Selection */}
+{currentProduct.type
+  .filter((type) => currentPrice > 0)
+  .length > 0 && (
+  <div className="mb-4 xl:mb-6">
+    <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
+    <div className="space-y-2 xl:space-y-3">
+      {currentProduct.type
+        .filter((type) => getGameDisplayPrice(currentProduct, type, selectedRentDuration) > 0)
+        .map((type) => (
+          <button
+            key={type}
+            onClick={() => setSelectedType(type)}
+            className={`w-full px-4 xl:px-6 py-2 xl:py-3 rounded-lg xl:rounded-xl font-medium transition-all duration-300 text-left text-sm xl:text-base ${
+              selectedType === type
+                ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {type}
+          </button>
+        ))}
+    </div>
+  </div>
+)}
+
 
                 {/* Rent Duration Selection - Only show if Rent is selected (removed 2 months) */}
                 {selectedType === 'Rent' && (
@@ -718,25 +725,31 @@ This option is best suited for single-player games or customers who prefer offli
                 </div>
               </div>
  
-              {/* Type Selection */}
-              <div className="mb-4 sm:mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
-                <div className="space-y-2 sm:space-y-3">
-                  {currentProduct.type.map((type) => (
-                    <button
-                      key={type}
-                      onClick={() => setSelectedType(type)}
-                      className={`w-full px-3 sm:px-4 py-2 rounded-lg font-medium transition-all duration-300 text-left text-sm ${
-                        selectedType === type
-                          ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              </div>
+               {/* Type Selection */}
+{currentProduct.type
+  .filter((type) => currentPrice > 0)
+  .length > 0 && (
+  <div className="mb-4 xl:mb-6">
+    <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
+    <div className="space-y-2 xl:space-y-3">
+      {currentProduct.type
+        .filter((type) => getGameDisplayPrice(currentProduct, type, selectedRentDuration) > 0)
+        .map((type) => (
+          <button
+            key={type}
+            onClick={() => setSelectedType(type)}
+            className={`w-full px-4 xl:px-6 py-2 xl:py-3 rounded-lg xl:rounded-xl font-medium transition-all duration-300 text-left text-sm xl:text-base ${
+              selectedType === type
+                ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {type}
+          </button>
+        ))}
+    </div>
+  </div>
+)}
 
               {/* Rent Duration Selection - Only show if Rent is selected (removed 2 months) */}
               {selectedType === 'Rent' && (
