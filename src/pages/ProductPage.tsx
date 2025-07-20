@@ -419,7 +419,7 @@ This option is best suited for single-player games or customers who prefer offli
           >
             {type}
           </button>
-        ))}
+        ))} 
     </div>
   </div>
 )}
