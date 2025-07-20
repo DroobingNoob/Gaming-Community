@@ -31,6 +31,43 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
 
   const isLoading = gamesLoading || subscriptionsLoading;
 
+  const getAvailableTypes = (game: Game) => {
+    if (game.category === 'subscription') {
+      return game.type; // Subscriptions keep original logic
+    }
+    
+    const availableTypes = [];
+    
+    // Check if Rent is available (at least one rental duration has a price)
+    if (game.type.includes('Rent') && (
+      (game.rent_1_month && game.rent_1_month > 0) ||
+      (game.rent_3_months && game.rent_3_months > 0) ||
+      (game.rent_6_months && game.rent_6_months > 0)
+    )) {
+      availableTypes.push('Rent');
+    }
+    
+    // Check if Permanent Offline is available
+    if (game.type.includes('Permanent Offline') && game.permanent_offline_price && game.permanent_offline_price > 0) {
+      availableTypes.push('Permanent Offline');
+    }
+    
+    // Check if Permanent Offline + Online is available
+    if (game.type.includes('Permanent Offline + Online') && game.permanent_online_price && game.permanent_online_price > 0) {
+      availableTypes.push('Permanent Offline + Online');
+    }
+    
+    return availableTypes;
+  };
+
+  const getAvailableRentDurations = (game: Game) => {
+    const durations = [];
+    if (game.rent_1_month && game.rent_1_month > 0) durations.push({ key: '1_month', label: '1 Month', price: game.rent_1_month });
+    if (game.rent_3_months && game.rent_3_months > 0) durations.push({ key: '3_months', label: '3 Months', price: game.rent_3_months });
+    if (game.rent_6_months && game.rent_6_months > 0) durations.push({ key: '6_months', label: '6 Months', price: game.rent_6_months });
+    return durations;
+  };
+
   // Find the product by ID and set up editions
   useEffect(() => {
     if (id && !isLoading) {
