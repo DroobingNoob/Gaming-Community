@@ -95,6 +95,10 @@ function App() {
   
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}, [location.pathname]);
   
   // Track if we've already shown login toast to prevent duplicates
   const hasShownLoginToast = useRef(false);
