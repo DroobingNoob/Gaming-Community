@@ -736,8 +736,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           </div>
         </div>
         
-        <div 
-          onClick={() => setCrudOperation('read')}
+        <div
+          onClick={() => {
+       setCrudOperation('read');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }}
           className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
         >
           <div className="text-center">
