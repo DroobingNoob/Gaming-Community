@@ -67,7 +67,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [currentEdition, setCurrentEdition] = useState<'Standard' | 'Deluxe'>('Standard');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-
+  const [searchQuery, setSearchQuery] = useState('');
+  
   // Supabase data hooks
   const { games, refetch: refetchGames } = useGames();
   const { subscriptions, refetch: refetchSubscriptions } = useSubscriptions();
@@ -1463,6 +1464,14 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     } else if (stockType === 'subscriptions') {
       items = subscriptions;
     }
+
+    const lowerSearch = searchQuery.toLowerCase();
+
+const filteredItems = items.filter(item => {
+  const target = item.title || item.name; // Adjust depending on your data
+  return target?.toLowerCase().includes(lowerSearch);
+});
+
     
     return (
       <div className="space-y-8">
@@ -1472,9 +1481,19 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           </h2>
           <p className="text-gray-600 text-lg">Manage your existing content</p>
         </div>
+
+        <div className="max-w-md mx-auto mb-6">
+  <input
+    type="text"
+    placeholder="Search by title..."
+    className="w-full px-4 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+  />
+</div>
         
         <div className="grid grid-cols-1 gap-6 max-w-4xl mx-auto">
-          {items.map((item) => (
+          {filteredItems.map((item) => (
             <div key={item.id} className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 flex items-center justify-between hover:shadow-2xl transition-all duration-300">
               <div className="flex items-center space-x-6">
                 {activeSection === 'testimonials' ? (
@@ -1529,7 +1548,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             </div>
           ))}
           
-          {items.length === 0 && (
+          {filteredItems.length === 0 && (
             <div className="text-center py-12">
               <div className="bg-gray-100 rounded-full p-6 w-24 h-24 mx-auto mb-4 flex items-center justify-center">
                 <Database className="w-12 h-12 text-gray-400" />
