@@ -693,7 +693,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         </div>
         
         <div 
-          onClick={() => setStockType('subscriptions')}
+           onClick={() => {
+      setStockType('subscriptions');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }}
           className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
         >
           <div className="text-center">
