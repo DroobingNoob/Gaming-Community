@@ -721,8 +721,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        <div 
-          onClick={() => setCrudOperation('create')}
+        <div
+          onClick={() => {
+      setCrudOperation('create');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }}
           className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
         >
           <div className="text-center">
