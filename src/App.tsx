@@ -94,7 +94,7 @@ function App() {
   const [hasNewsletterDiscount, setHasNewsletterDiscount] = useState(false);
   
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation(); 
 
   useEffect(() => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
