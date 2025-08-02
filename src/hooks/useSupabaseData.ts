@@ -146,8 +146,6 @@ export const useTestimonials = () => {
 };
 
 //Hook for Payment Settings
-import { supabase } from '../config/supabase';
-
 export const paymentSettingsService = {
   async getSettings() {
     const { data, error } = await supabase
