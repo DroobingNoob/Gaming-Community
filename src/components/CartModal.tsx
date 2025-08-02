@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
-import { useGames } from '../hooks/useSupabaseData';
+import { useAllGames } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
 
 interface CartItem {
@@ -32,10 +32,13 @@ const CartModal: React.FC<CartModalProps> = ({
   onCheckout,
   onAddToCart
 }) => {
-  const { games } = useGames();
+  const { allGames, loading } = useAllGames();
   
   // Get recommended games
-  const recommendedGames = games.filter(game => game.is_recommended === true);
+  const recommendedGames = allGames.filter(game => 
+    game.is_recommended === true && 
+    game.category === 'game'
+  ).slice(0, 3);
 
   if (!isOpen) return null;
 
@@ -140,14 +143,14 @@ const CartModal: React.FC<CartModalProps> = ({
           )}
 
           {/* Recommended Games Section */}
-          {recommendedGames.length > 0 && (
+          {!loading && recommendedGames.length > 0 && (
             <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-200">
               <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center space-x-2">
                 <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">Recommended for You</span>
                 <span className="text-orange-500">🎮</span>
               </h3>
               <div className="space-y-3 sm:space-y-4">
-                {recommendedGames.slice(0, 3).map((game) => (
+                {recommendedGames.map((game) => (
                   <div key={game.id} className="flex items-center space-x-3 sm:space-x-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-orange-200 hover:shadow-xl transition-all duration-300">
                     <img
                       src={game.image}
