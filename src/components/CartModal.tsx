@@ -1,5 +1,7 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
+import { useGames } from '../hooks/useSupabaseData';
+import { Game } from '../config/supabase';
 
 interface CartItem {
   id: string;
@@ -18,6 +20,7 @@ interface CartModalProps {
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemoveItem: (id: string) => void;
   onCheckout: () => void;
+  onAddToCart?: (product: Game, platform: string, type: string, price: number) => void;
 }
 
 const CartModal: React.FC<CartModalProps> = ({ 
@@ -26,11 +29,27 @@ const CartModal: React.FC<CartModalProps> = ({
   cartItems, 
   onUpdateQuantity, 
   onRemoveItem,
-  onCheckout
+  onCheckout,
+  onAddToCart
 }) => {
+  const { games } = useGames();
+  
+  // Get recommended games
+  const recommendedGames = games.filter(game => game.is_recommended === true);
+
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  const handleAddRecommendedToCart = (game: Game) => {
+    if (onAddToCart) {
+      // Use default values: first platform, rent type, 1 month rent price
+      const platform = game.platform[0] || 'PS5';
+      const type = 'Rent (1 month)';
+      const price = game.rent_1_month || game.sale_price;
+      onAddToCart(game, platform, type, price);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
@@ -117,6 +136,42 @@ const CartModal: React.FC<CartModalProps> = ({
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Recommended Games Section */}
+          {recommendedGames.length > 0 && (
+            <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-200">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center space-x-2">
+                <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">Recommended for You</span>
+                <span className="text-orange-500">🎮</span>
+              </h3>
+              <div className="space-y-3 sm:space-y-4">
+                {recommendedGames.slice(0, 3).map((game) => (
+                  <div key={game.id} className="flex items-center space-x-3 sm:space-x-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-orange-200 hover:shadow-xl transition-all duration-300">
+                    <img
+                      src={game.image}
+                      alt={game.title}
+                      className="w-12 h-12 sm:w-16 sm:h-16 aspect-square object-cover rounded-lg shadow-md flex-shrink-0"
+                    />
+                    
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-800 mb-1 text-sm sm:text-base line-clamp-2">{game.title}</h4>
+                      <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
+                        <span className="bg-cyan-400 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium">{game.platform.join(', ')}</span>
+                      </div>
+                      <p className="text-orange-600 font-bold text-sm sm:text-lg">₹{game.rent_1_month || game.sale_price}</p>
+                    </div>
+
+                    <button
+                      onClick={() => handleAddRecommendedToCart(game)}
+                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex-shrink-0"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
