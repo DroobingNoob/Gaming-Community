@@ -75,7 +75,7 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-70 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] p-4">
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl max-w-md w-full shadow-2xl border border-white/20 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 text-white relative">
