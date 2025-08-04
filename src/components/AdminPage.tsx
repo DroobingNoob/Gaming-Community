@@ -42,7 +42,7 @@ interface GameFormData {
 }
 
 const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
-  const [activeSection, setActiveSection] = useState<'main' | 'testimonials' | 'stock'>('main');
+  const [activeSection, setActiveSection] = useState<'main' | 'testimonials' | 'stock'>('main'); 
   const [stockType, setStockType] = useState<'games' | 'subscriptions' | null>(null);
   const [crudOperation, setCrudOperation] = useState<'create' | 'read' | 'update' | 'delete' | null>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);
