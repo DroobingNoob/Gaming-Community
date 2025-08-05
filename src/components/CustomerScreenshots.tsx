@@ -1,14 +1,43 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTestimonials } from '../hooks/useSupabaseData';
 import Loader from './Loader';
 
+const SCROLL_SPEED = 0.5; // pixels per frame
+
 const CustomerScreenshots: React.FC = () => {
   const { testimonials, loading, error } = useTestimonials();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const scroll = () => {
+      if (scrollRef.current && !isPaused) {
+        scrollRef.current.scrollLeft += SCROLL_SPEED;
+
+        const scrollWidth = scrollRef.current.scrollWidth;
+        const containerWidth = scrollRef.current.clientWidth;
+
+        if (scrollRef.current.scrollLeft >= scrollWidth / 2) {
+          scrollRef.current.scrollLeft = 0;
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(scroll);
+    };
+
+    animationFrameId = requestAnimationFrame(scroll);
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isPaused]);
 
   if (loading) {
     return (
       <div className="py-8">
-        <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">Customer Screenshots</h3>
+        <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">
+          Customer Screenshots
+        </h3>
         <Loader size="medium" message="Loading customer screenshots..." />
       </div>
     );
@@ -17,7 +46,9 @@ const CustomerScreenshots: React.FC = () => {
   if (error || testimonials.length === 0) {
     return (
       <div className="py-8">
-        <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">Customer Screenshots</h3>
+        <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">
+          Customer Screenshots
+        </h3>
         <div className="text-center py-8">
           <p className="text-gray-600">No screenshots available at the moment.</p>
         </div>
@@ -27,12 +58,25 @@ const CustomerScreenshots: React.FC = () => {
 
   return (
     <div className="py-8">
-      <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">Customer Screenshots</h3>
-      
-      {/* Phone Screenshots Display */}
-      <div className="relative overflow-hidden">
-        <div className="flex space-x-4 sm:space-x-6 animate-scroll-slow">
-          {/* Duplicate screenshots for seamless loop */}
+      <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">
+        Customer Screenshots
+      </h3>
+
+      {/* Infinite Scroll Container */}
+      <div
+        className="relative overflow-hidden"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        <div
+          ref={scrollRef}
+          className="flex space-x-4 sm:space-x-6"
+          style={{
+            overflowX: 'scroll',
+            scrollBehavior: 'auto',
+            scrollbarWidth: 'none',
+          }}
+        >
           {[...testimonials, ...testimonials].map((screenshot, index) => (
             <div
               key={`${screenshot.id}-${index}`}
@@ -48,11 +92,11 @@ const CustomerScreenshots: React.FC = () => {
                       src={screenshot.image}
                       alt="Customer screenshot"
                       className="w-32 sm:w-48 md:w-56 h-auto max-h-64 sm:max-h-80 md:max-h-96 object-cover rounded-lg sm:rounded-xl"
-                      style={{ aspectRatio: '9/16' }} // Phone aspect ratio
+                      style={{ aspectRatio: '9/16' }}
                     />
                   </div>
                 </div>
-                
+
                 {/* Phone Home Indicator */}
                 <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 sm:w-12 h-0.5 sm:h-1 bg-gray-600 rounded-full"></div>
               </div>
@@ -72,25 +116,6 @@ const CustomerScreenshots: React.FC = () => {
           </p>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes scroll-slow {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-        
-        .animate-scroll-slow {
-          animation: scroll-slow 30s linear infinite;
-        }
-        
-        .animate-scroll-slow:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </div>
   );
 };
