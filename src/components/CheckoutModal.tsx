@@ -99,7 +99,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       toast.success('Mystery Box coupon applied! Free mystery game included');
     } else if (coupon === 'GAMINGCOMMUNITY15') {
       setCouponDiscount(subtotal * 0.15);
-      toast.success('Flash Sale discount applied! 50% off');
+      toast.success('Flash Sale discount applied! 15% off');
     } else {
       setCouponDiscount(0);
       toast.error('Invalid coupon code or not eligible');
