@@ -1,5 +1,7 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
+import { useRecommendedGames } from '../hooks/useSupabaseData';
+import { Game, getGameDisplayPrice, getGameDiscountPercentage } from '../config/supabase';
 
 interface CartItem {
   id: string;
@@ -18,6 +20,7 @@ interface CartModalProps {
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemoveItem: (id: string) => void;
   onCheckout: () => void;
+  onAddToCart?: (product: Game, platform: string, type: string, price: number) => void;
 }
 
 const CartModal: React.FC<CartModalProps> = ({ 
@@ -26,11 +29,24 @@ const CartModal: React.FC<CartModalProps> = ({
   cartItems, 
   onUpdateQuantity, 
   onRemoveItem,
-  onCheckout
+  onCheckout,
+  onAddToCart
 }) => {
+  const { recommendedGames, loading: recommendedLoading } = useRecommendedGames(4);
+
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  const handleAddRecommendedToCart = (game: Game) => {
+    if (onAddToCart) {
+      // Use default settings: first platform, Rent type, 1 month duration
+      const platform = game.platform[0] || 'PS5';
+      const type = 'Rent';
+      const price = getGameDisplayPrice(game, type, '1_month');
+      onAddToCart(game, platform, type, price);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-[70] p-0 sm:p-4">
@@ -135,6 +151,61 @@ const CartModal: React.FC<CartModalProps> = ({
               <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Proceed to Checkout</span>
             </button>
+          </div>
+        )}
+
+        {/* Recommended Games Section */}
+        {cartItems.length > 0 && recommendedGames.length > 0 && (
+          <div className="border-t border-gray-200 p-3 sm:p-6 bg-gradient-to-r from-blue-50 to-cyan-50">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span>Recommended for You</span>
+            </h3>
+            
+            {recommendedLoading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                {recommendedGames.slice(0, 4).map((game) => {
+                  const displayPrice = getGameDisplayPrice(game, 'Rent', '1_month');
+                  const discountPercentage = getGameDiscountPercentage(game, 'Rent', '1_month');
+                  
+                  return (
+                    <div key={game.id} className="bg-white rounded-lg sm:rounded-xl p-2 sm:p-3 shadow-md border border-white/50 hover:shadow-lg transition-all duration-300">
+                      <img
+                        src={game.image}
+                        alt={game.title}
+                        className="w-full aspect-square object-cover rounded-md sm:rounded-lg mb-2"
+                      />
+                      <h4 className="font-semibold text-gray-800 text-xs sm:text-sm mb-1 line-clamp-2">
+                        {game.title}
+                      </h4>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-1">
+                          <span className="text-blue-600 font-bold text-xs sm:text-sm">₹{displayPrice}</span>
+                          {discountPercentage > 0 && (
+                            <span className="text-gray-400 line-through text-xs">₹{game.original_price}</span>
+                          )}
+                        </div>
+                        {discountPercentage > 0 && (
+                          <span className="bg-orange-500 text-white px-1 py-0.5 rounded text-xs font-bold">
+                            -{discountPercentage}%
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleAddRecommendedToCart(game)}
+                        className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-1.5 sm:py-2 px-2 rounded-md sm:rounded-lg font-medium text-xs sm:text-sm transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-105"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </div>
