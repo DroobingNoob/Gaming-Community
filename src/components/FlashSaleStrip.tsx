@@ -43,7 +43,7 @@ const FlashSaleStrip: React.FC = () => {
         <div className="flex items-center gap-2">
           <Zap className="w-4 h-4 animate-pulse text-yellow-300" />
           <span className="font-extrabold tracking-wide whitespace-nowrap">
-            🔥 FLASH SALE: 50% OFF
+            🔥 FLASH SALE: 15% OFF
           </span>
         </div>
 
