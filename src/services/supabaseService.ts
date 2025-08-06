@@ -322,7 +322,7 @@ export const testimonialsService = {
     try {
       const { data, error } = await supabase
         .from('testimonials')
-        .select('id, image')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
