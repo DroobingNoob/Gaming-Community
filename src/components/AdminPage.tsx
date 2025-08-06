@@ -336,7 +336,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         type: ['Permanent'],
         show_in_bestsellers: false,
         category: 'subscription'
-      }; 
+      };  
 
       if (crudOperation === 'create') {
         await subscriptionsService.add(itemData);
