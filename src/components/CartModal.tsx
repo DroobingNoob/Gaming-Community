@@ -23,11 +23,11 @@ interface CartModalProps {
   onCheckout: () => void;
 }
 
-const CartModal: React.FC<CartModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  cartItems, 
-  onUpdateQuantity, 
+const CartModal: React.FC<CartModalProps> = ({
+  isOpen,
+  onClose,
+  cartItems,
+  onUpdateQuantity,
   onRemoveItem,
   onCheckout
 }) => {
@@ -39,7 +39,7 @@ const CartModal: React.FC<CartModalProps> = ({
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const handleGameClick = (game: Game) => {
-    onClose(); // Close cart modal first
+    onClose();
     if (game.category === 'game') {
       navigate(`/games/${game.id}`);
     } else {
@@ -49,7 +49,7 @@ const CartModal: React.FC<CartModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-[70] p-0 sm:p-4">
-      <div className="bg-white/95 backdrop-blur-sm rounded-t-3xl sm:rounded-3xl w-full sm:max-w-2xl sm:w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden flex flex-col shadow-2xl border border-white/20">
+      <div className="bg-white/95 backdrop-blur-sm rounded-t-3xl sm:rounded-3xl w-full sm:max-w-2xl sm:w-full max-h-[90vh] sm:max-h-[80vh] flex flex-col shadow-2xl border border-white/20 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-white/90 backdrop-blur-sm">
           <div className="flex items-center space-x-2 sm:space-x-3">
@@ -68,7 +68,7 @@ const CartModal: React.FC<CartModalProps> = ({
           </button>
         </div>
 
-        {/* Cart Items */}
+        {/* Content Scrollable Area */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-6">
           {cartItems.length === 0 ? (
             <div className="text-center py-8 sm:py-12">
@@ -92,7 +92,7 @@ const CartModal: React.FC<CartModalProps> = ({
                     alt={item.title}
                     className="w-12 h-12 sm:w-16 sm:h-16 aspect-square object-cover rounded-lg shadow-md flex-shrink-0"
                   />
-                  
+
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-gray-800 mb-1 text-sm sm:text-base line-clamp-2">{item.title}</h3>
                     <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
@@ -138,7 +138,7 @@ const CartModal: React.FC<CartModalProps> = ({
 
         {/* Footer */}
         {cartItems.length > 0 && (
-          <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-b-3xl sm:rounded-b-3xl">
+          <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-blue-50">
             <div className="flex justify-between items-center mb-3 sm:mb-4">
               <span className="text-lg sm:text-xl font-bold text-gray-800">Total:</span>
               <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">₹{total.toFixed(2)}</span>
@@ -155,16 +155,16 @@ const CartModal: React.FC<CartModalProps> = ({
 
         {/* Bestseller Games Section */}
         {!bestsellersLoading && bestsellers.length > 0 && (
-          <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-white to-gray-50">
+          <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-white to-gray-50 overflow-y-auto max-h-[30vh]">
             <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-center">
               You Might Also Like
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
               {bestsellers.slice(0, 6).map((game) => {
-                const displayPrice = game.category === 'game' 
+                const displayPrice = game.category === 'game'
                   ? getGameDisplayPrice(game, 'Rent', '1_month')
                   : game.sale_price;
-                
+
                 const discountPercentage = game.category === 'game'
                   ? getGameDiscountPercentage(game, 'Rent', '1_month')
                   : game.discount;
