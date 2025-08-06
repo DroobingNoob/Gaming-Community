@@ -198,7 +198,7 @@ const CartModal: React.FC<CartModalProps> = ({
                             <span className="text-gray-500 line-through text-xs">₹{game.original_price}</span>
                           )}
                         </div>
-                      </div>
+                      </div> 
                     </div>
                   );
                 })}
