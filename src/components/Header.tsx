@@ -34,10 +34,10 @@ const Header: React.FC<HeaderProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const { games } = useGames();
-  const { subscriptions } = useSubscriptions();
+  const { subscriptions } = useSubscriptions({ limit: 100 }); // Limit search suggestions
 
   // Combine games and subscriptions for search
-  const allItems = [...games, ...subscriptions];
+  const allItems = [...(games || []), ...(subscriptions || [])];
 
   useEffect(() => {
     if (searchQuery.trim().length > 0) {

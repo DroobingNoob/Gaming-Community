@@ -1,6 +1,5 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
-import { toast } from 'react-toastify';
 import { useBestsellers } from '../hooks/useSupabaseData';
 import { Game, getGameDisplayPrice, getGameDiscountPercentage } from '../config/supabase';
 import { useNavigate } from 'react-router-dom';

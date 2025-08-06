@@ -7,7 +7,6 @@ import Loader from '../components/Loader';
 
 const SubscriptionsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { subscriptions, loading, error } = useSubscriptions();
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [sortBy, setSortBy] = useState('name-asc');
@@ -17,38 +16,14 @@ const SubscriptionsPage: React.FC = () => {
   
   const itemsPerPage = 24;
 
-  // Filter and sort subscriptions
-  const filteredAndSortedSubscriptions = useMemo(() => {
-    let filtered = subscriptions.filter(subscription => {
-      const matchesSearch = subscription.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesPrice = subscription.sale_price >= priceRange[0] && subscription.sale_price <= priceRange[1];
-      
-      return matchesSearch && matchesPrice;
-    });
-
-    // Sort subscriptions
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'name-asc':
-          return a.title.localeCompare(b.title);
-        case 'name-desc':
-          return b.title.localeCompare(a.title);
-        case 'price-low':
-          return a.sale_price - b.sale_price;
-        case 'price-high':
-          return b.sale_price - a.sale_price;
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [subscriptions, searchQuery, priceRange, sortBy]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredAndSortedSubscriptions.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedSubscriptions = filteredAndSortedSubscriptions.slice(startIndex, startIndex + itemsPerPage);
+  // Use server-side filtering and pagination
+  const { subscriptions, totalCount, totalPages, loading, error } = useSubscriptions({
+    searchQuery,
+    priceRange,
+    sortBy,
+    page: currentPage,
+    limit: itemsPerPage
+  });
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -206,18 +181,18 @@ const SubscriptionsPage: React.FC = () => {
             {/* Results Header */}
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <p className="text-gray-600 text-sm sm:text-base">
-                Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAndSortedSubscriptions.length)} of {filteredAndSortedSubscriptions.length} subscriptions
+                Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount} subscriptions
               </p>
             </div>
 
             {/* Subscriptions Grid/List */}
-            {filteredAndSortedSubscriptions.length === 0 ? (
+            {subscriptions.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-600">No subscriptions found matching your criteria.</p>
               </div>
             ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
-                {paginatedSubscriptions.map((subscription) => (
+                {subscriptions.map((subscription) => (
                   <div
                     key={subscription.id}
                     className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-3 cursor-pointer group"
@@ -261,7 +236,7 @@ const SubscriptionsPage: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                {paginatedSubscriptions.map((subscription) => (
+                {subscriptions.map((subscription) => (
                   <div
                     key={subscription.id}
                     className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"

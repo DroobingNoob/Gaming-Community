@@ -33,13 +33,13 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [selectedRentDuration, setSelectedRentDuration] = useState<'1_month' | '2_months' | '3_months' | '6_months'>('1_month');
 
   // Get related products from database
-  const { games } = useGames();
-  const { subscriptions } = useSubscriptions();
+  const { games } = useGames({ limit: 8 }); // Limit related products
+  const { subscriptions } = useSubscriptions({ limit: 8 }); // Limit related products
 
   // Filter related products (same category, different from current product)
   const relatedProducts = product.category === 'game' 
-    ? games.filter(game => game.id !== product.id).slice(0, 4)
-    : subscriptions.filter(sub => sub.id !== product.id).slice(0, 4);
+    ? (games || []).filter(game => game.id !== product.id).slice(0, 4)
+    : (subscriptions || []).filter(sub => sub.id !== product.id).slice(0, 4);
 
   useEffect(() => {
     const handleScroll = () => {
