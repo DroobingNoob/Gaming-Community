@@ -404,10 +404,26 @@ function App() {
 
   const handleAddToCart = (product: Game, platform: string, type: string, price: number) => {
     try {
+      // Prevent duplicate rapid additions
       const itemId = `${product.id}-${platform}-${type}`;
+      
+      // Check if we're already processing this item (debounce)
+      const now = Date.now();
+      const lastAddTime = sessionStorage.getItem(`lastAdd_${itemId}`);
+      if (lastAddTime && (now - parseInt(lastAddTime)) < 1000) {
+        console.log('Preventing duplicate cart addition');
+        return;
+      }
+      sessionStorage.setItem(`lastAdd_${itemId}`, now.toString());
+      
       const existingItem = cartItems.find(item => item.id === itemId);
       
       if (existingItem) {
+        // Limit quantity to prevent runaway additions
+        if (existingItem.quantity >= 10) {
+          toast.warning('Maximum quantity (10) reached for this item');
+          return;
+        }
         setCartItems(items =>
           items.map(item =>
             item.id === itemId

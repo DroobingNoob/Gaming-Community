@@ -17,12 +17,18 @@ export class CartStorageService {
   // Save cart items for a user
   static async saveCartItems(userId: string, cartItems: any[]): Promise<boolean> {
     try {
+      // Prevent saving if cart is suspiciously large
+      if (cartItems.length > 50) {
+        console.warn('Cart too large, not saving to prevent spam');
+        return false;
+      }
+      
       const cartData = cartItems.map(item => ({
         userId,
         productId: item.id.split('-')[0], // Extract product ID from combined ID
         title: item.title,
         price: item.price,
-        quantity: item.quantity,
+        quantity: Math.min(item.quantity, 10), // Cap quantity at 10
         image: item.image,
         platform: item.platform,
         type: item.type,

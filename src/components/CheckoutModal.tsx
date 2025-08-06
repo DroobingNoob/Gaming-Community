@@ -304,7 +304,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
               <div className="flex items-center space-x-2">
                 <Gift className="w-4 h-4 text-orange-500" />
-                <span className="text-orange-800 font-medium text-sm">GAMINGCOMMUNITY50 - 50% off Flash Sale</span>
+                <span className="text-orange-800 font-medium text-sm">GAMINGCOMMUNITY50 - 50% off (Min ₹999)</span>
               </div>
             </div>
           </div>
