@@ -7,7 +7,6 @@ import Loader from '../components/Loader';
 
 const GamesPage: React.FC = () => {
   const navigate = useNavigate();
-  const { games, loading, error } = useGames(); // This now returns unique games only
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [priceRange, setPriceRange] = useState([0, 10000]);
@@ -18,46 +17,15 @@ const GamesPage: React.FC = () => {
   
   const itemsPerPage = 24;
 
-  // Filter and sort games
-  const filteredAndSortedGames = useMemo(() => {
-    let filtered = games.filter(game => {
-      const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesPlatform = selectedPlatform === 'all' || game.platform.includes(selectedPlatform);
-      
-      // For price filtering, use 1 month rent price for games
-      const displayPrice = getGameDisplayPrice(game, 'Rent', '1_month');
-      const matchesPrice = displayPrice >= priceRange[0] && displayPrice <= priceRange[1];
-      
-      return matchesSearch && matchesPlatform && matchesPrice;
-    });
-
-    // Sort games
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'name-asc':
-          return a.title.localeCompare(b.title);
-        case 'name-desc':
-          return b.title.localeCompare(a.title);
-        case 'price-low':
-          const priceA = getGameDisplayPrice(a, 'Rent', '1_month');
-          const priceB = getGameDisplayPrice(b, 'Rent', '1_month');
-          return priceA - priceB;
-        case 'price-high':
-          const priceA2 = getGameDisplayPrice(a, 'Rent', '1_month');
-          const priceB2 = getGameDisplayPrice(b, 'Rent', '1_month');
-          return priceB2 - priceA2;
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [games, searchQuery, selectedPlatform, priceRange, sortBy]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredAndSortedGames.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedGames = filteredAndSortedGames.slice(startIndex, startIndex + itemsPerPage);
+  // Use server-side filtering and pagination
+  const { games, totalCount, totalPages, loading, error } = useGames({
+    searchQuery,
+    platform: selectedPlatform,
+    priceRange,
+    sortBy,
+    page: currentPage,
+    limit: itemsPerPage
+  });
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -230,18 +198,18 @@ const GamesPage: React.FC = () => {
             {/* Results Header */}
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <p className="text-gray-600 text-sm sm:text-base">
-                Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAndSortedGames.length)} of {filteredAndSortedGames.length} games
+                Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount} games
               </p>
             </div>
 
             {/* Games Grid/List */}
-            {filteredAndSortedGames.length === 0 ? (
+            {games.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-600">No games found matching your criteria.</p>
               </div>
             ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
-                {paginatedGames.map((game) => {
+                {games.map((game) => {
                   const displayPrice = getGameDisplayPrice(game, 'Rent', '1_month');
                   const discountPercentage = getGameDiscountPercentage(game, 'Rent', '1_month');
 
@@ -295,7 +263,7 @@ const GamesPage: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                {paginatedGames.map((game) => {
+                {games.map((game) => {
                   const displayPrice = getGameDisplayPrice(game, 'Rent', '1_month');
                   const discountPercentage = getGameDiscountPercentage(game, 'Rent', '1_month');
 
