@@ -633,7 +633,7 @@ This option is best suited for single-player games or customers who prefer offli
                 {product.category === 'game' && (
                   <div className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
                     <Shield className="w-6 h-6 text-green-500" />
-                    <div>
+                    <div> 
                       <div className="font-bold text-gray-800 text-sm">Game Under Warranty</div>
                       <div className="text-gray-600 text-xs">6 months coverage</div>
                     </div>
