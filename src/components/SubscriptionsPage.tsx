@@ -235,9 +235,9 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
                           -{subscription.discount}%
                         </div>
                       )}
-                      {/* <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium shadow-lg">
+                      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium shadow-lg">
                         {subscription.platform.join(', ')}
-                      </div> */}  
+                      </div>  
                     </div>
                     <div className="p-3 sm:p-4">
                       <h3 className="font-bold text-gray-800 text-xs sm:text-sm mb-2 line-clamp-2">
@@ -279,12 +279,12 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
                           <div className="flex-1 mb-3 sm:mb-0">
                             <h3 className="font-bold text-gray-800 text-sm sm:text-lg mb-1 sm:mb-2">{subscription.title}</h3>
                             <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2 hidden sm:block">{subscription.description}</p>
-                            {/* <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2">
                               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
                                 {subscription.platform.join(', ')}
                               </span>
-                            </div> */} 
-                          </div>
+                            </div> 
+                          </div> 
                           <div className="text-left sm:text-right">
                             <div className="flex items-center space-x-2 mb-2 sm:mb-3">
                               <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
