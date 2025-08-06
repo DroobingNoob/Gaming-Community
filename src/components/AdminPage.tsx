@@ -332,8 +332,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       const itemData = {
         ...subscriptionFormData,
         discount,
-        platform: ['Multi-Platform'],
-        type: ['Permanent'],
+        platform: [''],
+        type: [''], 
         show_in_bestsellers: false,
         category: 'subscription'
       };
