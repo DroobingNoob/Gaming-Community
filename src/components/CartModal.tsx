@@ -199,7 +199,7 @@ const CartModal: React.FC<CartModalProps> = ({
                       </div>
                     </div>
                   </div>
-                );
+                ); 
               })}
             </div>
           </div>
