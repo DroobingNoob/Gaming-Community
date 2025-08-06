@@ -204,10 +204,6 @@ const CartModal: React.FC<CartModalProps> = ({
                               {game.platform.join(', ')}
                             </div>
                           )}
-                          )}
-                          {item.type !== 'Permanent' && (
-                            <span className="bg-orange-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium">{item.type}</span>
-                          )}
                         </div>
                       </div> 
                     </div>
