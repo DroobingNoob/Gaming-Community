@@ -235,9 +235,11 @@ This option is best suited for single-player games or customers who prefer offli
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-6">{product.title}</h1>
                 
                 <div className="flex items-center space-x-2 mb-6">
-                  <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg">
-                    {product.platform.join(', ')}
-                  </span>
+                  {product.category === 'game' && (
+                    <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg">
+                      {product.platform.join(', ')}
+                    </span>
+                  )}
                 </div>
 
                 {/* Platform Selection */}
@@ -365,13 +367,15 @@ This option is best suited for single-player games or customers who prefer offli
 
                 {/* Trust Labels */}
                 <div className="grid grid-cols-1 gap-4 mb-8">
-                  <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
-                    <Shield className="w-8 h-8 text-green-500" />
-                    <div>
-                      <div className="font-bold text-gray-800">Game Under Warranty</div>
-                      <div className="text-gray-600 text-sm">6 months coverage</div>
+                  {product.category === 'game' && (
+                    <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                      <Shield className="w-8 h-8 text-green-500" />
+                      <div>
+                        <div className="font-bold text-gray-800">Game Under Warranty</div>
+                        <div className="text-gray-600 text-sm">6 months coverage</div>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-200">
                     <Clock className="w-8 h-8 text-blue-500" />
                     <div>
@@ -494,9 +498,11 @@ This option is best suited for single-player games or customers who prefer offli
               <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">{product.title}</h1>
               
               <div className="flex items-center space-x-2 mb-4">
-                <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                  {product.platform.join(', ')}
-                </span>
+                {product.category === 'game' && (
+                  <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                    {product.platform.join(', ')}
+                  </span>
+                )}
               </div>
 
               {/* Platform Selection */}
@@ -624,13 +630,15 @@ This option is best suited for single-player games or customers who prefer offli
 
               {/* Trust Labels */}
               <div className="grid grid-cols-1 gap-3 sm:gap-4 mb-6 sm:mb-8">
-                <div className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
-                  <Shield className="w-6 h-6 text-green-500" />
-                  <div>
-                    <div className="font-bold text-gray-800 text-sm">Game Under Warranty</div>
-                    <div className="text-gray-600 text-xs">6 months coverage</div>
+                {product.category === 'game' && (
+                  <div className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                    <Shield className="w-6 h-6 text-green-500" />
+                    <div>
+                      <div className="font-bold text-gray-800 text-sm">Game Under Warranty</div>
+                      <div className="text-gray-600 text-xs">6 months coverage</div>
+                    </div>
                   </div>
-                </div>
+                )}
                 <div className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-200">
                   <Clock className="w-6 h-6 text-blue-500" />
                   <div>
