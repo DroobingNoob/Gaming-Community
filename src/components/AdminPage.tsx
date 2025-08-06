@@ -68,6 +68,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isRecommended, setIsRecommended] = useState(false);
   
   // Supabase data hooks
   const { games, refetch: refetchGames } = useGames();
