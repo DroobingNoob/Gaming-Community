@@ -160,9 +160,12 @@ export const useTestimonials = () => {
     try {
       setLoading(true);
       const testimonialsData = await testimonialsService.getAll();
+      console.log('Testimonials fetched in hook:', testimonialsData);
+      console.log('Number of testimonials:', testimonialsData.length);
       setTestimonials(testimonialsData);
       setError(null);
     } catch (err) {
+      console.error('Error in useTestimonials hook:', err);
       setError('Failed to fetch testimonials');
       console.error(err);
     } finally {

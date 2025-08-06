@@ -320,11 +320,15 @@ export const testimonialsService = {
   // Get all testimonials
   async getAll(): Promise<Testimonial[]> {
     try {
+      console.log('Fetching testimonials from Supabase...');
       const { data, error } = await supabase
         .from('testimonials')
         .select('*')
         .order('created_at', { ascending: false });
 
+      console.log('Supabase testimonials response:', { data, error });
+      console.log('Data length:', data?.length || 0);
+      
       if (error) throw error;
       return data || [];
     } catch (error) {
