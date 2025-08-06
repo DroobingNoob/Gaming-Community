@@ -828,7 +828,7 @@ This option is best suited for single-player games or customers who prefer offli
                   <span>Share</span>
                 </button>
               </div>
-
+ 
               {/* Trust Labels */}
               <div className="grid grid-cols-1 gap-3 mb-4 sm:mb-6">
                 <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
