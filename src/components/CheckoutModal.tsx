@@ -437,9 +437,9 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">UPI ID</label>
                 <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-3">
-                  <span className="flex-1 font-mono text-sm">gamingcommunity@paytm</span>
+                  <span className="flex-1 font-mono text-sm">9069043750@Yes</span>
                   <button
-                    onClick={() => copyToClipboard('gamingcommunity@paytm', 'upiId')}
+                    onClick={() => copyToClipboard('9069043750@Yes', 'upiId')}
                     className="text-blue-500 hover:text-blue-700 transition-colors"
                   >
                     {copiedUpiId ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
