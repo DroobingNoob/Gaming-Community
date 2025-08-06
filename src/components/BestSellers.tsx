@@ -174,7 +174,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
                                 </div>
                               )}
                               <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-medium shadow-lg">
-                                {game.platform.join(', ')}
+                                {game.category === 'game' ? game.platform.join(', ') : 'Subscription'}
                               </div>
                               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                             </div>

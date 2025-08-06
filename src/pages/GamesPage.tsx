@@ -263,7 +263,7 @@ const GamesPage: React.FC = () => {
                           </div>
                         )}
                         <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium shadow-lg">
-                          {game.platform.join(', ')}
+                          {game.category === 'game' ? game.platform.join(', ') : 'Subscription'}
                         </div>
                         {game.edition && game.edition !== 'Standard' && (
                           <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium shadow-lg">
@@ -318,7 +318,7 @@ const GamesPage: React.FC = () => {
                               <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2 hidden sm:block">{game.description}</p>
                               <div className="flex items-center space-x-2">
                                 <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
-                                  {game.platform.join(', ')}
+                                  {game.category === 'game' ? game.platform.join(', ') : 'Subscription'}
                                 </span>
                                 {game.edition && game.edition !== 'Standard' && (
                                   <span className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-2 py-1 rounded text-xs font-medium">

@@ -235,7 +235,7 @@ const SubscriptionsPage: React.FC = () => {
                         </div>
                       )}
                       <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium shadow-lg">
-                        {subscription.platform.join(', ')}
+                        Subscription
                       </div>
                     </div>
                     <div className="p-3 sm:p-4">
@@ -280,7 +280,7 @@ const SubscriptionsPage: React.FC = () => {
                             <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2 hidden sm:block">{subscription.description}</p>
                             <div className="flex items-center space-x-2">
                               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
-                                {subscription.platform.join(', ')}
+                                Subscription
                               </span>
                             </div>
                           </div>

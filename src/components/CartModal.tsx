@@ -192,10 +192,21 @@ const CartModal: React.FC<CartModalProps> = ({
                         <h4 className="font-semibold text-gray-800 text-xs sm:text-sm mb-1 line-clamp-2">
                           {game.title}
                         </h4>
-                        <div className="flex items-center space-x-1">
-                          <span className="text-orange-500 font-bold text-sm">₹{displayPrice}</span>
-                          {discountPercentage > 0 && (
-                            <span className="text-gray-500 line-through text-xs">₹{game.original_price}</span>
+                        <div className="space-y-1">
+                          <div className="flex items-center space-x-1">
+                            <span className="text-orange-500 font-bold text-sm">₹{displayPrice}</span>
+                            {discountPercentage > 0 && (
+                              <span className="text-gray-500 line-through text-xs">₹{game.original_price}</span>
+                            )}
+                          </div>
+                          {game.category === 'game' && (
+                            <div className="text-xs text-gray-500">
+                              {game.platform.join(', ')}
+                            </div>
+                          )}
+                          )}
+                          {item.type !== 'Permanent' && (
+                            <span className="bg-orange-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium">{item.type}</span>
                           )}
                         </div>
                       </div> 
