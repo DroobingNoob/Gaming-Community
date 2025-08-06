@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS payment_settings (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   razorpay_enabled boolean DEFAULT true,
   upi_qr_image text DEFAULT '/UPI.jpg',
-  upi_id text DEFAULT 'gamingcommunity@paytm',
+  upi_id text DEFAULT '9069043750@Yes',
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
@@ -48,7 +48,7 @@ CREATE POLICY "Allow authenticated insert on payment_settings"
 
 -- Insert default settings
 INSERT INTO payment_settings (razorpay_enabled, upi_qr_image, upi_id)
-VALUES (true, '/UPI.jpg', 'gamingcommunity@paytm')
+VALUES (true, '/UPI.jpg', '9069043750@Yes')
 ON CONFLICT DO NOTHING;
 
 -- Create index for better performance
