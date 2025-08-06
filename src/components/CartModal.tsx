@@ -1,7 +1,5 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
-import { useGames } from '../hooks/useSupabaseData';
-import { Game, getGameDisplayPrice } from '../config/supabase';
 
 interface CartItem {
   id: string;
@@ -20,7 +18,6 @@ interface CartModalProps {
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemoveItem: (id: string) => void;
   onCheckout: () => void;
-  onGameClick?: (game: Game) => void;
 }
 
 const CartModal: React.FC<CartModalProps> = ({ 
@@ -29,14 +26,8 @@ const CartModal: React.FC<CartModalProps> = ({
   cartItems, 
   onUpdateQuantity, 
   onRemoveItem,
-  onCheckout,
-  onGameClick
+  onCheckout
 }) => {
-  const { allGames } = useGames();
-  
-  // Get recommended games
-  const recommendedGames = allGames.filter(game => game.is_recommended).slice(0, 3);
-
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -65,62 +56,17 @@ const CartModal: React.FC<CartModalProps> = ({
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-6">
           {cartItems.length === 0 ? (
-            <div>
-              <div className="text-center py-8 sm:py-12">
-                <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ShoppingBag className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400" />
-                </div>
-                <p className="text-gray-500 text-base sm:text-lg mb-4">Your cart is empty</p>
-                <button
-                  onClick={onClose}
-                  className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-colors shadow-lg text-sm sm:text-base"
-                >
-                  Continue Shopping
-                </button>
+            <div className="text-center py-8 sm:py-12">
+              <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ShoppingBag className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400" />
               </div>
-              
-              {/* Recommended Games */}
-              {recommendedGames.length > 0 && onGameClick && (
-                <div className="mt-6">
-                  <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">Recommended for You</h3>
-                  <div className="space-y-3">
-                    {recommendedGames.map((game) => {
-                      const displayPrice = getGameDisplayPrice(game, 'Rent', '1_month');
-                      
-                      return (
-                        <div
-                          key={game.id}
-                          className="flex items-center space-x-3 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-3 border border-blue-200 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
-                          onClick={() => {
-                            onGameClick(game);
-                            onClose();
-                          }}
-                        >
-                          <img
-                            src={game.image}
-                            alt={game.title}
-                            className="w-12 h-12 sm:w-16 sm:h-16 aspect-square object-cover rounded-lg shadow-md flex-shrink-0"
-                          />
-                          
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-gray-800 mb-1 text-sm sm:text-base line-clamp-2">{game.title}</h4>
-                            <div className="flex items-center space-x-2 mb-1">
-                              <span className="bg-cyan-400 text-white px-2 py-0.5 rounded text-xs font-medium">{game.platform.join(', ')}</span>
-                            </div>
-                            <p className="text-cyan-600 font-bold text-sm sm:text-base">₹{displayPrice}</p>
-                          </div>
-                          
-                          <div className="flex-shrink-0">
-                            <button className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-2 px-3 rounded-lg font-medium text-xs transition-all duration-300 shadow-lg hover:shadow-xl">
-                              View
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+              <p className="text-gray-500 text-base sm:text-lg mb-4">Your cart is empty</p>
+              <button
+                onClick={onClose}
+                className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-colors shadow-lg text-sm sm:text-base"
+              >
+                Continue Shopping
+              </button>
             </div>
           ) : (
             <div className="space-y-3 sm:space-y-4">

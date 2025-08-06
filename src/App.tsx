@@ -545,13 +545,6 @@ function App() {
           onUpdateQuantity={handleUpdateQuantity}
           onRemoveItem={handleRemoveItem}
           onCheckout={handleCheckout}
-          onGameClick={(game) => {
-            if (game.category === 'game') {
-              navigate(`/games/${game.id}`);
-            } else {
-              navigate(`/subscriptions/${game.id}`);
-            }
-          }}
         />
 
         <CheckoutModal
