@@ -329,11 +329,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         ? Math.round(((subscriptionFormData.original_price - subscriptionFormData.sale_price) / subscriptionFormData.original_price) * 100)
         : 0;
 
-      const itemData = {
+       const itemData = {
         ...subscriptionFormData,
         discount,
-        platform: [''],
-        type: [''], 
+        platform: ['Multi-Platform'],
+        type: ['Permanent'],
         show_in_bestsellers: false,
         category: 'subscription'
       };
