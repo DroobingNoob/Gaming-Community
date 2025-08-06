@@ -1546,6 +1546,20 @@ const filteredItems = items.filter(item => {
                     </div>
                   </>
                 )}
+                
+                {/* Recommendation Checkbox */}
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isRecommended"
+                    checked={isRecommended}
+                    onChange={(e) => setIsRecommended(e.target.checked)}
+                    className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                  />
+                  <label htmlFor="isRecommended" className="text-sm font-medium text-gray-700">
+                    Put in Recommendation
+                  </label>
+                </div>
               </div>
               
               <div className="flex space-x-3">
