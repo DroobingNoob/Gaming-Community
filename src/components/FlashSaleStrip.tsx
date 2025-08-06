@@ -28,7 +28,7 @@ const FlashSaleStrip: React.FC = () => {
   const format = (n: number) => n.toString().padStart(2, '0');
 
   const handleCopyCoupon = () => {
-    navigator.clipboard.writeText('GAMINGCOMMUNITY50');
+    navigator.clipboard.writeText('GAMINGCOMMUNITY15');
     setCopiedCoupon(true);
     setTimeout(() => setCopiedCoupon(false), 2000);
   };
@@ -65,7 +65,7 @@ const FlashSaleStrip: React.FC = () => {
           onClick={handleCopyCoupon}
           className="flex items-center gap-2 border-2 border-dashed border-yellow-300 rounded-full px-4 py-1 hover:bg-yellow-300 hover:text-red-600 transition-colors"
         >
-          <span className="font-mono text-xs sm:text-sm">GAMINGCOMMUNITY50</span>
+          <span className="font-mono text-xs sm:text-sm">GAMINGCOMMUNITY15</span>
           {copiedCoupon ? (
             <Check className="w-4 h-4 text-green-400" />
           ) : (
