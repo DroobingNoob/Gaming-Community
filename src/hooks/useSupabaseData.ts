@@ -145,6 +145,36 @@ export const useTestimonials = () => {
   return { testimonials, loading, error, refetch: fetchTestimonials };
 };
 
+// Hook for recommended games
+export const useRecommendedGames = (limit: number = 6) => {
+  const [recommendedGames, setRecommendedGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchRecommendedGames = async () => {
+    try {
+      setLoading(true);
+      const recommendedData = await gamesService.getRecommended(limit);
+      
+      // Filter to show only unique games (primary editions)
+      const uniqueRecommended = getUniqueGamesForCustomer(recommendedData);
+      setRecommendedGames(uniqueRecommended);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch recommended games');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecommendedGames();
+  }, [limit]);
+
+  return { recommendedGames, loading, error, refetch: fetchRecommendedGames };
+};
+
 //Hook for Payment Settings
 export const paymentSettingsService = {
   async getSettings() {

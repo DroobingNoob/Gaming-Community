@@ -30,6 +30,7 @@ export interface Game {
   show_in_bestsellers?: boolean;
   created_at?: string;
   updated_at?: string;
+  is_recommended?: boolean;
 }
 
 export interface Testimonial {

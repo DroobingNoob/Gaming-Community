@@ -545,6 +545,7 @@ function App() {
           onUpdateQuantity={handleUpdateQuantity}
           onRemoveItem={handleRemoveItem}
           onCheckout={handleCheckout}
+          onAddToCart={handleAddToCart}
         />
 
         <CheckoutModal

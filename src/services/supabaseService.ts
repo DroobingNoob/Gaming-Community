@@ -38,6 +38,25 @@ export const gamesService = {
     }
   },
 
+  // Get recommended games
+  async getRecommended(limitCount: number = 6): Promise<Game[]> {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .select('*')
+        .eq('category', 'game')
+        .eq('is_recommended', true)
+        .order('created_at', { ascending: false })
+        .limit(limitCount);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching recommended games:', error);
+      return [];
+    }
+  },
+
   // Add new game
   async add(game: Omit<Game, 'id' | 'created_at' | 'updated_at'>): Promise<string> {
     try {
