@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { useBestsellers } from '../hooks/useSupabaseData';
 import { Game, getGameDisplayPrice, getGameDiscountPercentage } from '../config/supabase';
 import { useNavigate } from 'react-router-dom';
@@ -36,16 +37,6 @@ const CartModal: React.FC<CartModalProps> = ({
 
   if (!isOpen) return null;
 
-      // Prevent invalid quantities
-      if (quantity < 1) {
-        handleRemoveItem(id);
-        return;
-      }
-      if (quantity > 10) {
-        toast.warning('Maximum quantity (10) reached for this item');
-        return;
-      }
-      
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const handleGameClick = (game: Game) => {

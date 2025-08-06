@@ -477,6 +477,16 @@ function App() {
 
   const handleUpdateQuantity = (id: string, quantity: number) => {
     try {
+      // Prevent invalid quantities
+      if (quantity < 1) {
+        handleRemoveItem(id);
+        return;
+      }
+      if (quantity > 10) {
+        toast.warning('Maximum quantity (10) reached for this item');
+        return;
+      }
+      
       setCartItems(items =>
         items.map(item =>
           item.id === id ? { ...item, quantity } : item
