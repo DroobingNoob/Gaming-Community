@@ -1,5 +1,8 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
+import { useBestsellers } from '../hooks/useSupabaseData';
+import { Game, getGameDisplayPrice, getGameDiscountPercentage } from '../config/supabase';
+import { useNavigate } from 'react-router-dom';
 
 interface CartItem {
   id: string;
@@ -28,9 +31,21 @@ const CartModal: React.FC<CartModalProps> = ({
   onRemoveItem,
   onCheckout
 }) => {
+  const navigate = useNavigate();
+  const { bestsellers, loading: bestsellersLoading } = useBestsellers(6);
+
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  const handleGameClick = (game: Game) => {
+    onClose(); // Close cart modal first
+    if (game.category === 'game') {
+      navigate(`/games/${game.id}`);
+    } else {
+      navigate(`/subscriptions/${game.id}`);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-[70] p-0 sm:p-4">
@@ -135,6 +150,58 @@ const CartModal: React.FC<CartModalProps> = ({
               <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Proceed to Checkout</span>
             </button>
+          </div>
+        )}
+
+        {/* Bestseller Games Section */}
+        {!bestsellersLoading && bestsellers.length > 0 && (
+          <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-white to-gray-50">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-center">
+              You Might Also Like
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+              {bestsellers.slice(0, 6).map((game) => {
+                const displayPrice = game.category === 'game' 
+                  ? getGameDisplayPrice(game, 'Rent', '1_month')
+                  : game.sale_price;
+                
+                const discountPercentage = game.category === 'game'
+                  ? getGameDiscountPercentage(game, 'Rent', '1_month')
+                  : game.discount;
+
+                return (
+                  <div
+                    key={game.id}
+                    className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
+                    onClick={() => handleGameClick(game)}
+                  >
+                    <div className="relative">
+                      <img
+                        src={game.image}
+                        alt={game.title}
+                        className="w-full aspect-square object-cover"
+                      />
+                      {discountPercentage > 0 && (
+                        <div className="absolute top-1 right-1 bg-gradient-to-r from-orange-500 to-red-500 text-white px-1.5 py-0.5 rounded-full text-xs font-bold">
+                          -{discountPercentage}%
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-2 sm:p-3">
+                      <h4 className="font-semibold text-gray-800 text-xs sm:text-sm mb-1 line-clamp-2">
+                        {game.title}
+                      </h4>
+                      <div className="flex items-center space-x-1">
+                        <span className="text-orange-500 font-bold text-sm">₹{displayPrice}</span>
+                        {discountPercentage > 0 && (
+                          <span className="text-gray-500 line-through text-xs">₹{game.original_price}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

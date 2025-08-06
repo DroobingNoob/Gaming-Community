@@ -177,15 +177,27 @@ This option is best suited for single-player games or customers who prefer offli
   };
 
   const handleAddToCart = () => {
-    const price = calculatePrice();
-    const typeWithDuration = selectedType === 'Rent' ? `${selectedType} (${selectedRentDuration.replace('_', ' ')})` : selectedType;
-    onAddToCart(product, selectedPlatform, typeWithDuration, price);
+    if (product.category === 'subscription') {
+      // For subscriptions, use simple values
+      onAddToCart(product, 'Subscription', 'Permanent', product.sale_price);
+    } else {
+      // For games, use the selected options
+      const price = calculatePrice();
+      const typeWithDuration = selectedType === 'Rent' ? `${selectedType} (${selectedRentDuration.replace('_', ' ')})` : selectedType;
+      onAddToCart(product, selectedPlatform, typeWithDuration, price);
+    }
   };
 
   const handleBuyNow = () => {
-    const price = calculatePrice();
-    const typeWithDuration = selectedType === 'Rent' ? `${selectedType} (${selectedRentDuration.replace('_', ' ')})` : selectedType;
-    onBuyNow(product, selectedPlatform, typeWithDuration, price);
+    if (product.category === 'subscription') {
+      // For subscriptions, use simple values
+      onBuyNow(product, 'Subscription', 'Permanent', product.sale_price);
+    } else {
+      // For games, use the selected options
+      const price = calculatePrice();
+      const typeWithDuration = selectedType === 'Rent' ? `${selectedType} (${selectedRentDuration.replace('_', ' ')})` : selectedType;
+      onBuyNow(product, selectedPlatform, typeWithDuration, price);
+    }
   };
 
   return (
@@ -229,47 +241,53 @@ This option is best suited for single-player games or customers who prefer offli
                 </div>
 
                 {/* Platform Selection */}
-                <div className="mb-6">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
-                  <div className="flex space-x-3">
-                    {product.platform.map((platform) => (
-                      <button
-                        key={platform}
-                        onClick={() => setSelectedPlatform(platform)}
-                        className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                          selectedPlatform === platform
-                            ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-lg'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {platform}
-                      </button>
-                    ))}
+                {/* Platform Selection - Only show for games */}
+                {product.category === 'game' && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
+                    <div className="flex space-x-3">
+                      {product.platform.map((platform) => (
+                        <button
+                          key={platform}
+                          onClick={() => setSelectedPlatform(platform)}
+                          className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+                            selectedPlatform === platform
+                              ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-lg'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {platform}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Type Selection */}
-                <div className="mb-6">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
-                  <div className="space-y-3">
-                    {product.type.map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => setSelectedType(type)}
-                        className={`w-full px-6 py-3 rounded-xl font-medium transition-all duration-300 text-left ${
-                          selectedType === type
-                            ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ))}
+                {/* Type Selection - Only show for games */}
+                {product.category === 'game' && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
+                    <div className="space-y-3">
+                      {product.type.map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => setSelectedType(type)}
+                          className={`w-full px-6 py-3 rounded-xl font-medium transition-all duration-300 text-left ${
+                            selectedType === type
+                              ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Rent Duration Selection - Only show if Rent is selected */}
-                {selectedType === 'Rent' && (
+                {product.category === 'game' && selectedType === 'Rent' && (
                   <div className="mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-3">Rental Duration</label>
                     <div className="grid grid-cols-2 gap-3">
@@ -297,12 +315,15 @@ This option is best suited for single-player games or customers who prefer offli
                 )}
 
                 {/* Type Description */}
-                <div className="mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-200">
-                  <h4 className="font-bold text-blue-800 mb-3">About This Option</h4>
-                  <p className="text-blue-700 text-sm leading-relaxed whitespace-pre-line">
-                    {getTypeDescription()}
-                  </p>
-                </div>
+                {/* Type Description - Only show for games */}
+                {product.category === 'game' && (
+                  <div className="mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-200">
+                    <h4 className="font-bold text-blue-800 mb-3">About This Option</h4>
+                    <p className="text-blue-700 text-sm leading-relaxed whitespace-pre-line">
+                      {getTypeDescription()}
+                    </p>
+                  </div>
+                )}
 
                 {/* Pricing */}
                 <div className="flex items-center space-x-4 mb-8">
@@ -479,47 +500,53 @@ This option is best suited for single-player games or customers who prefer offli
               </div>
 
               {/* Platform Selection */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
-                <div className="flex space-x-3">
-                  {product.platform.map((platform) => (
-                    <button
-                      key={platform}
-                      onClick={() => setSelectedPlatform(platform)}
-                      className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                        selectedPlatform === platform
-                          ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-lg'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {platform}
-                    </button>
-                  ))}
+              {/* Platform Selection - Only show for games */}
+              {product.category === 'game' && (
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Platform</label>
+                  <div className="flex space-x-3">
+                    {product.platform.map((platform) => (
+                      <button
+                        key={platform}
+                        onClick={() => setSelectedPlatform(platform)}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                          selectedPlatform === platform
+                            ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-lg'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {platform}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Type Selection */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
-                <div className="space-y-3">
-                  {product.type.map((type) => (
-                    <button
-                      key={type}
-                      onClick={() => setSelectedType(type)}
-                      className={`w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 text-left ${
-                        selectedType === type
-                          ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
+              {/* Type Selection - Only show for games */}
+              {product.category === 'game' && (
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
+                  <div className="space-y-3">
+                    {product.type.map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => setSelectedType(type)}
+                        className={`w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 text-left ${
+                          selectedType === type
+                            ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Rent Duration Selection - Only show if Rent is selected */}
-              {selectedType === 'Rent' && (
+              {product.category === 'game' && selectedType === 'Rent' && (
                 <div className="mb-6">
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Rental Duration</label>
                   <div className="grid grid-cols-2 gap-3">
@@ -547,12 +574,15 @@ This option is best suited for single-player games or customers who prefer offli
               )}
 
               {/* Type Description */}
-              <div className="mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
-                <h4 className="font-bold text-blue-800 mb-3 text-sm">About This Option</h4>
-                <p className="text-blue-700 text-xs leading-relaxed whitespace-pre-line">
-                  {getTypeDescription()}
-                </p>
-              </div>
+              {/* Type Description - Only show for games */}
+              {product.category === 'game' && (
+                <div className="mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
+                  <h4 className="font-bold text-blue-800 mb-3 text-sm">About This Option</h4>
+                  <p className="text-blue-700 text-xs leading-relaxed whitespace-pre-line">
+                    {getTypeDescription()}
+                  </p>
+                </div>
+              )}
 
               {/* Pricing */}
               <div className="flex items-center space-x-3 sm:space-x-4 mb-6">
