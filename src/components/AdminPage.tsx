@@ -237,6 +237,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         description: '',
         type: ['Rent'],
         category: 'subscription'
+        edition_features: [],
       });
       setIsAddingSubscription(false);
       // Note: You might want to add a refetch for subscriptions here
@@ -665,6 +666,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     );
   };
 
+    const [newFeature, setNewFeature] = useState('');
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -713,9 +715,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-bold text-gray-800">Manage Games</h3>
                   <button
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {paginatedSubscriptions.map((subscription) => (
                     onClick={() => setIsAddingGame(true)}
                     className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
                   >
@@ -1621,44 +1620,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 )}
               </div>
             )}
-            ))}
           </div>
-          
-          {/* Pagination */}
-          {totalSubscriptionsPages > 1 && (
-            <div className="flex items-center justify-center space-x-2 mt-6">
-              <button
-                onClick={() => setSubscriptionsPage(Math.max(1, subscriptionsPage - 1))}
-                disabled={subscriptionsPage === 1}
-                className="px-4 py-2 text-gray-600 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-lg hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Previous
-              </button>
-              
-              {Array.from({ length: totalSubscriptionsPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  onClick={() => setSubscriptionsPage(page)}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    subscriptionsPage === page
-                      ? 'bg-gradient-to-r from-purple-400 to-indigo-500 text-white'
-                      : 'text-gray-600 bg-white/80 backdrop-blur-sm border border-gray-300 hover:bg-white/90'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-              
-              <button
-                onClick={() => setSubscriptionsPage(Math.min(totalSubscriptionsPages, subscriptionsPage + 1))}
-                disabled={subscriptionsPage === totalSubscriptionsPages}
-                className="px-4 py-2 text-gray-600 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-lg hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </>
+        </div>
       </div>
     </div>
   );
