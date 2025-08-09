@@ -13,9 +13,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [activeTab, setActiveTab] = useState<'games' | 'subscriptions' | 'screenshots'>('games');
   const [isAddingGame, setIsAddingGame] = useState(false);
   const [isAddingSubscription, setIsAddingSubscription] = useState(false);
+  const [isScreenshotModalOpen, setIsScreenshotModalOpen] = useState(false);
   const [isAddingScreenshot, setIsAddingScreenshot] = useState(false);
   const [editingGame, setEditingGame] = useState<Game | null>(null);
   const [editingSubscription, setEditingSubscription] = useState<Game | null>(null);
+  const [editingScreenshot, setEditingScreenshot] = useState<Testimonial | null>(null);
   const [editingScreenshot, setEditingScreenshot] = useState<Testimonial | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -281,6 +283,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
   const startEditingGame = (game: Game) => {
     setEditingGame(game);
+    setIsGameModalOpen(true);
     setGameForm(game);
   };
 
