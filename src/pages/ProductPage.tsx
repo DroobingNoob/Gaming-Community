@@ -198,7 +198,16 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
   };
 
   const getTypeDescription = () => {
-    if (selectedType === 'Rent') {
+    if (product.category === 'subscription') {
+      // For subscriptions, always use rental pricing
+      const rentPrices = {
+        '1_month': product.rent_1_month || 0,
+        '3_months': product.rent_3_months || 0,
+        '6_months': product.rent_6_months || 0,
+        '12_months': product.rent_12_months || 0
+      };
+      return rentPrices[selectedRentDuration];
+    } else if (selectedType === 'Rent') {
       return ` 🎮 Rental Game Accounts:
 
 ✔️ We provide a fully legal account with your desired rental game pre-purchased.
@@ -214,9 +223,9 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
 
 ✔️ Console must remain connected to the internet during the rental period.
 
-✔️ After the selected rental period ends, the game must be returned as per the agreed process.
 
-✔️ Continuing to use the game after your rental period may result in account restrictions or being blocked from future rentals.
+        '6_months': product.rent_6_months || 0,
+        '12_months': product.rent_12_months || 0
 
 ✔️ Credentials cannot be changed. If changed, the game will be removed, and no refund or recovery will be provided.`;
     } else if (selectedType === 'Permanent Offline') {

@@ -57,12 +57,13 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [subscriptionForm, setSubscriptionForm] = useState<Partial<Game>>({
     title: '',
     image: '',
-    original_price: 0,
-    sale_price: 0,
-    platform: ['PS5'],
+    rent_1_month: 0,
+    rent_3_months: 0,
+    rent_6_months: 0,
+    rent_12_months: 0,
     discount: 0,
     description: '',
-    type: ['Permanent'],
+    type: ['Rent'],
     category: 'subscription'
   });
 
@@ -211,12 +212,13 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       setSubscriptionForm({
         title: '',
         image: '',
-        original_price: 0,
-        sale_price: 0,
-        platform: ['PS5'],
+        rent_1_month: 0,
+        rent_3_months: 0,
+        rent_6_months: 0,
+        rent_12_months: 0,
         discount: 0,
         description: '',
-        type: ['Permanent'],
+        type: ['Rent'],
         category: 'subscription'
       });
       setIsAddingSubscription(false);
@@ -314,12 +316,13 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     setSubscriptionForm({
       title: '',
       image: '',
-      original_price: 0,
-      sale_price: 0,
-      platform: ['PS5'],
+      rent_1_month: 0,
+      rent_3_months: 0,
+      rent_6_months: 0,
+      rent_12_months: 0,
       discount: 0,
       description: '',
-      type: ['Permanent'],
+      type: ['Rent'],
       category: 'subscription'
     });
     setScreenshotForm({ image: '' });
@@ -688,8 +691,678 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           <div className="p-6">
             {activeTab === 'screenshots' && renderScreenshotsSection()}
             {activeTab === 'games' && (
-              <div className="text-center py-8">
-                <p className="text-gray-600">Games management section</p>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-gray-800">Manage Games</h3>
+                  <button
+                    onClick={() => setIsAddingGame(true)}
+                    className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add Game</span>
+                  </button>
+                </div>
+
+                {/* Loading State */}
+                {gamesLoading && (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading games...</p>
+                  </div>
+                )}
+
+                {/* Error State */}
+                {gamesError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p className="text-red-600">Error loading games: {gamesError}</p>
+                    <button
+                      onClick={refetchGames}
+                      className="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                )}
+
+                {/* Games Grid */}
+                {!gamesLoading && !gamesError && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {allGames && allGames.length > 0 ? (
+                      allGames.map((game) => (
+                        <div key={game.id} className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+                          <div className="aspect-square relative">
+                            <img
+                              src={game.image}
+                              alt={game.title}
+                              className="w-full h-full object-cover"
+                            />
+                            {game.discount > 0 && (
+                              <div className="absolute top-2 left-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                                -{game.discount}%
+                              </div>
+                            )}
+                            <div className="absolute top-2 right-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
+                              {game.platform.join(', ')}
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <h4 className="font-bold text-gray-800 mb-2 line-clamp-2">{game.title}</h4>
+                            <div className="flex items-center space-x-2 mb-3">
+                              <span className="text-orange-500 font-bold">₹{game.rent_1_month || game.sale_price}</span>
+                              {game.original_price > (game.rent_1_month || game.sale_price) && (
+                                <span className="text-gray-500 line-through text-sm">₹{game.original_price}</span>
+                              )}
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-gray-500">
+                                {game.created_at ? new Date(game.created_at).toLocaleDateString() : 'No date'}
+                              </span>
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={() => startEditingGame(game)}
+                                  className="text-blue-600 hover:text-blue-800 p-1"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteGame(game.id!)}
+                                  className="text-red-600 hover:text-red-800 p-1"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="col-span-full text-center py-8">
+                        <div className="w-12 h-12 text-gray-400 mx-auto mb-4">🎮</div>
+                        <p className="text-gray-600">No games found</p>
+                        <p className="text-sm text-gray-500 mt-2">Add your first game to get started</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Add Game Modal */}
+                {isAddingGame && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-bold text-gray-800">Add New Game</h3>
+                        <button
+                          onClick={() => {
+                            setIsAddingGame(false);
+                            setGameForm({
+                              title: '',
+                              image: '',
+                              original_price: 0,
+                              sale_price: 0,
+                              rent_1_month: 0,
+                              rent_3_months: 0,
+                              rent_6_months: 0,
+                              permanent_offline_price: 0,
+                              permanent_online_price: 0,
+                              platform: ['PS5'],
+                              discount: 0,
+                              description: '',
+                              type: ['Rent'],
+                              category: 'game',
+                              show_in_bestsellers: false,
+                              edition: 'Standard',
+                              edition_features: []
+                            });
+                          }}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <X className="w-6 h-6" />
+                        </button>
+                      </div>
+
+                      <div className="space-y-6">
+                        {/* Basic Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Title <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={gameForm.title || ''}
+                              onChange={(e) => setGameForm(prev => ({ ...prev, title: e.target.value }))}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                              placeholder="Game title"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Platform
+                            </label>
+                            <select
+                              value={gameForm.platform?.[0] || 'PS5'}
+                              onChange={(e) => setGameForm(prev => ({ ...prev, platform: [e.target.value] }))}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            >
+                              <option value="PS5">PlayStation 5</option>
+                              <option value="PS4">PlayStation 4</option>
+                              <option value="PSVR2">PlayStation VR 2</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Image Upload */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Image <span className="text-red-500">*</span>
+                          </label>
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                            {gameForm.image ? (
+                              <div className="space-y-4">
+                                <img
+                                  src={gameForm.image}
+                                  alt="Preview"
+                                  className="w-32 h-32 object-cover mx-auto rounded-lg"
+                                />
+                                <button
+                                  onClick={() => setGameForm(prev => ({ ...prev, image: '' }))}
+                                  className="text-red-600 hover:text-red-800 text-sm"
+                                >
+                                  Remove Image
+                                </button>
+                              </div>
+                            ) : (
+                              <div>
+                                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                <p className="text-gray-600 mb-2">Upload game image</p>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) handleImageUpload(file, 'game');
+                                  }}
+                                  className="hidden"
+                                  id="game-upload"
+                                  disabled={uploadingImage}
+                                />
+                                <label
+                                  htmlFor="game-upload"
+                                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg cursor-pointer inline-flex items-center space-x-2"
+                                >
+                                  {uploadingImage ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                      <span>Uploading...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="w-4 h-4" />
+                                      <span>Choose File</span>
+                                    </>
+                                  )}
+                                </label>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Pricing Options */}
+                        <div>
+                          <h4 className="text-lg font-semibold text-gray-800 mb-4">Pricing Options</h4>
+                          
+                          {/* Original Price */}
+                          <div className="mb-6">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Original Price (₹)
+                            </label>
+                            <input
+                              type="number"
+                              value={gameForm.original_price || ''}
+                              onChange={(e) => setGameForm(prev => ({ ...prev, original_price: parseFloat(e.target.value) || 0 }))}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                              placeholder="0"
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+
+                          {/* Rental Prices */}
+                          <div className="mb-6">
+                            <h5 className="text-md font-semibold text-gray-700 mb-3">Rental Prices</h5>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">1 Month (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.rent_1_month || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, rent_1_month: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">3 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.rent_3_months || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, rent_3_months: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">6 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.rent_6_months || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, rent_6_months: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">12 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.rent_12_months || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, rent_12_months: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Permanent Prices */}
+                          <div className="mb-6">
+                            <h5 className="text-md font-semibold text-gray-700 mb-3">Permanent Prices</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Offline Only (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.permanent_offline_price || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, permanent_offline_price: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Online + Offline (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.permanent_online_price || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, permanent_online_price: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Description
+                          </label>
+                          <textarea
+                            value={gameForm.description || ''}
+                            onChange={(e) => setGameForm(prev => ({ ...prev, description: e.target.value }))}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            rows={4}
+                            placeholder="Game description"
+                          />
+                        </div>
+
+                        {/* Options */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Edition
+                            </label>
+                            <select
+                              value={gameForm.edition || 'Standard'}
+                              onChange={(e) => setGameForm(prev => ({ ...prev, edition: e.target.value as 'Standard' | 'Premium' }))}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            >
+                              <option value="Standard">Standard</option>
+                              <option value="Premium">Premium</option>
+                            </select>
+                          </div>
+                          <div className="flex items-center space-x-4 pt-8">
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={gameForm.show_in_bestsellers || false}
+                                onChange={(e) => setGameForm(prev => ({ ...prev, show_in_bestsellers: e.target.checked }))}
+                                className="rounded border-gray-300 text-cyan-600 focus:ring-cyan-400"
+                              />
+                              <span className="text-sm font-medium text-gray-700">Show in Bestsellers</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex space-x-3 pt-4">
+                          <button
+                            onClick={() => {
+                              setIsAddingGame(false);
+                              setGameForm({
+                                title: '',
+                                image: '',
+                                original_price: 0,
+                                sale_price: 0,
+                                rent_1_month: 0,
+                                rent_3_months: 0,
+                                rent_6_months: 0,
+                                permanent_offline_price: 0,
+                                permanent_online_price: 0,
+                                platform: ['PS5'],
+                                discount: 0,
+                                description: '',
+                                type: ['Rent'],
+                                category: 'game',
+                                show_in_bestsellers: false,
+                                edition: 'Standard',
+                                edition_features: []
+                              });
+                            }}
+                            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-medium transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={handleAddGame}
+                            disabled={!gameForm.title || !gameForm.image || uploadingImage}
+                            className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                          >
+                            <Save className="w-4 h-4" />
+                            <span>Add Game</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Edit Game Modal */}
+                {editingGame && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-bold text-gray-800">Edit Game</h3>
+                        <button
+                          onClick={cancelEditing}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <X className="w-6 h-6" />
+                        </button>
+                      </div>
+
+                      <div className="space-y-6">
+                        {/* Basic Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Title <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={gameForm.title || ''}
+                              onChange={(e) => setGameForm(prev => ({ ...prev, title: e.target.value }))}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                              placeholder="Game title"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Platform
+                            </label>
+                            <select
+                              value={gameForm.platform?.[0] || 'PS5'}
+                              onChange={(e) => setGameForm(prev => ({ ...prev, platform: [e.target.value] }))}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            >
+                              <option value="PS5">PlayStation 5</option>
+                              <option value="PS4">PlayStation 4</option>
+                              <option value="PSVR2">PlayStation VR 2</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Current Image Preview */}
+                        {gameForm.image && (
+                          <div className="text-center">
+                            <img
+                              src={gameForm.image}
+                              alt="Current game image"
+                              className="w-32 h-32 object-cover mx-auto rounded-lg border border-gray-200"
+                            />
+                          </div>
+                        )}
+
+                        {/* Image Upload */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Replace Game Image
+                          </label>
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                            <p className="text-gray-600 mb-2">Upload new game image</p>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleImageUpload(file, 'game');
+                              }}
+                              className="hidden"
+                              id="edit-game-upload"
+                              disabled={uploadingImage}
+                            />
+                            <label
+                              htmlFor="edit-game-upload"
+                              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg cursor-pointer inline-flex items-center space-x-2"
+                            >
+                              {uploadingImage ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                  <span>Uploading...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="w-4 h-4" />
+                                  <span>Choose New File</span>
+                                </>
+                              )}
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* Pricing Options */}
+                        <div>
+                          <h4 className="text-lg font-semibold text-gray-800 mb-4">Pricing Options</h4>
+                          
+                          {/* Original Price */}
+                          <div className="mb-6">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Original Price (₹)
+                            </label>
+                            <input
+                              type="number"
+                              value={gameForm.original_price || ''}
+                              onChange={(e) => setGameForm(prev => ({ ...prev, original_price: parseFloat(e.target.value) || 0 }))}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                              placeholder="0"
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+
+                          {/* Rental Prices */}
+                          <div className="mb-6">
+                            <h5 className="text-md font-semibold text-gray-700 mb-3">Rental Prices</h5>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">1 Month (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.rent_1_month || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, rent_1_month: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">3 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.rent_3_months || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, rent_3_months: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">6 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.rent_6_months || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, rent_6_months: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">12 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.rent_12_months || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, rent_12_months: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Permanent Prices */}
+                          <div className="mb-6">
+                            <h5 className="text-md font-semibold text-gray-700 mb-3">Permanent Prices</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Offline Only (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.permanent_offline_price || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, permanent_offline_price: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Online + Offline (₹)</label>
+                                <input
+                                  type="number"
+                                  value={gameForm.permanent_online_price || ''}
+                                  onChange={(e) => setGameForm(prev => ({ ...prev, permanent_online_price: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Description
+                          </label>
+                          <textarea
+                            value={gameForm.description || ''}
+                            onChange={(e) => setGameForm(prev => ({ ...prev, description: e.target.value }))}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            rows={4}
+                            placeholder="Game description"
+                          />
+                        </div>
+
+                        {/* Options */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Edition
+                            </label>
+                            <select
+                              value={gameForm.edition || 'Standard'}
+                              onChange={(e) => setGameForm(prev => ({ ...prev, edition: e.target.value as 'Standard' | 'Premium' }))}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            >
+                              <option value="Standard">Standard</option>
+                              <option value="Premium">Premium</option>
+                            </select>
+                          </div>
+                          <div className="flex items-center space-x-4 pt-8">
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={gameForm.show_in_bestsellers || false}
+                                onChange={(e) => setGameForm(prev => ({ ...prev, show_in_bestsellers: e.target.checked }))}
+                                className="rounded border-gray-300 text-cyan-600 focus:ring-cyan-400"
+                              />
+                              <span className="text-sm font-medium text-gray-700">Show in Bestsellers</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex space-x-3 pt-4">
+                          <button
+                            onClick={cancelEditing}
+                            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-medium transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={handleUpdateGame}
+                            disabled={!gameForm.title || !gameForm.image || uploadingImage}
+                            className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                          >
+                            <Save className="w-4 h-4" />
+                            <span>Update Game</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             {activeTab === 'subscriptions' && (
@@ -717,16 +1390,14 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                             setSubscriptionForm({
                               title: '',
                               image: '',
-                              original_price: 0,
-                              sale_price: 0,
                               rent_1_month: 0,
                               rent_3_months: 0,
                               rent_6_months: 0,
                               rent_12_months: 0,
-                              platform: ['PS5'],
+                              platform: ['Subscription'],
                               discount: 0,
                               description: '',
-                              type: ['Permanent'],
+                              type: ['Rent'],
                               category: 'subscription'
                             });
                           }}
@@ -750,21 +1421,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
                               placeholder="Subscription title"
                             />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              Platform
-                            </label>
-                            <select
-                              value={subscriptionForm.platform?.[0] || 'PS5'}
-                              onChange={(e) => setSubscriptionForm(prev => ({ ...prev, platform: [e.target.value] }))}
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                            >
-                              <option value="PS5">PlayStation 5</option>
-                              <option value="PS4">PlayStation 4</option>
-                              <option value="Xbox">Xbox</option>
-                              <option value="PC">PC</option>
-                            </select>
                           </div>
                         </div>
 
@@ -826,18 +1482,16 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
                         {/* Pricing Options */}
                         <div>
-                          <h4 className="text-lg font-semibold text-gray-800 mb-4">Pricing Options</h4>
+                          <h4 className="text-lg font-semibold text-gray-800 mb-4">Rental Duration Pricing</h4>
+                          <p className="text-sm text-gray-600 mb-4">Set prices for different subscription durations. Leave blank for durations you don't want to offer.</p>
                           
-                          {/* Permanent Price */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
-                              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Original Price (₹)
-                              </label>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">1 Month (₹)</label>
                               <input
                                 type="number"
-                                value={subscriptionForm.original_price || ''}
-                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, original_price: parseFloat(e.target.value) || 0 }))}
+                                value={subscriptionForm.rent_1_month || ''}
+                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_1_month: parseFloat(e.target.value) || 0 }))}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
                                 placeholder="0"
                                 min="0"
@@ -845,74 +1499,40 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Permanent Price (₹)
-                              </label>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">3 Months (₹)</label>
                               <input
                                 type="number"
-                                value={subscriptionForm.sale_price || ''}
-                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, sale_price: parseFloat(e.target.value) || 0 }))}
+                                value={subscriptionForm.rent_3_months || ''}
+                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_3_months: parseFloat(e.target.value) || 0 }))}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
                                 placeholder="0"
                                 min="0"
                                 step="0.01"
                               />
                             </div>
-                          </div>
-
-                          {/* Rental Prices */}
-                          <div>
-                            <h5 className="text-md font-semibold text-gray-700 mb-3">Rental Prices (Optional)</h5>
-                            <p className="text-sm text-gray-600 mb-4">Leave blank if not offering rental for that duration</p>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">1 Month (₹)</label>
-                                <input
-                                  type="number"
-                                  value={subscriptionForm.rent_1_month || ''}
-                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_1_month: parseFloat(e.target.value) || undefined }))}
-                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                  placeholder="0"
-                                  min="0"
-                                  step="0.01"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">3 Months (₹)</label>
-                                <input
-                                  type="number"
-                                  value={subscriptionForm.rent_3_months || ''}
-                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_3_months: parseFloat(e.target.value) || undefined }))}
-                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                  placeholder="0"
-                                  min="0"
-                                  step="0.01"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">6 Months (₹)</label>
-                                <input
-                                  type="number"
-                                  value={subscriptionForm.rent_6_months || ''}
-                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_6_months: parseFloat(e.target.value) || undefined }))}
-                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                  placeholder="0"
-                                  min="0"
-                                  step="0.01"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">12 Months (₹)</label>
-                                <input
-                                  type="number"
-                                  value={subscriptionForm.rent_12_months || ''}
-                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_12_months: parseFloat(e.target.value) || undefined }))}
-                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                  placeholder="0"
-                                  min="0"
-                                  step="0.01"
-                                />
-                              </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">6 Months (₹)</label>
+                              <input
+                                type="number"
+                                value={subscriptionForm.rent_6_months || ''}
+                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_6_months: parseFloat(e.target.value) || 0 }))}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                placeholder="0"
+                                min="0"
+                                step="0.01"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">12 Months (₹)</label>
+                              <input
+                                type="number"
+                                value={subscriptionForm.rent_12_months || ''}
+                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_12_months: parseFloat(e.target.value) || 0 }))}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                placeholder="0"
+                                min="0"
+                                step="0.01"
+                              />
                             </div>
                           </div>
                         </div>
@@ -939,16 +1559,14 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                               setSubscriptionForm({
                                 title: '',
                                 image: '',
-                                original_price: 0,
-                                sale_price: 0,
                                 rent_1_month: 0,
                                 rent_3_months: 0,
                                 rent_6_months: 0,
                                 rent_12_months: 0,
-                                platform: ['PS5'],
+                                platform: ['Subscription'],
                                 discount: 0,
                                 description: '',
-                                type: ['Permanent'],
+                                type: ['Rent'],
                                 category: 'subscription'
                               });
                             }}
@@ -958,13 +1576,22 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                           </button>
                           <button
                             onClick={handleAddSubscription}
-                            disabled={!subscriptionForm.title || !subscriptionForm.image || uploadingImage}
+                            disabled={!subscriptionForm.title || !subscriptionForm.image || uploadingImage || 
+                              (!subscriptionForm.rent_1_month && !subscriptionForm.rent_3_months && 
+                               !subscriptionForm.rent_6_months && !subscriptionForm.rent_12_months)}
                             className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                           >
                             <Save className="w-4 h-4" />
                             <span>Add Subscription</span>
                           </button>
                         </div>
+                        
+                        {(!subscriptionForm.rent_1_month && !subscriptionForm.rent_3_months && 
+                          !subscriptionForm.rent_6_months && !subscriptionForm.rent_12_months) && (
+                          <p className="text-red-600 text-sm text-center">
+                            Please set at least one rental duration price
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

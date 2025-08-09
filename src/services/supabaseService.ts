@@ -259,7 +259,9 @@ export const subscriptionsService = {
         .from('games')
         .insert([{
           ...subscription,
-          category: 'subscription'
+          category: 'subscription',
+          platform: ['Subscription'], // Default platform for subscriptions
+          type: ['Rent'] // Subscriptions only offer rental
         }])
         .select('id')
         .single();
