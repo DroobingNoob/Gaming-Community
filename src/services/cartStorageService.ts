@@ -37,7 +37,7 @@ export class CartStorageService {
 
       const response = await fetch(this.SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -47,6 +47,12 @@ export class CartStorageService {
           cartData
         })
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Google Sheets API error:', errorText);
+        return false;
+      }
 
       return true;
     } catch (error) {
@@ -60,12 +66,15 @@ export class CartStorageService {
     try {
       const response = await fetch(`${this.SCRIPT_URL}?action=loadCart&userId=${userId}`, {
         method: 'GET',
-        mode: 'cors', // Try CORS for GET requests
+        mode: 'cors',
       });
 
       if (response.ok) {
         const data = await response.json();
         return data.cartItems || [];
+      } else {
+        const errorText = await response.text();
+        console.error('Google Sheets API error:', errorText);
       }
       
       return [];
@@ -80,7 +89,7 @@ export class CartStorageService {
     try {
       const response = await fetch(this.SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -89,6 +98,12 @@ export class CartStorageService {
           userId
         })
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Google Sheets API error:', errorText);
+        return false;
+      }
 
       return true;
     } catch (error) {
@@ -102,7 +117,7 @@ export class CartStorageService {
     try {
       const response = await fetch(this.SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -110,6 +125,12 @@ export class CartStorageService {
           action: 'cleanupOldCarts'
         })
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Google Sheets API error:', errorText);
+        return false;
+      }
 
       return true;
     } catch (error) {
