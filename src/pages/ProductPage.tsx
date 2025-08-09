@@ -27,7 +27,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
   const [isImageSticky, setIsImageSticky] = useState(true);
   const [selectedPlatform, setSelectedPlatform] = useState('');
   const [selectedType, setSelectedType] = useState('');
-  const [selectedRentDuration, setSelectedRentDuration] = useState<'1_month' | '3_months' | '6_months'>('1_month');
+  const [selectedRentDuration, setSelectedRentDuration] = useState<'1_month' | '3_months' | '6_months' | '12_months'>('1_month');
 
   const isLoading = gamesLoading || subscriptionsLoading;
 
