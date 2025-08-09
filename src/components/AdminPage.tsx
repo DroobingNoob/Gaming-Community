@@ -1022,7 +1022,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                       </div>
                     </div>
                   )}
-                  )}
+                  
 
                  
                   {activeTab === 'games' && formData.type?.includes('Rent') && (
