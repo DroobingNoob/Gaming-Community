@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, Upload, Save, X, Image as ImageIcon, Loader2, Search } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Upload, Save, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useTestimonials, useAllGames } from '../hooks/useSupabaseData';
 import { gamesService, subscriptionsService, testimonialsService } from '../services/supabaseService';
@@ -719,23 +719,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     <Plus className="w-4 h-4" />
                     <span>Add Game</span>
                   </button>
-                </div>
-
-                {/* Search Bar */}
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="text"
-                      placeholder="Search games..."
-                      value={gamesSearch}
-                      onChange={(e) => {
-                        setGamesSearch(e.target.value);
-                        setGamesPage(1); // Reset to first page when searching
-                      }}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                    />
-                  </div>
                 </div>
 
                 {/* Loading State */}
