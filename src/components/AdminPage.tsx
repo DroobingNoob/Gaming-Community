@@ -1024,7 +1024,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   )}
                   )}
 
-                  {/* Rental Pricing - Only show if Rent type is selected for games */}
+                 
                   {activeTab === 'games' && formData.type?.includes('Rent') && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Rental Pricing (₹) - Optional</label>
