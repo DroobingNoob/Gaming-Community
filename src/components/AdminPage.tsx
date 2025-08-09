@@ -74,19 +74,20 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     let searchQuery = '';
     
     if (activeTab === 'games') {
-      // Group games by title and show only one per title (preferably Standard edition)
-      const gameGroups: { [title: string]: Game[] } = {};
-      (allGames || []).forEach(game => {
-        if (!gameGroups[game.title]) {
-          gameGroups[game.title] = [];
+      // Group games by title and show only one representative per title
+      const gameGroups = (allGames || []).reduce((groups, game) => {
+        if (!groups[game.title]) {
+          groups[game.title] = [];
         }
-        gameGroups[game.title].push(game);
-      });
+        groups[game.title].push(game);
+        return groups;
+      }, {} as { [title: string]: Game[] });
       
-      // Select one representative game per title (prefer Standard edition)
-      items = Object.values(gameGroups).map(editions => {
+      // Get one representative per game title (prefer Standard edition)
+      items = Object.keys(gameGroups).map(title => {
+        const editions = gameGroups[title];
         const standardEdition = editions.find(game => game.edition === 'Standard');
-        return standardEdition || editions[0]; // Use Standard if available, otherwise first edition
+        return standardEdition || editions[0];
       });
       searchQuery = gamesSearchQuery;
     } else if (activeTab === 'subscriptions') {
@@ -613,15 +614,20 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     <div>
                       <h3 className="font-bold text-gray-800">
                         {item.title}
-                        {/* Show available editions count */}
+                        {/* Show edition count for games with multiple editions */}
                         {activeTab === 'games' && (() => {
-                          const gameEditions = (allGames || []).filter(g => g.title === item.title);
-                          return gameEditions.length > 1 ? (
+                          const sameTitle = (allGames || []).filter(g => g.title === item.title);
+                          return sameTitle.length > 1 ? (
                             <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                              {gameEditions.length} editions
+                              {sameTitle.length} editions
                             </span>
                           ) : null;
                         })()}
+                        {activeTab === 'subscriptions' && item.edition && (
+                          <span className="ml-2 bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+                            {item.edition}
+                          </span>
+                        )}
                       </h3>
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-orange-500 font-bold">₹{activeTab === 'games' ? (
