@@ -32,7 +32,7 @@ const CartModal: React.FC<CartModalProps> = ({
   onCheckout
 }) => {
   const navigate = useNavigate();
-  const { games } = useGames({ limit: 50 }); // Get more games to filter recommended ones
+  const { games } = useGames({ limit: 250 }); // Get more games to filter recommended ones
   const { subscriptions } = useSubscriptions({ limit: 50 }); // Get more subscriptions to filter recommended ones
 
   if (!isOpen) return null;
