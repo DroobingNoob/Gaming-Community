@@ -180,6 +180,21 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
   };
 
   const calculatePrice = () => {
+    if (product.category === 'subscription') {
+      // For subscriptions, use rental pricing if available, otherwise fall back to sale_price
+      if (selectedType === 'Rent') {
+        const rentPrices = {
+          '1_month': product.rent_1_month || 0,
+          '3_months': product.rent_3_months || 0,
+          '6_months': product.rent_6_months || 0,
+          '12_months': product.rent_12_months || 0
+        };
+        return rentPrices[selectedRentDuration as keyof typeof rentPrices] || product.sale_price;
+      }
+      return product.sale_price;
+    }
+    
+    // For games, keep existing logic
     if (currentProduct.category === 'subscription') {
       return currentProduct.sale_price; // Subscriptions keep original logic
     }
@@ -201,9 +216,9 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
     if (selectedType === 'Rent') {
       return ` 🎮 Rental Game Accounts:
 
-✔️ We provide a fully legal account with your desired rental game pre-purchased.
 
-✔️ You just need to download and play – quick and hassle-free!
+        '6_months': product.rent_6_months || 0,
+        '12_months': product.rent_12_months || 0
 
 ✔️ Games can be rented for the following durations:
 • 1 Month
