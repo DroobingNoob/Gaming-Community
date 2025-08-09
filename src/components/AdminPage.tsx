@@ -39,7 +39,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     permanent_offline_price: 0,
     permanent_online_price: 0,
     platform: [],
-    discount: 0,
     description: '',
     type: [],
     category: 'game',
@@ -103,7 +102,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       permanent_offline_price: 0,
       permanent_online_price: 0,
       platform: [],
-      discount: 0,
       description: '',
       type: [],
       category: 'game',
@@ -230,7 +228,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         permanent_offline_price: gameItem.permanent_offline_price || 0,
         permanent_online_price: gameItem.permanent_online_price || 0,
         platform: gameItem.platform,
-        discount: gameItem.discount,
         description: gameItem.description,
         type: gameItem.type,
         category: gameItem.category,
@@ -932,7 +929,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   )}
 
                   {/* Platform Selection */}
-                  <div>
+                  {activeTab === 'games' && (
+                    <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Platform</label>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                       {['PS4', 'PS5', 'PSVR2', 'Xbox'].map((platform) => (
@@ -993,20 +991,189 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Duration Selection - Only for subscriptions */}
+                  {activeTab === 'subscriptions' && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Discount (%)</label>
-                      <input
-                        type="number"
-                        value={formData.discount}
-                        onChange={(e) => setFormData(prev => ({ ...prev, discount: parseInt(e.target.value) || 0 }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                        min="0"
-                        max="100"
-                      />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Available Durations</label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {[
+                          { key: 'rent_1_month', label: '1 Month' },
+                          { key: 'rent_3_months', label: '3 Months' },
+                          { key: 'rent_6_months', label: '6 Months' },
+                          { key: 'rent_12_months', label: '12 Months' }
+                        ].map((duration) => (
+                          <label key={duration.key} className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              checked={(formData as any)[duration.key] > 0}
+                              onChange={(e) => {
+                                if (!e.target.checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    [duration.key]: 0
+                                  }));
+                                }
+                              }}
+                              className="rounded"
+                            />
+                            <span className="text-sm">{duration.label}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
+                  )}
+                  )}
 
-                    <div className="space-y-2">
+                  {/* Rental Pricing - Only show if Rent type is selected for games */}
+                  {activeTab === 'games' && formData.type?.includes('Rent') && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Rental Pricing (₹) - Optional</label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">1 Month</label>
+                          <input
+                            type="number"
+                            value={formData.rent_1_month}
+                            onChange={(e) => setFormData(prev => ({ ...prev, rent_1_month: parseFloat(e.target.value) || 0 }))}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            min="0"
+                            step="0.01"
+                            placeholder="Optional"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">3 Months</label>
+                          <input
+                            type="number"
+                            value={formData.rent_3_months}
+                            onChange={(e) => setFormData(prev => ({ ...prev, rent_3_months: parseFloat(e.target.value) || 0 }))}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            min="0"
+                            step="0.01"
+                            placeholder="Optional"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">6 Months</label>
+                          <input
+                            type="number"
+                            value={formData.rent_6_months}
+                            onChange={(e) => setFormData(prev => ({ ...prev, rent_6_months: parseFloat(e.target.value) || 0 }))}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            min="0"
+                            step="0.01"
+                            placeholder="Optional"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">12 Months</label>
+                          <input
+                            type="number"
+                            value={formData.rent_12_months}
+                            onChange={(e) => setFormData(prev => ({ ...prev, rent_12_months: parseFloat(e.target.value) || 0 }))}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            min="0"
+                            step="0.01"
+                            placeholder="Optional"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Permanent Pricing - Only show if permanent types are selected for games */}
+                  {activeTab === 'games' && (formData.type?.includes('Permanent Offline') || formData.type?.includes('Permanent Offline + Online')) && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Permanent Pricing (₹)</label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {formData.type?.includes('Permanent Offline') && (
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Offline Only</label>
+                            <input
+                              type="number"
+                              value={formData.permanent_offline_price}
+                              onChange={(e) => setFormData(prev => ({ ...prev, permanent_offline_price: parseFloat(e.target.value) || 0 }))}
+                              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                        )}
+                        {formData.type?.includes('Permanent Offline + Online') && (
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Offline + Online</label>
+                            <input
+                              type="number"
+                              value={formData.permanent_online_price}
+                              onChange={(e) => setFormData(prev => ({ ...prev, permanent_online_price: parseFloat(e.target.value) || 0 }))}
+                              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Subscription Duration Pricing - Only for subscriptions */}
+                  {activeTab === 'subscriptions' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Duration Pricing (₹) - Optional</label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">1 Month</label>
+                          <input
+                            type="number"
+                            value={formData.rent_1_month}
+                            onChange={(e) => setFormData(prev => ({ ...prev, rent_1_month: parseFloat(e.target.value) || 0 }))}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            min="0"
+                            step="0.01"
+                            placeholder="Optional"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">3 Months</label>
+                          <input
+                            type="number"
+                            value={formData.rent_3_months}
+                            onChange={(e) => setFormData(prev => ({ ...prev, rent_3_months: parseFloat(e.target.value) || 0 }))}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            min="0"
+                            step="0.01"
+                            placeholder="Optional"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">6 Months</label>
+                          <input
+                            type="number"
+                            value={formData.rent_6_months}
+                            onChange={(e) => setFormData(prev => ({ ...prev, rent_6_months: parseFloat(e.target.value) || 0 }))}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            min="0"
+                            step="0.01"
+                            placeholder="Optional"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">12 Months</label>
+                          <input
+                            type="number"
+                            value={formData.rent_12_months}
+                            onChange={(e) => setFormData(prev => ({ ...prev, rent_12_months: parseFloat(e.target.value) || 0 }))}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            min="0"
+                            step="0.01"
+                            placeholder="Optional"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
                       <label className="flex items-center space-x-2">
                         <input
                           type="checkbox"
@@ -1028,7 +1195,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                           <span className="text-sm">Recommended Game</span>
                         </label>
                       )}
-                    </div>
                   </div>
                 </>
               )}
