@@ -444,7 +444,7 @@ This option is best suited for single-player games or customers who prefer offli
                   </div>
                 )}
 
-                {/* Duration Selection - Show for games with Rent selected, or all subscriptions */}
+                {/* Duration Selection - Show for games with Rent type or subscriptions */}
                 {((product.category === 'game' && selectedType === 'Rent') || product.category === 'subscription') && (
                   <div className="mb-4 xl:mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -454,8 +454,8 @@ This option is best suited for single-player games or customers who prefer offli
                       {[
                         { key: '1_month', label: '1 Month', price: product.category === 'game' ? currentProduct.rent_1_month : product.rent_1_month },
                         { key: '3_months', label: '3 Months', price: product.category === 'game' ? currentProduct.rent_3_months : product.rent_3_months },
-                        { key: '6_months', label: '6 Months', price: product.category === 'game' ? currentProduct.rent_6_months : product.rent_6_months },
-                        { key: '12_months', label: '12 Months', price: product.category === 'game' ? currentProduct.rent_12_months : product.rent_12_months }
+                        { key: '6_months', label: '6 Months', price: product.rent_6_months },
+                        { key: '12_months', label: '12 Months', price: product.rent_12_months }
                       ].filter(duration => duration.price && duration.price > 0).map((duration) => (
                         <button
                           key={duration.key}
@@ -509,16 +509,6 @@ This option is best suited for single-player games or customers who prefer offli
                       ✔️ Must return account after rental period ends
                       ✔️ No permanent ownership - rental only
                       ✔️ Support provided throughout rental duration
-                    </p>
-                  </div>
-                )}
-
-                {/* Subscription Description */}
-                {product.category === 'subscription' && (
-                  <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-200">
-                    <h4 className="font-bold text-purple-800 mb-3 text-sm">Subscription Details</h4>
-                    <p className="text-purple-700 text-xs leading-relaxed whitespace-pre-line">
-                      {getTypeDescription()}
                     </p>
                   </div>
                 )}
