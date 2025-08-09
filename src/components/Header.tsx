@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({
 
   const { games } = useGames();
   const { subscriptions } = useSubscriptions({ limit: 100 }); // Limit search suggestions
-
+ 
   // Combine games and subscriptions for search
   const allItems = [...(games || []), ...(subscriptions || [])];
 
