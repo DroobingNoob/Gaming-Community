@@ -19,6 +19,7 @@ export interface Game {
   rent_1_month?: number;
   rent_3_months?: number;
   rent_6_months?: number;
+  rent_12_months?: number;
   // Permanent pricing
   permanent_offline_price?: number;
   permanent_online_price?: number;
@@ -56,7 +57,8 @@ export const getGameDisplayPrice = (game: Game, selectedType: string, selectedRe
     const rentPrices = {
       '1_month': game.rent_1_month || 0,
       '3_months': game.rent_3_months || 0,
-      '6_months': game.rent_6_months || 0
+      '6_months': game.rent_6_months || 0,
+      '12_months': game.rent_12_months || 0
     };
     return rentPrices[selectedRentDuration as keyof typeof rentPrices] || game.rent_1_month || 0;
   } else if (selectedType === 'Permanent Offline') {

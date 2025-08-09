@@ -34,7 +34,7 @@ export const gamesService = {
       // Build query with only necessary columns
       let query = supabase
         .from('games')
-        .select('id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, permanent_offline_price, permanent_online_price, platform, discount, description, type, category, show_in_bestsellers, edition, base_game_id, edition_features, is_recommended', { count: 'exact' })
+        .select('id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, permanent_offline_price, permanent_online_price, platform, discount, description, type, category, show_in_bestsellers, edition, base_game_id, edition_features, is_recommended', { count: 'exact' })
         .eq('category', 'game');
 
       // Apply search filter
@@ -101,7 +101,7 @@ export const gamesService = {
     try {
       const { data, error } = await supabase
         .from('games')
-        .select('id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, permanent_offline_price, permanent_online_price, platform, discount, description, type, category, edition, base_game_id, edition_features')
+        .select('id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, permanent_offline_price, permanent_online_price, platform, discount, description, type, category, edition, base_game_id, edition_features')
         .eq('category', 'game')
         .eq('show_in_bestsellers', true)
         .order('created_at', { ascending: false })
@@ -195,7 +195,7 @@ export const subscriptionsService = {
       // Build query with only necessary columns
       let query = supabase
         .from('games')
-        .select('id, title, image, original_price, sale_price, platform, discount, description, type, category', { count: 'exact' })
+        .select('id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, platform, discount, description, type, category', { count: 'exact' })
         .eq('category', 'subscription');
 
       // Apply search filter
