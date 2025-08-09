@@ -295,7 +295,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
   const cancelEditing = () => {
     setEditingGame(null);
+    setIsGameModalOpen(true);
     setEditingSubscription(null);
+    setIsSubscriptionModalOpen(true);
     setEditingScreenshot(null);
     setGameForm({
       title: '',

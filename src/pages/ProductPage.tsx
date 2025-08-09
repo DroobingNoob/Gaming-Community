@@ -845,6 +845,26 @@ This option is best suited for single-player games or customers who prefer offli
                     {getTypeDescription()}
                   </p>
                 </div>
+              )}
+
+              {/* Subscription Description */}
+              {product.category === 'subscription' && (
+                <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-200">
+                  <h4 className="font-bold text-purple-800 mb-3 text-sm">About This Subscription</h4>
+                  <p className="text-purple-700 text-xs leading-relaxed">
+                    🎮 Subscription Service:
+                    
+                    ✔️ Get access to premium gaming services for your selected duration
+                    ✔️ Full account access with all subscription benefits  
+                    ✔️ Online features and multiplayer access included
+                    ✔️ Choose from flexible duration options
+                    ✔️ Account credentials provided immediately after payment
+                    ✔️ 24/7 support during your subscription period
+                    
+                    🚫 Account credentials cannot be changed
+                    🚫 Subscription is non-transferable and for single use only
+                  </p>
+                </div>
               ) : (
                 <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-200">
                   <h4 className="font-bold text-purple-800 mb-3 text-sm">About Subscription Rentals</h4>
