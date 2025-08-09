@@ -29,6 +29,7 @@ export interface Game {
   type: string[];
   category: 'game' | 'subscription';
   show_in_bestsellers?: boolean;
+  is_recommended?: boolean;
   created_at?: string;
   updated_at?: string;
 }

@@ -93,12 +93,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     if (!response.ok) {
       throw new Error('Failed to upload image');
     }
-        platform: selectedPlatforms,
+
     const data = await response.json();
     return data.secure_url;
-        type: gameForm.type,
+  };
 
-        is_recommended: gameForm.is_recommended,
   // Handle image upload
   const handleImageUpload = async (file: File, formType: 'game' | 'subscription' | 'screenshot') => {
     try {
@@ -1596,11 +1595,19 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                         </div>
                         
                         {(!subscriptionForm.rent_1_month && !subscriptionForm.rent_3_months && 
+                        {game.is_recommended && (
+                          <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-1 rounded text-xs font-medium">
+                            ⭐ Recommended
+                          </span>
+                        )}
                           !subscriptionForm.rent_6_months && !subscriptionForm.rent_12_months) && (
                           <p className="text-red-600 text-sm text-center">
                             Please set at least one rental duration price
                           </p>
                         )}
+                        <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 py-1 rounded text-xs font-medium">
+                          {game.edition}
+                        </span>
                       </div>
                     </div>
                   </div>

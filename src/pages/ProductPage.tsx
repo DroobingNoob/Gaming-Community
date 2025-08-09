@@ -513,6 +513,16 @@ This option is best suited for single-player games or customers who prefer offli
                   </div>
                 )}
 
+                {/* Subscription Description */}
+                {product.category === 'subscription' && (
+                  <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-200">
+                    <h4 className="font-bold text-purple-800 mb-3 text-sm">Subscription Details</h4>
+                    <p className="text-purple-700 text-xs leading-relaxed whitespace-pre-line">
+                      {getTypeDescription()}
+                    </p>
+                  </div>
+                )}
+
                 {/* Pricing */}
                 <div className="flex items-center space-x-3 xl:space-x-4 mb-6 xl:mb-8">
                   <span className="text-3xl xl:text-5xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
