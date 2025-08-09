@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, Upload, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Upload, Search, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAllGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
 import { gamesService, subscriptionsService, testimonialsService } from '../services/supabaseService';
