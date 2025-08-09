@@ -19,6 +19,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [editingSubscription, setEditingSubscription] = useState<Game | null>(null);
   const [editingScreenshot, setEditingScreenshot] = useState<Testimonial | null>(null);
   const [isGameModalOpen, setIsGameModalOpen] = useState(false);
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   // Fetch data using hooks
@@ -1103,7 +1104,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 )}
 
                 {/* Edit Game Modal */}
-                {(isGameModalOpen || editingGame) && (
+                {editingGame && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
                       <div className="flex items-center justify-between mb-6">
@@ -1382,7 +1383,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 </div>
 
                 {/* Add Subscription Modal */}
-                {isAddingSubscription && (
+                {(isAddingSubscription || isSubscriptionModalOpen || editingSubscription) && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
                       <div className="flex items-center justify-between mb-6">
