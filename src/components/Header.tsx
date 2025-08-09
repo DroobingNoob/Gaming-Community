@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({
   const [searchSuggestions, setSearchSuggestions] = useState<Game[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const { games } = useGames();
+  const { games } = useGames({ limit: 1000 });
   const { subscriptions } = useSubscriptions({ limit: 100 }); // Limit search suggestions
  
   // Combine games and subscriptions for search
