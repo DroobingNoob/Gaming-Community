@@ -678,7 +678,6 @@ This option is best suited for single-player games or customers who prefer offli
                               <div className="w-2 h-2 bg-white rounded-full"></div>
                             </div>
                           )}
-                         
                         </div>
                         {edition.edition_features && edition.edition_features.length > 0 && (
                           <div className="mt-2 flex flex-wrap gap-1">
@@ -781,8 +780,8 @@ This option is best suited for single-player games or customers who prefer offli
               )}
 
               {/* Type Description */}
-              {/* Type Description - Show for both games and subscriptions */}
-              {(product.category === 'game' || (product.category === 'subscription' && hasRentalOptions(product))) && (
+              <div className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-3 sm:p-4 border border-blue-200">
+                <h4 className="font-bold text-blue-800 mb-2 sm:mb-3 text-sm">About This Option</h4>
                 <p className="text-blue-700 text-xs leading-relaxed whitespace-pre-line">
                   {getTypeDescription()}
                 </p>
