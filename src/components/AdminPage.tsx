@@ -49,9 +49,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     permanent_offline_price: 0,
     permanent_online_price: 0,
     platform: ['PS5'],
-    platform: ['PS5'],
     description: '',
-    type: ['Rent'],
     type: ['Rent'],
     show_in_bestsellers: false,
     is_recommended: false,
@@ -311,9 +309,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       permanent_offline_price: 0,
       permanent_online_price: 0,
       platform: ['PS5'],
-      platform: ['PS5'],
       description: '',
-      type: ['Rent'],
       type: ['Rent'],
       show_in_bestsellers: false,
       is_recommended: false,
@@ -1388,179 +1384,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
                 {/* Add Subscription Modal */}
                 {(isAddingSubscription || isSubscriptionModalOpen || editingSubscription) && (
-                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-                      <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xl font-bold text-gray-800">Add New Subscription</h3>
-                        <button
-                          onClick={() => {
-                            setIsAddingSubscription(false);
-                            setSubscriptionForm({
-                              title: '',
-                              image: '',
-                              rent_1_month: 0,
-                              rent_3_months: 0,
-                              rent_6_months: 0,
-                              rent_12_months: 0,
-                              platform: ['Subscription'],
-                              discount: 0,
-                              description: '',
-                              type: ['Rent'],
-                              category: 'subscription'
-                            });
-                          }}
-                          className="text-gray-400 hover:text-gray-600"
-                        >
-                          <X className="w-6 h-6" />
-                        </button>
-                      </div>
-
-                      <div className="space-y-4">
-                        {/* Basic Info */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              Title <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              type="text"
-                              value={subscriptionForm.title || ''}
-                              onChange={(e) => setSubscriptionForm(prev => ({ ...prev, title: e.target.value }))}
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                              placeholder="Subscription title"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Image Upload */}
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            Image <span className="text-red-500">*</span>
-                          </label>
-                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                            {subscriptionForm.image ? (
-                              <div className="space-y-4">
-                                <img
-                                  src={subscriptionForm.image}
-                                  alt="Preview"
-                                  className="w-32 h-32 object-cover mx-auto rounded-lg"
-                                />
-                                <button
-                                  onClick={() => setSubscriptionForm(prev => ({ ...prev, image: '' }))}
-                                  className="text-red-600 hover:text-red-800 text-sm"
-                                >
-                                  Remove Image
-                                </button>
-                              </div>
-                            ) : (
-                              <div>
-                                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                <p className="text-gray-600 mb-2">Upload subscription image</p>
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) handleImageUpload(file, 'subscription');
-                                  }}
-                                  className="hidden"
-                                  id="subscription-upload"
-                                  disabled={uploadingImage}
-                                />
-                                <label
-                                  htmlFor="subscription-upload"
-                                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg cursor-pointer inline-flex items-center space-x-2"
-                                >
-                                  {uploadingImage ? (
-                                    <>
-                                      <Loader2 className="w-4 h-4 animate-spin" />
-                                      <span>Uploading...</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Upload className="w-4 h-4" />
-                                      <span>Choose File</span>
-                                    </>
-                                  )}
-                                </label>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Pricing Options */}
-                        <div>
-                          <h4 className="text-lg font-semibold text-gray-800 mb-4">Rental Duration Pricing</h4>
-                          <p className="text-sm text-gray-600 mb-4">Set prices for different subscription durations. Leave blank for durations you don't want to offer.</p>
-                          
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">1 Month (₹)</label>
-                              <input
-                                type="number"
-                                value={subscriptionForm.rent_1_month || ''}
-                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_1_month: parseFloat(e.target.value) || 0 }))}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                placeholder="0"
-                                min="0"
-                                step="0.01"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">3 Months (₹)</label>
-                              <input
-                                type="number"
-                                value={subscriptionForm.rent_3_months || ''}
-                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_3_months: parseFloat(e.target.value) || 0 }))}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                placeholder="0"
-                                min="0"
-                                step="0.01"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">6 Months (₹)</label>
-                              <input
-                                type="number"
-                                value={subscriptionForm.rent_6_months || ''}
-                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_6_months: parseFloat(e.target.value) || 0 }))}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                placeholder="0"
-                                min="0"
-                                step="0.01"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">12 Months (₹)</label>
-                              <input
-                                type="number"
-                                value={subscriptionForm.rent_12_months || ''}
-                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_12_months: parseFloat(e.target.value) || 0 }))}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                placeholder="0"
-                                min="0"
-                                step="0.01"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Description */}
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            Description
-                          </label>
-                          <textarea
-                            value={subscriptionForm.description || ''}
-                            onChange={(e) => setSubscriptionForm(prev => ({ ...prev, description: e.target.value }))}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                            rows={4}
-                            placeholder="Subscription description"
-                          />
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex space-x-3 pt-4">
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 p-4 pt-8 overflow-y-auto">
+                    <div className="bg-white rounded-2xl max-w-2xl w-full my-8 shadow-2xl">
+                      <div className="p-6">
+                        <div className="flex items-center justify-between mb-6">
+                          <h3 className="text-xl font-bold text-gray-800">Add New Subscription</h3>
                           <button
                             onClick={() => {
                               setIsAddingSubscription(false);
@@ -1578,36 +1406,198 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                 category: 'subscription'
                               });
                             }}
-                            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-medium transition-colors"
+                            className="text-gray-400 hover:text-gray-600"
                           >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={handleAddSubscription}
-                            disabled={!subscriptionForm.title || !subscriptionForm.image || uploadingImage || 
-                              (!subscriptionForm.rent_1_month && !subscriptionForm.rent_3_months && 
-                               !subscriptionForm.rent_6_months && !subscriptionForm.rent_12_months)}
-                            className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                          >
-                            <Save className="w-4 h-4" />
-                            <span>Add Subscription</span>
+                            <X className="w-6 h-6" />
                           </button>
                         </div>
-                        
-                        {(!subscriptionForm.rent_1_month && !subscriptionForm.rent_3_months && 
-                        {game.is_recommended && (
-                          <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-1 rounded text-xs font-medium">
-                            ⭐ Recommended
-                          </span>
-                        )}
-                          !subscriptionForm.rent_6_months && !subscriptionForm.rent_12_months) && (
-                          <p className="text-red-600 text-sm text-center">
-                            Please set at least one rental duration price
-                          </p>
-                        )}
-                        <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 py-1 rounded text-xs font-medium">
-                          {game.edition}
-                        </span>
+
+                        <div className="space-y-4">
+                          {/* Basic Info */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Title <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={subscriptionForm.title || ''}
+                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, title: e.target.value }))}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                placeholder="Subscription title"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Image Upload */}
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Image <span className="text-red-500">*</span>
+                            </label>
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                              {subscriptionForm.image ? (
+                                <div className="space-y-4">
+                                  <img
+                                    src={subscriptionForm.image}
+                                    alt="Preview"
+                                    className="w-32 h-32 object-cover mx-auto rounded-lg"
+                                  />
+                                  <button
+                                    onClick={() => setSubscriptionForm(prev => ({ ...prev, image: '' }))}
+                                    className="text-red-600 hover:text-red-800 text-sm"
+                                  >
+                                    Remove Image
+                                  </button>
+                                </div>
+                              ) : (
+                                <div>
+                                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                  <p className="text-gray-600 mb-2">Upload subscription image</p>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) handleImageUpload(file, 'subscription');
+                                    }}
+                                    className="hidden"
+                                    id="subscription-upload"
+                                    disabled={uploadingImage}
+                                  />
+                                  <label
+                                    htmlFor="subscription-upload"
+                                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg cursor-pointer inline-flex items-center space-x-2"
+                                  >
+                                    {uploadingImage ? (
+                                      <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <span>Uploading...</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Upload className="w-4 h-4" />
+                                        <span>Choose File</span>
+                                      </>
+                                    )}
+                                  </label>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Pricing Options */}
+                          <div>
+                            <h4 className="text-lg font-semibold text-gray-800 mb-4">Rental Duration Pricing</h4>
+                            <p className="text-sm text-gray-600 mb-4">Set prices for different subscription durations. Leave blank for durations you don't want to offer.</p>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">1 Month (₹)</label>
+                                <input
+                                  type="number"
+                                  value={subscriptionForm.rent_1_month || ''}
+                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_1_month: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">3 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={subscriptionForm.rent_3_months || ''}
+                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_3_months: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">6 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={subscriptionForm.rent_6_months || ''}
+                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_6_months: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">12 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={subscriptionForm.rent_12_months || ''}
+                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_12_months: parseFloat(e.target.value) || 0 }))}
+                                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Description */}
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Description
+                            </label>
+                            <textarea
+                              value={subscriptionForm.description || ''}
+                              onChange={(e) => setSubscriptionForm(prev => ({ ...prev, description: e.target.value }))}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                              rows={4}
+                              placeholder="Subscription description"
+                            />
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex space-x-3 pt-4">
+                            <button
+                              onClick={() => {
+                                setIsAddingSubscription(false);
+                                setSubscriptionForm({
+                                  title: '',
+                                  image: '',
+                                  rent_1_month: 0,
+                                  rent_3_months: 0,
+                                  rent_6_months: 0,
+                                  rent_12_months: 0,
+                                  platform: ['Subscription'],
+                                  discount: 0,
+                                  description: '',
+                                  type: ['Rent'],
+                                  category: 'subscription'
+                                });
+                              }}
+                              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-medium transition-colors"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={handleAddSubscription}
+                              disabled={!subscriptionForm.title || !subscriptionForm.image || uploadingImage || 
+                                (!subscriptionForm.rent_1_month && !subscriptionForm.rent_3_months && 
+                                 !subscriptionForm.rent_6_months && !subscriptionForm.rent_12_months)}
+                              className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                            >
+                              <Save className="w-4 h-4" />
+                              <span>Add Subscription</span>
+                            </button>
+                          </div>
+                          
+                          {(!subscriptionForm.rent_1_month && !subscriptionForm.rent_3_months && 
+                            !subscriptionForm.rent_6_months && !subscriptionForm.rent_12_months) && (
+                            <p className="text-red-600 text-sm text-center">
+                              Please set at least one rental duration price
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
