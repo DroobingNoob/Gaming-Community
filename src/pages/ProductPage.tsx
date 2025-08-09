@@ -783,7 +783,6 @@ This option is best suited for single-player games or customers who prefer offli
                   </div>
                 </div>
               ) : (
-                // For subscriptions, only show Rent type
                 <div className="mb-6">
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Subscription Type</label>
                   <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-2 rounded-lg font-medium shadow-lg text-center">
@@ -803,7 +802,7 @@ This option is best suited for single-player games or customers who prefer offli
                       { key: '1_month', label: '1 Month', price: product.category === 'game' ? currentProduct.rent_1_month : product.rent_1_month },
                       { key: '3_months', label: '3 Months', price: product.category === 'game' ? currentProduct.rent_3_months : product.rent_3_months },
                       { key: '6_months', label: '6 Months', price: product.category === 'game' ? currentProduct.rent_6_months : product.rent_6_months },
-                      { key: '12_months', label: '12 Months', price: product.category === 'game' ? currentProduct.rent_12_months : product.rent_12_months }
+                      { key: '12_months', label: '12 Months', price: product.rent_12_months }
                     ].filter(duration => duration.price && duration.price > 0).map((duration) => (
                       <button
                         key={duration.key}
@@ -843,26 +842,6 @@ This option is best suited for single-player games or customers who prefer offli
                   <h4 className="font-bold text-blue-800 mb-2 sm:mb-3 text-sm">About This Option</h4>
                   <p className="text-blue-700 text-xs leading-relaxed whitespace-pre-line">
                     {getTypeDescription()}
-                  </p>
-                </div>
-              )}
-
-              {/* Subscription Description */}
-              {product.category === 'subscription' && (
-                <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-200">
-                  <h4 className="font-bold text-purple-800 mb-3 text-sm">About This Subscription</h4>
-                  <p className="text-purple-700 text-xs leading-relaxed">
-                    🎮 Subscription Service:
-                    
-                    ✔️ Get access to premium gaming services for your selected duration
-                    ✔️ Full account access with all subscription benefits  
-                    ✔️ Online features and multiplayer access included
-                    ✔️ Choose from flexible duration options
-                    ✔️ Account credentials provided immediately after payment
-                    ✔️ 24/7 support during your subscription period
-                    
-                    🚫 Account credentials cannot be changed
-                    🚫 Subscription is non-transferable and for single use only
                   </p>
                 </div>
               ) : (
