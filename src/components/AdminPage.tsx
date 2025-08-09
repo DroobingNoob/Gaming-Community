@@ -959,7 +959,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     </div>
                   </div>
 
-                  {/* Type Selection - Only for games */}
+              
                   {activeTab === 'games' && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
