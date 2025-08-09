@@ -316,10 +316,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
       image: '',
       original_price: 0,
       sale_price: 0,
-      rent_1_month: 0,
-      rent_3_months: 0,
-      rent_6_months: 0,
-      rent_12_months: 0,
       platform: ['PS5'],
       discount: 0,
       description: '',
@@ -697,8 +693,282 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               </div>
             )}
             {activeTab === 'subscriptions' && (
-              <div className="text-center py-8">
-                <p className="text-gray-600">Subscriptions management section</p>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-gray-800">Manage Subscriptions</h3>
+                  <button
+                    onClick={() => setIsAddingSubscription(true)}
+                    className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add Subscription</span>
+                  </button>
+                </div>
+
+                {/* Add Subscription Modal */}
+                {isAddingSubscription && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-bold text-gray-800">Add New Subscription</h3>
+                        <button
+                          onClick={() => {
+                            setIsAddingSubscription(false);
+                            setSubscriptionForm({
+                              title: '',
+                              image: '',
+                              original_price: 0,
+                              sale_price: 0,
+                              rent_1_month: 0,
+                              rent_3_months: 0,
+                              rent_6_months: 0,
+                              rent_12_months: 0,
+                              platform: ['PS5'],
+                              discount: 0,
+                              description: '',
+                              type: ['Permanent'],
+                              category: 'subscription'
+                            });
+                          }}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <X className="w-6 h-6" />
+                        </button>
+                      </div>
+
+                      <div className="space-y-4">
+                        {/* Basic Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Title <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={subscriptionForm.title || ''}
+                              onChange={(e) => setSubscriptionForm(prev => ({ ...prev, title: e.target.value }))}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                              placeholder="Subscription title"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Platform
+                            </label>
+                            <select
+                              value={subscriptionForm.platform?.[0] || 'PS5'}
+                              onChange={(e) => setSubscriptionForm(prev => ({ ...prev, platform: [e.target.value] }))}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            >
+                              <option value="PS5">PlayStation 5</option>
+                              <option value="PS4">PlayStation 4</option>
+                              <option value="Xbox">Xbox</option>
+                              <option value="PC">PC</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Image Upload */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Image <span className="text-red-500">*</span>
+                          </label>
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                            {subscriptionForm.image ? (
+                              <div className="space-y-4">
+                                <img
+                                  src={subscriptionForm.image}
+                                  alt="Preview"
+                                  className="w-32 h-32 object-cover mx-auto rounded-lg"
+                                />
+                                <button
+                                  onClick={() => setSubscriptionForm(prev => ({ ...prev, image: '' }))}
+                                  className="text-red-600 hover:text-red-800 text-sm"
+                                >
+                                  Remove Image
+                                </button>
+                              </div>
+                            ) : (
+                              <div>
+                                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                <p className="text-gray-600 mb-2">Upload subscription image</p>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) handleImageUpload(file, 'subscription');
+                                  }}
+                                  className="hidden"
+                                  id="subscription-upload"
+                                  disabled={uploadingImage}
+                                />
+                                <label
+                                  htmlFor="subscription-upload"
+                                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg cursor-pointer inline-flex items-center space-x-2"
+                                >
+                                  {uploadingImage ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                      <span>Uploading...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="w-4 h-4" />
+                                      <span>Choose File</span>
+                                    </>
+                                  )}
+                                </label>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Pricing Options */}
+                        <div>
+                          <h4 className="text-lg font-semibold text-gray-800 mb-4">Pricing Options</h4>
+                          
+                          {/* Permanent Price */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Original Price (₹)
+                              </label>
+                              <input
+                                type="number"
+                                value={subscriptionForm.original_price || ''}
+                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, original_price: parseFloat(e.target.value) || 0 }))}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                placeholder="0"
+                                min="0"
+                                step="0.01"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Permanent Price (₹)
+                              </label>
+                              <input
+                                type="number"
+                                value={subscriptionForm.sale_price || ''}
+                                onChange={(e) => setSubscriptionForm(prev => ({ ...prev, sale_price: parseFloat(e.target.value) || 0 }))}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                placeholder="0"
+                                min="0"
+                                step="0.01"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Rental Prices */}
+                          <div>
+                            <h5 className="text-md font-semibold text-gray-700 mb-3">Rental Prices (Optional)</h5>
+                            <p className="text-sm text-gray-600 mb-4">Leave blank if not offering rental for that duration</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">1 Month (₹)</label>
+                                <input
+                                  type="number"
+                                  value={subscriptionForm.rent_1_month || ''}
+                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_1_month: parseFloat(e.target.value) || undefined }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">3 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={subscriptionForm.rent_3_months || ''}
+                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_3_months: parseFloat(e.target.value) || undefined }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">6 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={subscriptionForm.rent_6_months || ''}
+                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_6_months: parseFloat(e.target.value) || undefined }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">12 Months (₹)</label>
+                                <input
+                                  type="number"
+                                  value={subscriptionForm.rent_12_months || ''}
+                                  onChange={(e) => setSubscriptionForm(prev => ({ ...prev, rent_12_months: parseFloat(e.target.value) || undefined }))}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Description
+                          </label>
+                          <textarea
+                            value={subscriptionForm.description || ''}
+                            onChange={(e) => setSubscriptionForm(prev => ({ ...prev, description: e.target.value }))}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                            rows={4}
+                            placeholder="Subscription description"
+                          />
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex space-x-3 pt-4">
+                          <button
+                            onClick={() => {
+                              setIsAddingSubscription(false);
+                              setSubscriptionForm({
+                                title: '',
+                                image: '',
+                                original_price: 0,
+                                sale_price: 0,
+                                rent_1_month: 0,
+                                rent_3_months: 0,
+                                rent_6_months: 0,
+                                rent_12_months: 0,
+                                platform: ['PS5'],
+                                discount: 0,
+                                description: '',
+                                type: ['Permanent'],
+                                category: 'subscription'
+                              });
+                            }}
+                            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-medium transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={handleAddSubscription}
+                            disabled={!subscriptionForm.title || !subscriptionForm.image || uploadingImage}
+                            className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                          >
+                            <Save className="w-4 h-4" />
+                            <span>Add Subscription</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
