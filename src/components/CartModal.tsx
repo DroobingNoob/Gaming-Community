@@ -161,7 +161,7 @@ const CartModal: React.FC<CartModalProps> = ({
                 You Might Also Like
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                {bestsellers.filter(game => game.is_recommended === true).slice(0, 6).map((game) => {
+                {(game => game.is_recommended === true).slice(0, 6).map((game) => {
                   const displayPrice = game.category === 'game'
                     ? getGameDisplayPrice(game, 'Rent', '1_month')
                     : game.sale_price;
