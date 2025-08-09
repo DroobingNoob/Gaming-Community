@@ -356,7 +356,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     });
 
     return (
-      <div className="space-y-6">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-[80] p-4 overflow-y-auto">
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-bold text-gray-800">Upload Screenshots</h3>
           <button
@@ -386,7 +386,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             <p className="text-gray-600">Loading screenshots...</p>
           </div>
         )}
-
+        <div className="bg-white rounded-2xl max-w-md w-full my-8 shadow-2xl">
         {/* Error State */}
         {testimonialsError && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -648,53 +648,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   >
                     Cancel
                   </button>
-            {/* Edition Features - Only show for Premium/Deluxe editions */}
-            {formData.edition && formData.edition !== 'Standard' && (
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  {formData.edition} Edition Features
-                </label>
-                <div className="space-y-3">
-                  {/* Existing Features */}
-                  {formData.edition_features && formData.edition_features.length > 0 && (
-                    <div className="space-y-2">
-                      {formData.edition_features.map((feature, index) => (
-                        <div key={index} className="flex items-center space-x-2 bg-gray-50 rounded-lg p-3">
-                          <span className="flex-1 text-sm">{feature}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFeature(index)}
-                            className="text-red-500 hover:text-red-700 transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Add New Feature */}
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={newFeature}
-                      onChange={(e) => setNewFeature(e.target.value)}
-                      placeholder="Enter edition feature..."
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddFeature())}
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddFeature}
-                      className="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg transition-colors"
-                    >
-                      Add
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
                   <button
                     onClick={handleUpdateScreenshot}
                     disabled={!screenshotForm.image || uploadingImage}
@@ -1665,7 +1618,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                 )}
               </div>
             )}
-            </form>
           </div>
         </div>
       </div>
