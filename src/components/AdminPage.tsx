@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useTestimonials, useAllGames } from '../hooks/useSupabaseData';
 import { gamesService, subscriptionsService, testimonialsService } from '../services/supabaseService';
 import { Game, Testimonial } from '../config/supabase';
-
+ 
 interface AdminPageProps {
   onBackToHome: () => void;
 }
