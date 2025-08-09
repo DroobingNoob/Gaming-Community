@@ -19,7 +19,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
   const [showFilters, setShowFilters] = useState(false);
   
   const itemsPerPage = 24;
- 
+  
   // Filter and sort games
   const filteredAndSortedGames = useMemo(() => {
     let filtered = games.filter(game => {
