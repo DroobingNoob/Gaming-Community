@@ -74,21 +74,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     let searchQuery = '';
     
     if (activeTab === 'games') {
-      // Group games by title and show only one representative per title
-      const gameGroups = (allGames || []).reduce((groups, game) => {
-        if (!groups[game.title]) {
-          groups[game.title] = [];
-        }
-        groups[game.title].push(game);
-        return groups;
-      }, {} as { [title: string]: Game[] });
-      
-      // Get one representative per game title (prefer Standard edition)
-      items = Object.keys(gameGroups).map(title => {
-        const editions = gameGroups[title];
-        const standardEdition = editions.find(game => game.edition === 'Standard');
-        return standardEdition || editions[0];
-      });
+      items = allGames || []; // Show all games including all editions as separate items
       searchQuery = gamesSearchQuery;
     } else if (activeTab === 'subscriptions') {
       items = subscriptions || [];
@@ -614,16 +600,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     <div>
                       <h3 className="font-bold text-gray-800">
                         {item.title}
-                        {/* Show edition count for games with multiple editions */}
-                        {activeTab === 'games' && (() => {
-                          const sameTitle = (allGames || []).filter(g => g.title === item.title);
-                          return sameTitle.length > 1 ? (
-                            <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                              {sameTitle.length} editions
-                            </span>
-                          ) : null;
-                        })()}
-                        {activeTab === 'subscriptions' && item.edition && (
+                        {/* Show edition badge for games and subscriptions */}
+                        {item.edition && (
                           <span className="ml-2 bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
                             {item.edition}
                           </span>
