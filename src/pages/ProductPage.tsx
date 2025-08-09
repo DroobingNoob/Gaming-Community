@@ -198,16 +198,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
   };
 
   const getTypeDescription = () => {
-    if (product.category === 'subscription') {
-      // For subscriptions, always use rental pricing
-      const rentPrices = {
-        '1_month': product.rent_1_month || 0,
-        '3_months': product.rent_3_months || 0,
-        '6_months': product.rent_6_months || 0,
-        '12_months': product.rent_12_months || 0
-      };
-      return rentPrices[selectedRentDuration];
-    } else if (selectedType === 'Rent') {
+    if (selectedType === 'Rent') {
       return ` 🎮 Rental Game Accounts:
 
 ✔️ We provide a fully legal account with your desired rental game pre-purchased.
@@ -223,9 +214,9 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
 
 ✔️ Console must remain connected to the internet during the rental period.
 
+✔️ After the selected rental period ends, the game must be returned as per the agreed process.
 
-        '6_months': product.rent_6_months || 0,
-        '12_months': product.rent_12_months || 0
+✔️ Continuing to use the game after your rental period may result in account restrictions or being blocked from future rentals.
 
 ✔️ Credentials cannot be changed. If changed, the game will be removed, and no refund or recovery will be provided.`;
     } else if (selectedType === 'Permanent Offline') {
@@ -262,14 +253,30 @@ This option is best suited for single-player games or customers who prefer offli
 
   const handleAddToCart = () => {
     const price = calculatePrice();
-    const typeWithDuration = selectedType === 'Rent' ? `${selectedType} (${selectedRentDuration.replace('_', ' ')})` : selectedType;
-    onAddToCart(currentProduct, selectedPlatform, typeWithDuration, price);
+    if (product.category === 'subscription') {
+      // For subscriptions, use rental duration and pricing
+      const price = calculatePrice();
+      const typeWithDuration = `Rent (${selectedRentDuration.replace('_', ' ')})`;
+      onAddToCart(product, 'Subscription', typeWithDuration, price);
+    } else {
+      // For games, use the selected type and duration
+      const typeWithDuration = selectedType === 'Rent' ? `${selectedType} (${selectedRentDuration.replace('_', ' ')})` : selectedType;
+      onAddToCart(currentProduct, selectedPlatform, typeWithDuration, price);
+    }
   };
 
   const handleBuyNow = () => {
     const price = calculatePrice();
-    const typeWithDuration = selectedType === 'Rent' ? `${selectedType} (${selectedRentDuration.replace('_', ' ')})` : selectedType;
-    onBuyNow(currentProduct, selectedPlatform, typeWithDuration, price);
+    if (product.category === 'subscription') {
+      // For subscriptions, use rental duration and pricing
+      const price = calculatePrice();
+      const typeWithDuration = `Rent (${selectedRentDuration.replace('_', ' ')})`;
+      onBuyNow(product, 'Subscription', typeWithDuration, price);
+    } else {
+      // For games, use the selected type and duration
+      const typeWithDuration = selectedType === 'Rent' ? `${selectedType} (${selectedRentDuration.replace('_', ' ')})` : selectedType;
+      onBuyNow(currentProduct, selectedPlatform, typeWithDuration, price);
+    }
   };
 
   const handleRelatedProductClick = (relatedProduct: Game) => {
@@ -286,7 +293,6 @@ This option is best suited for single-player games or customers who prefer offli
     const newUrl = edition.category === 'game' 
       ? `/games/${edition.id}` 
       : `/subscriptions/${edition.id}`;
-    
     // Use replace to avoid creating too many history entries
     window.history.replaceState(null, '', newUrl);
   };
@@ -406,36 +412,50 @@ This option is best suited for single-player games or customers who prefer offli
                     ))}
                   </div>
                 </div>
-                {/* Type Selection */}
-                <div className="mb-4 xl:mb-6">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
-                  <div className="space-y-2 xl:space-y-3">
-                    {currentProduct.type.map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => setSelectedType(type)}
-                        className={`w-full px-4 xl:px-6 py-2 xl:py-3 rounded-lg xl:rounded-xl font-medium transition-all duration-300 text-left text-sm xl:text-base ${
-                          selectedType === type
-                            ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                </div>
 
-                {/* Rent Duration Selection - Only show if Rent is selected (removed 2 months) */}
-                {selectedType === 'Rent' && (
+                {/* Type Selection - Show for games and subscriptions with different logic */}
+                {product.category === 'game' ? (
                   <div className="mb-4 xl:mb-6">
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Rental Duration</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
+                    <div className="space-y-2 xl:space-y-3">
+                      {currentProduct.type.map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => setSelectedType(type)}
+                          className={`w-full px-4 xl:px-6 py-2 xl:py-3 rounded-lg xl:rounded-xl font-medium transition-all duration-300 text-left text-sm xl:text-base ${
+                            selectedType === type
+                              ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  // For subscriptions, only show Rent type
+                  <div className="mb-6">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Subscription Type</label>
+                    <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-6 py-3 rounded-xl font-medium shadow-lg text-center">
+                      Subscription Rental
+                    </div>
+                  </div>
+                )}
+
+                {/* Duration Selection - Show for games with Rent selected, or all subscriptions */}
+                {((product.category === 'game' && selectedType === 'Rent') || product.category === 'subscription') && (
+                  <div className="mb-4 xl:mb-6">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                      {product.category === 'game' ? 'Rental Duration' : 'Subscription Duration'}
+                    </label>
                     <div className="grid grid-cols-3 gap-2 xl:gap-3">
                       {[
-                        { key: '1_month', label: '1 Month', price: currentProduct.rent_1_month },
-                        { key: '3_months', label: '3 Months', price: currentProduct.rent_3_months },
-                        { key: '6_months', label: '6 Months', price: currentProduct.rent_6_months }
-                      ].map((duration) => (
+                        { key: '1_month', label: '1 Month', price: product.category === 'game' ? currentProduct.rent_1_month : product.rent_1_month },
+                        { key: '3_months', label: '3 Months', price: product.category === 'game' ? currentProduct.rent_3_months : product.rent_3_months },
+                        { key: '6_months', label: '6 Months', price: product.category === 'game' ? currentProduct.rent_6_months : product.rent_6_months },
+                        { key: '12_months', label: '12 Months', price: product.category === 'game' ? currentProduct.rent_12_months : product.rent_12_months }
+                      ].filter(duration => duration.price && duration.price > 0).map((duration) => (
                         <button
                           key={duration.key}
                           onClick={() => setSelectedRentDuration(duration.key as any)}
@@ -469,12 +489,28 @@ This option is best suited for single-player games or customers who prefer offli
                 )}
 
                 {/* Type Description */}
-                <div className="mb-4 xl:mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 xl:p-6 border border-blue-200">
-                  <h4 className="font-bold text-blue-800 mb-3 text-sm xl:text-base">About This Option</h4>
-                  <p className="text-blue-700 text-xs xl:text-sm leading-relaxed whitespace-pre-line">
-                    {getTypeDescription()}
-                  </p>
-                </div>
+                {product.category === 'game' ? (
+                  <div className="mb-4 xl:mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 xl:p-6 border border-blue-200">
+                    <h4 className="font-bold text-blue-800 mb-3 text-sm xl:text-base">About This Option</h4>
+                    <p className="text-blue-700 text-xs xl:text-sm leading-relaxed whitespace-pre-line">
+                      {getTypeDescription()}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200">
+                    <h4 className="font-bold text-purple-800 mb-3">About Subscription Rentals</h4>
+                    <p className="text-purple-700 text-sm leading-relaxed">
+                      🎮 Subscription Rental Details:
+                      
+                      ✔️ Get access to premium subscription services for your selected duration
+                      ✔️ Full access to all subscription benefits during the rental period
+                      ✔️ Account credentials provided after payment confirmation
+                      ✔️ Must return account after rental period ends
+                      ✔️ No permanent ownership - rental only
+                      ✔️ Support provided throughout rental duration
+                    </p>
+                  </div>
+                )}
 
                 {/* Pricing */}
                 <div className="flex items-center space-x-3 xl:space-x-4 mb-6 xl:mb-8">
@@ -726,36 +762,49 @@ This option is best suited for single-player games or customers who prefer offli
                 </div>
               </div>
 
-              {/* Type Selection */}
-              <div className="mb-4 sm:mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
-                <div className="space-y-2 sm:space-y-3">
-                  {currentProduct.type.map((type) => (
-                    <button
-                      key={type}
-                      onClick={() => setSelectedType(type)}
-                      className={`w-full px-3 sm:px-4 py-2 rounded-lg font-medium transition-all duration-300 text-left text-sm ${
-                        selectedType === type
-                          ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Rent Duration Selection - Only show if Rent is selected (removed 2 months) */}
-              {selectedType === 'Rent' && (
+              {/* Type Selection - Show for games and subscriptions with different logic */}
+              {product.category === 'game' ? (
                 <div className="mb-4 sm:mb-6">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Rental Duration</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
+                  <div className="space-y-2 sm:space-y-3">
+                    {currentProduct.type.map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => setSelectedType(type)}
+                        className={`w-full px-3 sm:px-4 py-2 rounded-lg font-medium transition-all duration-300 text-left text-sm ${
+                          selectedType === type
+                            ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                // For subscriptions, only show Rent type
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Subscription Type</label>
+                  <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-2 rounded-lg font-medium shadow-lg text-center">
+                    Subscription Rental
+                  </div>
+                </div>
+              )}
+
+              {/* Duration Selection - Show for games with Rent selected, or all subscriptions */}
+              {((product.category === 'game' && selectedType === 'Rent') || product.category === 'subscription') && (
+                <div className="mb-4 sm:mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    {product.category === 'game' ? 'Rental Duration' : 'Subscription Duration'}
+                  </label>
                   <div className="grid grid-cols-3 gap-2 sm:gap-3">
                     {[
-                      { key: '1_month', label: '1 Month', price: currentProduct.rent_1_month },
-                      { key: '3_months', label: '3 Months', price: currentProduct.rent_3_months },
-                      { key: '6_months', label: '6 Months', price: currentProduct.rent_6_months }
-                    ].map((duration) => (
+                      { key: '1_month', label: '1 Month', price: product.category === 'game' ? currentProduct.rent_1_month : product.rent_1_month },
+                      { key: '3_months', label: '3 Months', price: product.category === 'game' ? currentProduct.rent_3_months : product.rent_3_months },
+                      { key: '6_months', label: '6 Months', price: product.category === 'game' ? currentProduct.rent_6_months : product.rent_6_months },
+                      { key: '12_months', label: '12 Months', price: product.category === 'game' ? currentProduct.rent_12_months : product.rent_12_months }
+                    ].filter(duration => duration.price && duration.price > 0).map((duration) => (
                       <button
                         key={duration.key}
                         onClick={() => setSelectedRentDuration(duration.key as any)}
@@ -789,12 +838,28 @@ This option is best suited for single-player games or customers who prefer offli
               )}
 
               {/* Type Description */}
-              <div className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-3 sm:p-4 border border-blue-200">
-                <h4 className="font-bold text-blue-800 mb-2 sm:mb-3 text-sm">About This Option</h4>
-                <p className="text-blue-700 text-xs leading-relaxed whitespace-pre-line">
-                  {getTypeDescription()}
-                </p>
-              </div>
+              {product.category === 'game' ? (
+                <div className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-3 sm:p-4 border border-blue-200">
+                  <h4 className="font-bold text-blue-800 mb-2 sm:mb-3 text-sm">About This Option</h4>
+                  <p className="text-blue-700 text-xs leading-relaxed whitespace-pre-line">
+                    {getTypeDescription()}
+                  </p>
+                </div>
+              ) : (
+                <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-200">
+                  <h4 className="font-bold text-purple-800 mb-3 text-sm">About Subscription Rentals</h4>
+                  <p className="text-purple-700 text-xs leading-relaxed">
+                    🎮 Subscription Rental Details:
+                    
+                    ✔️ Get access to premium subscription services for your selected duration
+                    ✔️ Full access to all subscription benefits during the rental period
+                    ✔️ Account credentials provided after payment confirmation
+                    ✔️ Must return account after rental period ends
+                    ✔️ No permanent ownership - rental only
+                    ✔️ Support provided throughout rental duration
+                  </p>
+                </div>
+              )}
 
               {/* Pricing */}
               <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
@@ -883,22 +948,23 @@ This option is best suited for single-player games or customers who prefer offli
                 </nav>
               </div>
 
-              <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+              {/* Tab Content */}
+              <div className="space-y-3 sm:space-y-4">
                 {activeAccordion === 'details' && (
-                  <div className="space-y-3 sm:space-y-4">
+                  <div>
                     <p className="text-gray-600 leading-relaxed text-xs sm:text-sm">{currentProduct.description}</p>
                   </div>
                 )}
 
                 {activeAccordion === 'additional' && (
-                  <div className="space-y-3 sm:space-y-4">
-                    <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 sm:p-4">
-                      <h4 className="font-bold text-orange-800 mb-2 sm:mb-3 text-sm">Important Notice</h4>
+                  <div>
+                    <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4">
+                      <h4 className="font-bold text-orange-800 mb-2 text-sm">Important Notice</h4>
                       <p className="text-orange-700 text-xs sm:text-sm leading-relaxed">
                         Refunds are not available after purchase; however, a replacement will be provided if the product does not function properly.
                       </p>
                     </div>
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       <div>
                         <h4 className="font-bold text-gray-800 mb-1 sm:mb-2 text-sm">Platform</h4>
                         <p className="text-gray-600 text-xs sm:text-sm">{selectedPlatform}</p>
@@ -912,7 +978,7 @@ This option is best suited for single-player games or customers who prefer offli
                 )}
 
                 {activeAccordion === 'faq' && (
-                  <div className="space-y-3 sm:space-y-4">
+                  <div className="space-y-2 sm:space-y-3">
                     {faqs.map((faq, index) => (
                       <div key={index}>
                         <h5 className="font-semibold text-gray-800 mb-1 sm:mb-2 text-xs sm:text-sm">{faq.question}</h5>
