@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
-import { useBestsellers } from '../hooks/useSupabaseData';
+import { useGames, useSubscriptions } from '../hooks/useSupabaseData';
 import { Game, getGameDisplayPrice, getGameDiscountPercentage } from '../config/supabase';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,11 +32,18 @@ const CartModal: React.FC<CartModalProps> = ({
   onCheckout
 }) => {
   const navigate = useNavigate();
-  const { bestsellers, loading: bestsellersLoading } = useBestsellers(6);
+  const { games } = useGames({ limit: 50 }); // Get more games to filter recommended ones
+  const { subscriptions } = useSubscriptions({ limit: 50 }); // Get more subscriptions to filter recommended ones
 
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  // Filter recommended products only
+  const recommendedProducts = [
+    ...(games || []).filter(game => game.is_recommended === true),
+    ...(subscriptions || []).filter(sub => sub.is_recommended === true)
+  ].slice(0, 6);
 
   const handleGameClick = (game: Game) => {
     onClose();
@@ -155,13 +162,13 @@ const CartModal: React.FC<CartModalProps> = ({
           )}
 
           {/* Recommendations */}
-          {!bestsellersLoading && bestsellers.length > 0 && cartItems.length > 0 && (
+          {recommendedProducts.length > 0 && cartItems.length > 0 && (
             <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-white to-gray-50">
               <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-center">
                 You Might Also Like
               </h3> 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                {(game => game.is_recommended === true).slice(0, 6).map((game) => {
+                {recommendedProducts.map((game) => {
                   const displayPrice = game.category === 'game'
                     ? getGameDisplayPrice(game, 'Rent', '1_month')
                     : game.sale_price;
