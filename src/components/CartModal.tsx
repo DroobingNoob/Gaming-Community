@@ -159,7 +159,7 @@ const CartModal: React.FC<CartModalProps> = ({
             <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-white to-gray-50">
               <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-center">
                 You Might Also Like
-              </h3>
+              </h3> 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                 {(game => game.is_recommended === true).slice(0, 6).map((game) => {
                   const displayPrice = game.category === 'game'
