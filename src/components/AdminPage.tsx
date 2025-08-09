@@ -131,6 +131,25 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     }
   };
 
+  const handleAddFeature = () => {
+    if (newFeature.trim() && formData.edition_features) {
+      setFormData({
+        ...formData,
+        edition_features: [...formData.edition_features, newFeature.trim()]
+      });
+      setNewFeature('');
+    }
+  };
+
+  const handleRemoveFeature = (index: number) => {
+    if (formData.edition_features) {
+      setFormData({
+        ...formData,
+        edition_features: formData.edition_features.filter((_, i) => i !== index)
+      });
+    }
+  };
+
   // Game CRUD operations
   const handleAddGame = async () => {
     try {
@@ -237,7 +256,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         description: '',
         type: ['Rent'],
         category: 'subscription'
-        edition_features: [],
       });
       setIsAddingSubscription(false);
       // Note: You might want to add a refetch for subscriptions here
@@ -666,7 +684,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     );
   };
 
-    const [newFeature, setNewFeature] = useState('');
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
