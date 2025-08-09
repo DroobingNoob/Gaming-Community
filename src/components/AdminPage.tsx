@@ -60,11 +60,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     permanent_online_price: 0,
     platform: ['PS5'],
     description: '',
-    edition_features: [],
     type: ['Rent'],
     show_in_bestsellers: false,
     is_recommended: false,
-    edition: 'Standard'
+    edition: 'Standard',
+    edition_features: []
   });
 
   const [subscriptionForm, setSubscriptionForm] = useState<Partial<Game>>({
@@ -354,7 +354,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     });
 
     return (
-      <div className="space-y-6">
+      <div>
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-bold text-gray-800">Upload Screenshots</h3>
           <button
