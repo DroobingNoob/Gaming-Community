@@ -989,7 +989,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                       </div>
                     </div>
                   )}
-                  < />
+                 
                   {/* Duration Selection - Only for subscriptions */}
                   {activeTab === 'subscriptions' && (
                     <div>
