@@ -61,12 +61,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     platform: ['PS5'],
     description: '',
     edition_features: [],
-    edition_features: [],
     type: ['Rent'],
     show_in_bestsellers: false,
     is_recommended: false,
-    edition: 'Standard',
-    edition_features: []
+    edition: 'Standard'
   });
 
   const [subscriptionForm, setSubscriptionForm] = useState<Partial<Game>>({
@@ -356,7 +354,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     });
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-[80] p-4 overflow-y-auto">
+      <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-bold text-gray-800">Upload Screenshots</h3>
           <button
@@ -386,7 +384,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             <p className="text-gray-600">Loading screenshots...</p>
           </div>
         )}
-        <div className="bg-white rounded-2xl max-w-md w-full my-8 shadow-2xl">
+
         {/* Error State */}
         {testimonialsError && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
