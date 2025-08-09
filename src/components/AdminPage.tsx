@@ -928,37 +928,38 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     </div>
                   )}
 
-                  {/* Platform Selection */}
-                  {activeTab === 'games' && (
-                    <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Platform</label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {['PS4', 'PS5', 'PSVR2', 'Xbox'].map((platform) => (
-                        <label key={platform} className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={formData.platform?.includes(platform)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setFormData(prev => ({
-                                  ...prev,
-                                  platform: [...(prev.platform || []), platform]
-                                }));
-                              } else {
-                                setFormData(prev => ({
-                                  ...prev,
-                                  platform: prev.platform?.filter(p => p !== platform) || []
-                                }));
-                              }
-                            }}
-                            className="rounded"
-                          />
-                          <span className="text-sm">{platform}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  
+               {/* Platform Selection */}
+{activeTab === 'games' && (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">Platform</label>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+      {['PS4', 'PS5', 'PSVR2', 'Xbox'].map((platform) => (
+        <label key={platform} className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={formData.platform?.includes(platform)}
+            onChange={(e) => {
+              if (e.target.checked) {
+                setFormData(prev => ({
+                  ...prev,
+                  platform: [...(prev.platform || []), platform]
+                }));
+              } else {
+                setFormData(prev => ({
+                  ...prev,
+                  platform: prev.platform?.filter(p => p !== platform) || []
+                }));
+              }
+            }}
+            className="rounded"
+          />
+          <span className="text-sm">{platform}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+)}
+
                   {activeTab === 'games' && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
