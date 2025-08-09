@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, Upload, X, Check, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ArrowLeft, Plus, Edit, Trash2, Upload, X, Check, AlertCircle, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAllGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
 import { Game, Testimonial } from '../config/supabase';
@@ -23,9 +23,17 @@ interface EditionPricing {
 }
 
 const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
-  const [activeTab, setActiveTab] = useState<'games' | 'subscriptions' | 'screenshots'>('games');
+  const [activeTab, setActiveTab] = useState<'games' | 'subscriptions' | 'testimonials'>('games');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Game | Testimonial | null>(null);
+  const [gamesSearchQuery, setGamesSearchQuery] = useState('');
+  const [subscriptionsSearchQuery, setSubscriptionsSearchQuery] = useState('');
+  const [testimonialsSearchQuery, setTestimonialsSearchQuery] = useState('');
+  const [gamesCurrentPage, setGamesCurrentPage] = useState(1);
+  const [subscriptionsCurrentPage, setSubscriptionsCurrentPage] = useState(1);
+  const [testimonialsCurrentPage, setTestimonialsCurrentPage] = useState(1);
+  
+  const itemsPerPage = 9;
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -59,6 +67,106 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const { allGames, loading: gamesLoading, refetch: refetchGames } = useAllGames();
   const { subscriptions, loading: subscriptionsLoading, refetch: refetchSubscriptions } = useSubscriptions({ limit: 1000 });
   const { testimonials, loading: testimonialsLoading, refetch: refetchTestimonials } = useTestimonials();
+
+  // Filter items based on active tab and search
+  const filteredItems = useMemo(() => {
+    let items: Game[] = [];
+    let searchQuery = '';
+    
+    if (activeTab === 'games') {
+      // Group games by title and show only one per title (preferably Standard edition)
+      const gameGroups: { [title: string]: Game[] } = {};
+      (allGames || []).forEach(game => {
+        if (!gameGroups[game.title]) {
+          gameGroups[game.title] = [];
+        }
+        gameGroups[game.title].push(game);
+      });
+      
+      // Select one representative game per title (prefer Standard edition)
+      items = Object.values(gameGroups).map(editions => {
+        const standardEdition = editions.find(game => game.edition === 'Standard');
+        return standardEdition || editions[0]; // Use Standard if available, otherwise first edition
+      });
+      searchQuery = gamesSearchQuery;
+    } else if (activeTab === 'subscriptions') {
+      items = subscriptions || [];
+      searchQuery = subscriptionsSearchQuery;
+    }
+
+    const filtered = items.filter(item =>
+      item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    
+    return filtered;
+  }, [allGames, subscriptions, activeTab, gamesSearchQuery, subscriptionsSearchQuery]);
+
+  // Filter testimonials separately
+  const filteredTestimonials = useMemo(() => {
+    return (testimonials || []).filter(testimonial => {
+      // For testimonials, we can search by image URL or any other criteria
+      return testimonial.image.toLowerCase().includes(testimonialsSearchQuery.toLowerCase());
+    });
+  }, [testimonials, testimonialsSearchQuery]);
+
+  // Pagination logic
+  const getCurrentPageItems = () => {
+    let currentPage = 1;
+    let items: any[] = [];
+    
+    if (activeTab === 'testimonials') {
+      currentPage = testimonialsCurrentPage;
+      items = filteredTestimonials;
+    } else {
+      if (activeTab === 'games') {
+        currentPage = gamesCurrentPage;
+      } else {
+        currentPage = subscriptionsCurrentPage;
+      }
+      items = filteredItems;
+    }
+    
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    
+    return {
+      items: items.slice(startIndex, endIndex),
+      totalItems: items.length,
+      totalPages: Math.ceil(items.length / itemsPerPage),
+      currentPage
+    };
+  };
+
+  const { items: paginatedItems, totalItems, totalPages, currentPage } = getCurrentPageItems();
+
+  const handlePageChange = (page: number) => {
+    if (activeTab === 'games') {
+      setGamesCurrentPage(page);
+    } else if (activeTab === 'subscriptions') {
+      setSubscriptionsCurrentPage(page);
+    } else {
+      setTestimonialsCurrentPage(page);
+    }
+  };
+
+  const getCurrentSearchQuery = () => {
+    if (activeTab === 'games') return gamesSearchQuery;
+    if (activeTab === 'subscriptions') return subscriptionsSearchQuery;
+    return testimonialsSearchQuery;
+  };
+
+  const setCurrentSearchQuery = (query: string) => {
+    if (activeTab === 'games') {
+      setGamesSearchQuery(query);
+      setGamesCurrentPage(1); // Reset to first page when searching
+    } else if (activeTab === 'subscriptions') {
+      setSubscriptionsSearchQuery(query);
+      setSubscriptionsCurrentPage(1);
+    } else {
+      setTestimonialsSearchQuery(query);
+      setTestimonialsCurrentPage(1);
+    }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -350,7 +458,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         await subscriptionsService.delete(id);
         toast.success('Subscription deleted successfully!');
         refetchSubscriptions();
-      } else if (activeTab === 'screenshots') {
+      } else if (activeTab === 'testimonials') {
         await testimonialsService.delete(id);
         toast.success('Screenshot deleted successfully!');
         refetchTestimonials();
@@ -423,9 +531,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         {/* Tabs */}
         <div className="flex space-x-1 mb-8 bg-white/80 backdrop-blur-sm rounded-xl p-1 shadow-lg border border-white/20">
           {[
-            { id: 'games', label: 'Games', count: allGames.length },
+            { id: 'games', label: 'Games', count: filteredItems.length },
             { id: 'subscriptions', label: 'Subscriptions', count: subscriptions.length },
-            { id: 'screenshots', label: 'Screenshots', count: testimonials.length }
+            { id: 'testimonials', label: 'Screenshots', count: testimonials.length }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -461,6 +569,30 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           </button>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder={`Search ${activeTab === 'games' ? 'games' : activeTab === 'subscriptions' ? 'subscriptions' : 'testimonials'}...`}
+              value={getCurrentSearchQuery()}
+              onChange={(e) => setCurrentSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Results Summary */}
+        <div className="mb-4 flex items-center justify-between">
+          <p className="text-gray-600 text-sm">
+            Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} {activeTab}
+          </p>
+          <div className="text-sm text-gray-500">
+            Page {currentPage} of {totalPages}
+          </div>
+        </div>
+
         {/* Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {activeTab === 'games' && (gamesLoading ? (
@@ -469,38 +601,48 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               <p className="mt-4 text-gray-600">Loading games...</p>
             </div>
           ) : (
-            allGames.map((game) => (
-              <div key={game.id} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300">
+            paginatedItems.map((item) => (
+              <div key={item.id} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300">
                 <img
-                  src={game.image}
-                  alt={game.title}
+                  src={item.image}
+                  alt={item.title}
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-gray-800 text-sm line-clamp-2">{game.title}</h3>
-                    {game.edition && game.edition !== 'Standard' && (
-                      <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">
-                        {game.edition}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-orange-500 font-bold">₹{game.rent_1_month || game.sale_price}</span>
-                    <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded text-xs">
-                      {game.platform.join(', ')}
-                    </span>
+                    <div>
+                      <h3 className="font-bold text-gray-800">
+                        {item.title}
+                        {/* Show available editions count */}
+                        {activeTab === 'games' && (() => {
+                          const gameEditions = (allGames || []).filter(g => g.title === item.title);
+                          return gameEditions.length > 1 ? (
+                            <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                              {gameEditions.length} editions
+                            </span>
+                          ) : null;
+                        })()}
+                      </h3>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-orange-500 font-bold">₹{activeTab === 'games' ? (
+                          item.rent_1_month || item.sale_price
+                        ) : item.sale_price}</span>
+                        <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded text-xs">
+                          {activeTab === 'games' ? item.platform.join(', ') : 'Subscription'}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => handleEditGame(game)}
+                      onClick={() => handleEditGame(item)}
                       className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm transition-colors flex items-center justify-center space-x-1"
                     >
                       <Edit className="w-4 h-4" />
                       <span>Edit</span>
                     </button>
                     <button
-                      onClick={() => handleDelete(game.id!)}
+                      onClick={() => handleDelete(item.id!)}
                       className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded-lg text-sm transition-colors flex items-center justify-center space-x-1"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -518,7 +660,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               <p className="mt-4 text-gray-600">Loading subscriptions...</p>
             </div>
           ) : (
-            subscriptions.map((subscription) => (
+            paginatedItems.map((subscription) => (
               <div key={subscription.id} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300">
                 <img
                   src={subscription.image}
@@ -554,13 +696,13 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             ))
           ))}
 
-          {activeTab === 'screenshots' && (testimonialsLoading ? (
+          {activeTab === 'testimonials' && (testimonialsLoading ? (
             <div className="col-span-full text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading screenshots...</p>
             </div>
           ) : (
-            testimonials.map((testimonial) => (
+            paginatedItems.map((testimonial) => (
               <div key={testimonial.id} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300">
                 <img
                   src={testimonial.image}
@@ -590,6 +732,60 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           ))}
         </div>
 
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center space-x-2 mt-8">
+            <button
+              onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Previous
+            </button>
+            
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const page = i + 1;
+              return (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    currentPage === page
+                      ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white'
+                      : 'text-gray-600 bg-white border border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  {page}
+                </button>
+              );
+            })}
+            
+            {totalPages > 5 && (
+              <>
+                <span className="px-2 text-gray-500">...</span>
+                <button
+                  onClick={() => handlePageChange(totalPages)}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    currentPage === totalPages
+                      ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white'
+                      : 'text-gray-600 bg-white border border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  {totalPages}
+                </button>
+              </>
+            )}
+            
+            <button
+              onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        )}
+
         {/* Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -611,8 +807,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   </button>
                 </div>
 
-                <form onSubmit={activeTab === 'screenshots' ? handleTestimonialSubmit : handleSubmit} className="space-y-6">
-                  {activeTab !== 'screenshots' && (
+                <form onSubmit={activeTab === 'testimonials' ? handleTestimonialSubmit : handleSubmit} className="space-y-6">
+                  {activeTab !== 'testimonials' && (
                     <>
                       {/* Basic Information */}
                       <div>
@@ -997,7 +1193,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                   {/* Image Upload */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {activeTab === 'screenshots' ? 'Screenshot Image' : 'Game Image'}
+                      {activeTab === 'testimonials' ? 'Screenshot Image' : 'Game Image'}
                     </label>
                     
                     {/* Upload Area */}
