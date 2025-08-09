@@ -18,6 +18,16 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [editingGame, setEditingGame] = useState<Game | null>(null);
   const [editingSubscription, setEditingSubscription] = useState<Game | null>(null);
   const [editingScreenshot, setEditingScreenshot] = useState<Testimonial | null>(null);
+  
+  // Pagination states
+  const [gamesPage, setGamesPage] = useState(1);
+  const [subscriptionsPage, setSubscriptionsPage] = useState(1);
+  const [screenshotsPage, setScreenshotsPage] = useState(1);
+  const itemsPerPage = 9;
+  
+  // Search states
+  const [gamesSearch, setGamesSearch] = useState('');
+  const [subscriptionsSearch, setSubscriptionsSearch] = useState('');
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['PS5']);
   const [isGameModalOpen, setIsGameModalOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
@@ -50,6 +60,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     permanent_online_price: 0,
     platform: ['PS5'],
     description: '',
+    edition_features: [],
+    edition_features: [],
     type: ['Rent'],
     show_in_bestsellers: false,
     is_recommended: false,
