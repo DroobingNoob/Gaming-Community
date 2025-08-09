@@ -23,7 +23,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
   // Filter and sort games
   const filteredAndSortedGames = useMemo(() => {
     let filtered = games.filter(game => {
-      const matchesSearch = game.title.toLowerCase().startsWith(searchQuery.toLowerCase());
+      const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesPlatform = selectedPlatform === 'all' || game.platform.includes(selectedPlatform);
       const matchesPrice = game.sale_price >= priceRange[0] && game.sale_price <= priceRange[1];
       
