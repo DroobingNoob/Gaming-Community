@@ -43,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({
     if (searchQuery.trim().length > 0) {
       const filtered = allItems.filter(item =>
         item.title.toLowerCase().includes(searchQuery.toLowerCase())
-      ).slice(0, 5); // Limit to 5 suggestions
+      ); // Limit to 5 suggestions
       setSearchSuggestions(filtered);
       setShowSuggestions(true);
     } else {
