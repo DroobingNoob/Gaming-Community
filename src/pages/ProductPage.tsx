@@ -414,8 +414,9 @@ This option is best suited for single-player games or customers who prefer offli
                 </div>
 
                 {/* Type Selection - Show for games and subscriptions with different logic */}
-                {product.category === 'game' ? (
-                  <div className="mb-4 xl:mb-6">
+              {/* Type Selection - Show for games, rental-only for subscriptions */}
+              {product.category === 'game' ? (
+                <div className="mb-4 xl:mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
                     <div className="space-y-2 xl:space-y-3">
                       {currentProduct.type.map((type) => (
@@ -783,6 +784,7 @@ This option is best suited for single-player games or customers who prefer offli
                   </div>
                 </div>
               ) : (
+                // For subscriptions, only show Rent type
                 <div className="mb-6">
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Subscription Type</label>
                   <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-2 rounded-lg font-medium shadow-lg text-center">
@@ -802,7 +804,7 @@ This option is best suited for single-player games or customers who prefer offli
                       { key: '1_month', label: '1 Month', price: product.category === 'game' ? currentProduct.rent_1_month : product.rent_1_month },
                       { key: '3_months', label: '3 Months', price: product.category === 'game' ? currentProduct.rent_3_months : product.rent_3_months },
                       { key: '6_months', label: '6 Months', price: product.category === 'game' ? currentProduct.rent_6_months : product.rent_6_months },
-                      { key: '12_months', label: '12 Months', price: product.rent_12_months }
+                      { key: '12_months', label: '12 Months', price: product.category === 'game' ? currentProduct.rent_12_months : product.rent_12_months }
                     ].filter(duration => duration.price && duration.price > 0).map((duration) => (
                       <button
                         key={duration.key}
