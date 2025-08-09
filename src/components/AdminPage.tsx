@@ -959,7 +959,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     </div>
                   </div>
 
-              <div>
                   {activeTab === 'games' && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
@@ -990,7 +989,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                       </div>
                     </div>
                   )}
-                  </div>
+                  < />
                   {/* Duration Selection - Only for subscriptions */}
                   {activeTab === 'subscriptions' && (
                     <div>
