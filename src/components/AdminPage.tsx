@@ -346,6 +346,33 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     setScreenshotForm({ image: '' });
   };
 
+  // Filter and paginate games
+  const filteredGames = allGames?.filter(game =>
+    game.title.toLowerCase().includes(gamesSearch.toLowerCase())
+  ) || [];
+  const totalGamesPages = Math.ceil(filteredGames.length / itemsPerPage);
+  const paginatedGames = filteredGames.slice(
+    (gamesPage - 1) * itemsPerPage,
+    gamesPage * itemsPerPage
+  );
+
+  // Filter and paginate subscriptions
+  const filteredSubscriptions = subscriptions?.filter(sub =>
+    sub.title.toLowerCase().includes(subscriptionsSearch.toLowerCase())
+  ) || [];
+  const totalSubscriptionsPages = Math.ceil(filteredSubscriptions.length / itemsPerPage);
+  const paginatedSubscriptions = filteredSubscriptions.slice(
+    (subscriptionsPage - 1) * itemsPerPage,
+    subscriptionsPage * itemsPerPage
+  );
+
+  // Paginate screenshots
+  const totalScreenshotsPages = Math.ceil((testimonials?.length || 0) / itemsPerPage);
+  const paginatedScreenshots = testimonials?.slice(
+    (screenshotsPage - 1) * itemsPerPage,
+    screenshotsPage * itemsPerPage
+  ) || [];
+
   // Render screenshots section
   const renderScreenshotsSection = () => {
     console.log('Rendering screenshots section with data:', {
