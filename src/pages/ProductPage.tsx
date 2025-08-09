@@ -180,21 +180,6 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
   };
 
   const calculatePrice = () => {
-    if (product.category === 'subscription') {
-      // For subscriptions, use rental pricing if available, otherwise fall back to sale_price
-      if (selectedType === 'Rent') {
-        const rentPrices = {
-          '1_month': product.rent_1_month || 0,
-          '3_months': product.rent_3_months || 0,
-          '6_months': product.rent_6_months || 0,
-          '12_months': product.rent_12_months || 0
-        };
-        return rentPrices[selectedRentDuration as keyof typeof rentPrices] || product.sale_price;
-      }
-      return product.sale_price;
-    }
-    
-    // For games, keep existing logic
     if (currentProduct.category === 'subscription') {
       return currentProduct.sale_price; // Subscriptions keep original logic
     }
@@ -216,9 +201,9 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
     if (selectedType === 'Rent') {
       return ` 🎮 Rental Game Accounts:
 
+✔️ We provide a fully legal account with your desired rental game pre-purchased.
 
-        '6_months': product.rent_6_months || 0,
-        '12_months': product.rent_12_months || 0
+✔️ You just need to download and play – quick and hassle-free!
 
 ✔️ Games can be rented for the following durations:
 • 1 Month
@@ -796,8 +781,8 @@ This option is best suited for single-player games or customers who prefer offli
               )}
 
               {/* Type Description */}
-              <div className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-3 sm:p-4 border border-blue-200">
-                <h4 className="font-bold text-blue-800 mb-2 sm:mb-3 text-sm">About This Option</h4>
+              {/* Type Description - Show for both games and subscriptions */}
+              {(product.category === 'game' || (product.category === 'subscription' && hasRentalOptions(product))) && (
                 <p className="text-blue-700 text-xs leading-relaxed whitespace-pre-line">
                   {getTypeDescription()}
                 </p>
