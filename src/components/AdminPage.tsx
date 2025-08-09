@@ -93,11 +93,12 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     if (!response.ok) {
       throw new Error('Failed to upload image');
     }
-
+        platform: selectedPlatforms,
     const data = await response.json();
     return data.secure_url;
-  };
+        type: gameForm.type,
 
+        is_recommended: gameForm.is_recommended,
   // Handle image upload
   const handleImageUpload = async (file: File, formType: 'game' | 'subscription' | 'screenshot') => {
     try {
