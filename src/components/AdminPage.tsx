@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, Plus, Edit, Trash2, Upload, X, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAllGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
@@ -59,6 +59,32 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const { allGames, loading: gamesLoading, refetch: refetchGames } = useAllGames();
   const { subscriptions, loading: subscriptionsLoading, refetch: refetchSubscriptions } = useSubscriptions({ limit: 1000 });
   const { testimonials, loading: testimonialsLoading, refetch: refetchTestimonials } = useTestimonials();
+
+  // Filter items based on active tab and search
+  const filteredItems = useMemo(() => {
+    let items: Game[] = [];
+    
+    if (activeTab === 'games') {
+      // Group games by title and show only one per title (preferably Standard edition)
+      const gameGroups: { [title: string]: Game[] } = {};
+      (allGames || []).forEach(game => {
+        if (!gameGroups[game.title]) {
+          gameGroups[game.title] = [];
+        }
+        gameGroups[game.title].push(game);
+      });
+      
+      // Select one representative game per title (prefer Standard edition)
+      items = Object.values(gameGroups).map(editions => {
+        const standardEdition = editions.find(game => game.edition === 'Standard');
+        return standardEdition || editions[0]; // Use Standard if available, otherwise first edition
+      });
+    } else if (activeTab === 'subscriptions') {
+      items = subscriptions || [];
+    }
+
+    return items;
+  }, [activeTab, allGames, subscriptions]);
 
   const resetForm = () => {
     setFormData({
@@ -423,7 +449,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         {/* Tabs */}
         <div className="flex space-x-1 mb-8 bg-white/80 backdrop-blur-sm rounded-xl p-1 shadow-lg border border-white/20">
           {[
-            { id: 'games', label: 'Games', count: allGames.length },
+            { id: 'games', label: 'Games', count: filteredItems.length },
             { id: 'subscriptions', label: 'Subscriptions', count: subscriptions.length },
             { id: 'screenshots', label: 'Screenshots', count: testimonials.length }
           ].map((tab) => (
@@ -469,38 +495,48 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               <p className="mt-4 text-gray-600">Loading games...</p>
             </div>
           ) : (
-            allGames.map((game) => (
-              <div key={game.id} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300">
+            filteredItems.map((item) => (
+              <div key={item.id} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300">
                 <img
-                  src={game.image}
-                  alt={game.title}
+                  src={item.image}
+                  alt={item.title}
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-gray-800 text-sm line-clamp-2">{game.title}</h3>
-                    {game.edition && game.edition !== 'Standard' && (
-                      <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">
-                        {game.edition}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-orange-500 font-bold">₹{game.rent_1_month || game.sale_price}</span>
-                    <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded text-xs">
-                      {game.platform.join(', ')}
-                    </span>
+                    <div>
+                      <h3 className="font-bold text-gray-800">
+                        {item.title}
+                        {/* Show available editions count */}
+                        {activeTab === 'games' && (() => {
+                          const gameEditions = (allGames || []).filter(g => g.title === item.title);
+                          return gameEditions.length > 1 ? (
+                            <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                              {gameEditions.length} editions
+                            </span>
+                          ) : null;
+                        })()}
+                      </h3>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-orange-500 font-bold">₹{activeTab === 'games' ? (
+                          item.rent_1_month || item.sale_price
+                        ) : item.sale_price}</span>
+                        <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded text-xs">
+                          {activeTab === 'games' ? item.platform.join(', ') : 'Subscription'}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => handleEditGame(game)}
+                      onClick={() => handleEditGame(item)}
                       className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm transition-colors flex items-center justify-center space-x-1"
                     >
                       <Edit className="w-4 h-4" />
                       <span>Edit</span>
                     </button>
                     <button
-                      onClick={() => handleDelete(game.id!)}
+                      onClick={() => handleDelete(item.id!)}
                       className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded-lg text-sm transition-colors flex items-center justify-center space-x-1"
                     >
                       <Trash2 className="w-4 h-4" />
