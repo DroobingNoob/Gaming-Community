@@ -521,7 +521,7 @@ This option is best suited for single-player games or customers who prefer offli
     ? currentProduct[`rent_${selectedRentDuration}`]
     : product[`rent_${selectedRentDuration}`]
 } */}
-                   {calculatePrice()}
+                   ₹{calculatePrice()}
                   </span>
                   {discountPercentage > 0 && (
                     <>
