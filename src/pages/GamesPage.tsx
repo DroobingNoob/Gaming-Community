@@ -123,7 +123,7 @@ const GamesPage: React.FC = () => {
               
               {/* Search */}
               <div className="mb-4 sm:mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Search Games</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Search Gamesi</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
