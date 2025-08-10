@@ -11,7 +11,7 @@ interface BestSellersProps {
 
 const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
   const navigate = useNavigate();
-  const { bestsellers, loading, error } = useBestsellers;
+  const { bestsellers, loading, error } = useBestsellers(9);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
