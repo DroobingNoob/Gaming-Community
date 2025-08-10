@@ -163,7 +163,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                  <button
   onClick={() => setSearchQuery(tempSearchQuery)}
   className="ml-2 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
->
+> 
   Search
 </button>
                 </div>
