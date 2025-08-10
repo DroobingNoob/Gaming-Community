@@ -10,6 +10,7 @@ export const useGames = (filters: GameFilters = {}) => {
     totalPages: 0,
     currentPage: 1
   });
+  const [allGames, setAllGames] = useState<Game[]>([]); // All games including all editions
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,14 +20,12 @@ export const useGames = (filters: GameFilters = {}) => {
       const response = await gamesService.getAll(filters);
       setGamesResponse(response);
       
-      // For customer view (when no columns specified), show only unique games
-      if (!filters.columns) {
-        const uniqueGames = getUniqueGamesForCustomer(response.data);
-        setGamesResponse(prev => ({
-          ...response,
-          data: uniqueGames
-        }));
-      }
+      // For customer view, show only unique games (primary editions)
+      const uniqueGames = getUniqueGamesForCustomer(response.data);
+      setGamesResponse(prev => ({
+        ...response,
+        data: uniqueGames
+      }));
       
       setError(null);
     } catch (err) {
@@ -46,6 +45,7 @@ export const useGames = (filters: GameFilters = {}) => {
     totalCount: gamesResponse.count,
     totalPages: gamesResponse.totalPages,
     currentPage: gamesResponse.currentPage,
+    allGames, 
     loading, 
     error, 
     refetch: fetchGames 
@@ -61,7 +61,7 @@ export const useBestsellers = (limit: number = 6) => {
   const fetchBestsellers = async () => {
     try {
       setLoading(true);
-      const bestsellersData = await gamesService.getBestsellers(limit);
+      const bestsellersData = await gamesService.getBestsellers(limit); // Get exact limit
       
       // Filter to show only unique games (primary editions)
       const uniqueBestsellers = getUniqueGamesForCustomer(bestsellersData);
@@ -80,6 +80,34 @@ export const useBestsellers = (limit: number = 6) => {
   }, [limit]);
 
   return { bestsellers, loading, error, refetch: fetchBestsellers };
+};
+
+// Hook for all games data (for admin use - includes all editions) - Keep original for admin
+export const useAllGames = () => {
+  const [allGames, setAllGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchAllGames = async () => {
+    try {
+      setLoading(true);
+      // For admin, we still need all data but with optimized columns
+      const response = await gamesService.getAll({ limit: 1000 }); // Large limit for admin
+      setAllGames(response.data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch all games');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllGames();
+  }, []);
+
+  return { allGames, loading, error, refetch: fetchAllGames };
 };
 
 // Hook for subscriptions data with server-side filtering and pagination
