@@ -8,6 +8,7 @@ export interface GameFilters {
   sortBy?: string;
   page?: number;
   limit?: number;
+  columns?: string; // Add columns parameter for optimization
 }
 
 export interface PaginatedResponse<T> {
@@ -28,13 +29,14 @@ export const gamesService = {
         priceRange = [0, 10000],
         sortBy = 'name-asc',
         page = 1,
-        limit = 24
+        limit = 24,
+        columns = 'id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, permanent_offline_price, permanent_online_price, platform, discount, description, type, category, show_in_bestsellers, edition, base_game_id, edition_features, is_recommended'
       } = filters;
 
-      // Build query with only necessary columns
+      // Build query with specified columns for optimization
       let query = supabase
         .from('games')
-        .select('id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, permanent_offline_price, permanent_online_price, platform, discount, description, type, category, show_in_bestsellers, edition, base_game_id, edition_features, is_recommended', { count: 'exact' })
+        .select(columns, { count: 'exact' })
         .eq('category', 'game');
 
       // Apply search filter
@@ -101,11 +103,11 @@ export const gamesService = {
     try {
       const { data, error } = await supabase
         .from('games')
-        .select('id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, permanent_offline_price, permanent_online_price, platform, discount, description, type, category, edition, base_game_id, edition_features, is_recommended')
+        .select('id, title, image, original_price, sale_price, rent_1_month, platform, discount, category, edition, is_recommended') // Minimal columns for bestsellers
         .eq('category', 'game')
         .eq('show_in_bestsellers', true)
         .order('created_at', { ascending: false })
-        .limit(limitCount); // Use exact limit, not limit * 2
+        .limit(limitCount);
 
       if (error) throw error;
       return data || [];
@@ -189,13 +191,14 @@ export const subscriptionsService = {
         priceRange = [0, 10000],
         sortBy = 'name-asc',
         page = 1,
-        limit = 24
+        limit = 24,
+        columns = 'id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, platform, discount, description, type, category, is_recommended'
       } = filters;
 
-      // Build query with only necessary columns
+      // Build query with specified columns for optimization
       let query = supabase
         .from('games')
-        .select('id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, platform, discount, description, type, category', { count: 'exact' })
+        .select(columns, { count: 'exact' })
         .eq('category', 'subscription');
 
       // Apply search filter
@@ -325,7 +328,7 @@ export const testimonialsService = {
       console.log('Fetching testimonials from Supabase...');
       const { data, error } = await supabase
         .from('testimonials')
-        .select('*')
+        .select('id, image, created_at') // Only necessary columns
         .order('created_at', { ascending: false });
 
       console.log('Supabase testimonials response:', { data, error });
