@@ -117,7 +117,7 @@ const SubscriptionsPage: React.FC = () => {
           {/* Filters Sidebar */}
           <div className={`lg:block ${showFilters ? 'block' : 'hidden'} space-y-4 sm:space-y-6`}>
             <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-white/20">
-              <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4">Filters</h3>
+              <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4">Filtersi</h3>
               
               {/* Search */}
               <div className="mb-4 sm:mb-6">
