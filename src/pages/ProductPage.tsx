@@ -181,7 +181,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ onAddToCart, onBuyNow }) => {
 
   const calculatePrice = () => {
     if (currentProduct.category === 'subscription') {
-     return currentProduct[`rent_${selectedRentDuration}`] ; // Subscriptions keep original logic
+     return currentProduct[`rent_${selectedRentDuration}`] ; // Subscriptions keep original logic 
     }
 
     // For games, use the new pricing logic
