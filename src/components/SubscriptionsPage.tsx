@@ -119,7 +119,7 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
               <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Back</span>
             </button>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Subscriptions</h1>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Subscriptionsi</h1>
           </div>
           
           <div className="flex items-center space-x-2 sm:space-x-4">
