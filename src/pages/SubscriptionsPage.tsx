@@ -132,13 +132,14 @@ const SubscriptionsPage: React.FC = () => {
                     onChange={(e) => setTempSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-sm"
                   />
-                   <button
+                   
+                </div>
+                <button
       onClick={() => setSearchQuery(tempSearchQuery)}
       className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white px-4 rounded-r-lg shadow-lg transition-all"
     >
       Search
     </button>
-                </div>
               </div>
 
               {/* Price Range */}
