@@ -865,7 +865,11 @@ This option is best suited for single-player games or customers who prefer offli
               {/* Pricing */}
               <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
                 <span className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                  ₹{currentPrice.toFixed(2)}
+                 ₹{
+  product.category === 'game'
+    ? currentProduct[`rent_${selectedRentDuration}`]
+    : product[`rent_${selectedRentDuration}`]
+}
                 </span>
                 {discountPercentage > 0 && (
                   <>
