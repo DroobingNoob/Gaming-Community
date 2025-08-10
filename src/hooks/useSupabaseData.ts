@@ -176,3 +176,5 @@ export const paymentSettingsService = {
     return data;
   }
 };
+// Alias for useGames without filters to get all games
+export const useAllGames = () => useGames();
