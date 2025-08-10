@@ -139,6 +139,7 @@ const GamesPage: React.FC = () => {
                  <button
       onClick={() => setSearchQuery(tempSearchQuery)}
       className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white px-4 rounded-r-lg shadow-lg transition-all"
+                   style={{marginTop: "1rem"}}
     >
       Search
     </button>
