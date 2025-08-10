@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, Plus, Edit, Trash2, Upload, X, Check, AlertCircle, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAllGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
-import { Game, Testimonial } from '../config/supabase';
+import { useGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
 import { gamesService, subscriptionsService, testimonialsService } from '../services/supabaseService';
 
 interface AdminPageProps {
