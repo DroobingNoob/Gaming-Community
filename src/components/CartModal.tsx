@@ -163,7 +163,7 @@ const CartModal: React.FC<CartModalProps> = ({
 
           {/* Recommendations */}
           {recommendedProducts.length > 0
-            && cartItems.length > 0
+            // && cartItems.length > 0 
             && (
             <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-white to-gray-50">
               <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-center">
