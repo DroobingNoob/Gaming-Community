@@ -808,7 +808,9 @@ This option is best suited for single-player games or customers who prefer offli
                     ].filter(duration => duration.price && duration.price > 0).map((duration) => (
                       <button
                         key={duration.key}
-                        onClick={() => setSelectedRentDuration(duration.key as any)}
+                        onClick={() => setSelectedRentDuration(duration.key as any)
+                        console.log(selectedRentDuration)
+                        }
                         className={`px-2 sm:px-3 py-2 rounded-lg font-medium transition-all duration-300 text-xs sm:text-sm ${
                           selectedRentDuration === duration.key
                             ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg'
