@@ -593,7 +593,8 @@ This option is best suited for single-player games or customers who prefer offli
               {/* Pricing */}
               <div className="flex items-center space-x-3 sm:space-x-4 mb-6">
                 <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                  ₹{calculatePrice().toFixed(2)}
+                  {/* ₹{calculatePrice().toFixed(2)} */}
+                  ₹{calculatePrice()}
                 </span>
                 {product.discount > 0 && (
                   <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
