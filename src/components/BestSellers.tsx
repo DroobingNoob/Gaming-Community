@@ -144,7 +144,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
                     'grid-cols-3'
                   }`}>
                     {bestsellers 
-                      // .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide)
+                      .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide) 
                       .map((game) => {
                         // For games, show 1 month rent price by default, for subscriptions show sale_price
                         const displayPrice = game.category === 'game' 
