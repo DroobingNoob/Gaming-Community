@@ -50,8 +50,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     discountAmount = subtotal * 0.1; // 10% discount
   } else if (appliedCoupon === 'MYSTERYBOX' && mysteryBoxEligible) {
     // Mystery box is free, no monetary discount but eligible for free game
-  } else if (appliedCoupon === 'GAMINGCOMMUNITY15' && subtotal>=999) {
-    discountAmount = subtotal * 0.15; // 15% discount from flash sale
+  } else if (appliedCoupon === 'GAMINGCOMMUNITY100' && subtotal>=1000) {
+    discountAmount = 100; // 15% discount from flash sale
   } else if (couponDiscount > 0) {
     discountAmount = couponDiscount;
   }
@@ -97,9 +97,9 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     } else if (coupon === 'MYSTERYBOX' && mysteryBoxEligible) {
       setCouponDiscount(0); // No monetary discount, but eligible for mystery box
       toast.success('Mystery Box coupon applied! Free mystery game included');
-    } else if (coupon === 'GAMINGCOMMUNITY15' && subtotal>=999) {
-      setCouponDiscount(subtotal * 0.15);
-      toast.success('Flash Sale discount applied! 15% off');
+    } else if (coupon === 'GAMINGCOMMUNITY100' && subtotal>=999) {
+      setCouponDiscount(subtotal -100);
+      toast.success('Flash Sale discount applied! ₹100 off');
     } else {
       setCouponDiscount(0);
       toast.error('Invalid coupon code or not eligible');
@@ -304,7 +304,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
               <div className="flex items-center space-x-2">
                 <Gift className="w-4 h-4 text-orange-500" />
-                <span className="text-orange-800 font-medium text-sm">GAMINGCOMMUNITY15 - 15% off (Min ₹999)</span>
+                <span className="text-orange-800 font-medium text-sm">GAMINGCOMMUNITY100 - ₹100 off (Min ₹1000)</span>
               </div>
             </div>
           </div>
@@ -572,4 +572,4 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
   );
 };
 
-export default CheckoutModal;
+export default CheckoutModal; 

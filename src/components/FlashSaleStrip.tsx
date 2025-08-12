@@ -28,7 +28,7 @@ const FlashSaleStrip: React.FC = () => {
   const format = (n: number) => n.toString().padStart(2, '0');
 
   const handleCopyCoupon = () => {
-    navigator.clipboard.writeText('GAMINGCOMMUNITY15');
+    navigator.clipboard.writeText('GAMINGCOMMUNITY100');
     setCopiedCoupon(true);
     setTimeout(() => setCopiedCoupon(false), 2000);
   };
@@ -43,7 +43,7 @@ const FlashSaleStrip: React.FC = () => {
         <div className="flex items-center gap-2">
           <Zap className="w-4 h-4 animate-pulse text-yellow-300" />
           <span className="font-extrabold tracking-wide whitespace-nowrap">
-            🔥 FLASH SALE: 15% OFF
+            🔥 FLASH SALE: ₹100 OFF
           </span>
         </div>
 
@@ -65,7 +65,7 @@ const FlashSaleStrip: React.FC = () => {
           onClick={handleCopyCoupon}
           className="flex items-center gap-2 border-2 border-dashed border-yellow-300 rounded-full px-4 py-1 hover:bg-yellow-300 hover:text-red-600 transition-colors"
         >
-          <span className="font-mono text-xs sm:text-sm">GAMINGCOMMUNITY15</span>
+          <span className="font-mono text-xs sm:text-sm">GAMINGCOMMUNITY100</span>
           {copiedCoupon ? (
             <Check className="w-4 h-4 text-green-400" />
           ) : (
