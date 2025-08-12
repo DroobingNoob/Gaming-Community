@@ -76,6 +76,11 @@ export const gamesService = {
       const { data, error, count } = await query;
 
       if (error) throw error;
+
+      if (data) {
+  const sizeBytes = new TextEncoder().encode(JSON.stringify(data)).length;
+  console.log(`[EGRESS] gamesService.getAll: ${(sizeBytes / 1024).toFixed(2)} KB`);
+}
       
       const totalPages = Math.ceil((count || 0) / limit);
       
