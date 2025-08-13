@@ -361,20 +361,26 @@ export const subscriptionsService = {
 };
  
 // Testimonials Service
+// Testimonials Service
 export const testimonialsService = {
   // Get all testimonials
   async getAll(): Promise<Testimonial[]> {
+    const cacheKey = `testimonials:getAll`;
+
     try {
-      console.log('Fetching testimonials from Supabase...');
+      // Try cache first
+      const cached = await getFromCache(cacheKey);
+      if (cached) return cached;
+
+      console.log(`[Supabase] Fetching testimonials for key: ${cacheKey}`);
       const { data, error } = await supabase
         .from('testimonials')
         .select('*')
         .order('created_at', { ascending: false });
 
-      console.log('Supabase testimonials response:', { data, error });
-      console.log('Data length:', data?.length || 0);
-      
       if (error) throw error;
+
+      await saveToCache(cacheKey, data || []);
       return data || [];
     } catch (error) {
       console.error('Error fetching testimonials:', error);
@@ -391,10 +397,16 @@ export const testimonialsService = {
         .select('id')
         .single();
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
+      if (error) throw error;
+
+      console.log(`[Cache] Clearing testimonials cache after adding`);
+      const keys = await getAllKeys();
+      for (const key of keys) {
+        if (String(key).startsWith('testimonials:')) {
+          await removeCacheKey(String(key));
+        }
       }
+
       return data.id;
     } catch (error) {
       console.error('Error adding testimonial:', error);
@@ -413,10 +425,10 @@ export const testimonialsService = {
         })
         .eq('id', id);
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
+      if (error) throw error;
+
+      console.log(`[Cache] Partial invalidation for testimonial ID: ${id}`);
+      await removeCacheEntriesContainingGame(id); // Rename helper to something generic if used for testimonials too
     } catch (error) {
       console.error('Error updating testimonial:', error);
       throw error;
@@ -431,13 +443,14 @@ export const testimonialsService = {
         .delete()
         .eq('id', id);
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
+      if (error) throw error;
+
+      console.log(`[Cache] Partial invalidation for deleted testimonial ID: ${id}`);
+      await removeCacheEntriesContainingGame(id); // same helper issue here
     } catch (error) {
       console.error('Error deleting testimonial:', error);
       throw error;
     }
   }
 };
+ 
