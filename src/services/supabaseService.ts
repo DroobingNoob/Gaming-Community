@@ -228,10 +228,17 @@ export const gamesService = {
 };
 
 // Subscriptions Service
+// Subscriptions Service
 export const subscriptionsService = {
   // Get all subscriptions
   async getAll(filters: GameFilters = {}): Promise<PaginatedResponse<Game>> {
     try {
+      const cacheKey = `subscriptions:getAll:${JSON.stringify(filters)}`;
+      const cached = await getFromCache(cacheKey);
+      if (cached) return cached;
+
+      console.log(`[Supabase] Fetching subscriptions for key: ${cacheKey}`);
+
       const {
         searchQuery = '',
         priceRange = [0, 10000],
@@ -240,63 +247,46 @@ export const subscriptionsService = {
         limit = 24
       } = filters;
 
-      // Build query with only necessary columns
       let query = supabase
         .from('games')
-        .select('id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, platform, discount, description, type, category', { count: 'exact' })
+        .select(
+          'id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, platform, discount, description, type, category',
+          { count: 'exact' }
+        )
         .eq('category', 'subscription');
 
-      // Apply search filter
-      if (searchQuery) {
-        query = query.ilike('title', `%${searchQuery}%`);
-      }
+      if (searchQuery) query = query.ilike('title', `%${searchQuery}%`);
+      query = query
+        .gte('sale_price', priceRange[0])
+        .lte('sale_price', priceRange[1]);
 
-      // Apply price range filter
-      query = query.gte('sale_price', priceRange[0]).lte('sale_price', priceRange[1]);
-
-      // Apply sorting
       switch (sortBy) {
-        case 'name-asc':
-          query = query.order('title', { ascending: true });
-          break;
-        case 'name-desc':
-          query = query.order('title', { ascending: false });
-          break;
-        case 'price-low':
-          query = query.order('sale_price', { ascending: true });
-          break;
-        case 'price-high':
-          query = query.order('sale_price', { ascending: false });
-          break;
-        default:
-          query = query.order('created_at', { ascending: false });
+        case 'name-asc': query = query.order('title', { ascending: true }); break;
+        case 'name-desc': query = query.order('title', { ascending: false }); break;
+        case 'price-low': query = query.order('sale_price', { ascending: true }); break;
+        case 'price-high': query = query.order('sale_price', { ascending: false }); break;
+        default: query = query.order('created_at', { ascending: false });
       }
 
-      // Apply pagination
       const from = (page - 1) * limit;
       const to = from + limit - 1;
       query = query.range(from, to);
 
       const { data, error, count } = await query;
-
       if (error) throw error;
-      
-      const totalPages = Math.ceil((count || 0) / limit);
-      
-      return {
+
+      const result = {
         data: data || [],
         count: count || 0,
-        totalPages,
+        totalPages: Math.ceil((count || 0) / limit),
         currentPage: page
       };
+
+      await saveToCache(cacheKey, result);
+      return result;
     } catch (error) {
       console.error('Error fetching subscriptions:', error);
-      return {
-        data: [],
-        count: 0,
-        totalPages: 0,
-        currentPage: 1
-      };
+      return { data: [], count: 0, totalPages: 0, currentPage: 1 };
     }
   },
 
@@ -305,19 +295,27 @@ export const subscriptionsService = {
     try {
       const { data, error } = await supabase
         .from('games')
-        .insert([{
-          ...subscription,
-          category: 'subscription',
-          platform: ['Subscription'], // Default platform for subscriptions
-          type: ['Rent'] // Subscriptions only offer rental
-        }])
+        .insert([
+          {
+            ...subscription,
+            category: 'subscription',
+            platform: ['Subscription'],
+            type: ['Rent']
+          }
+        ])
         .select('id')
         .single();
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
+      if (error) throw error;
+
+      console.log(`[Cache] Clearing all subscription caches after adding`);
+      const keys = await getAllKeys();
+      for (const key of keys) {
+        if (String(key).startsWith('subscriptions:')) {
+          await removeCacheKey(String(key));
+        }
       }
+
       return data.id;
     } catch (error) {
       console.error('Error adding subscription:', error);
@@ -330,16 +328,13 @@ export const subscriptionsService = {
     try {
       const { error } = await supabase
         .from('games')
-        .update({
-          ...subscription,
-          updated_at: new Date().toISOString()
-        })
+        .update({ ...subscription, updated_at: new Date().toISOString() })
         .eq('id', id);
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
+      if (error) throw error;
+
+      console.log(`[Cache] Partial invalidation for subscription ID: ${id}`);
+      await removeCacheEntriesContainingGame(id);
     } catch (error) {
       console.error('Error updating subscription:', error);
       throw error;
@@ -354,17 +349,17 @@ export const subscriptionsService = {
         .delete()
         .eq('id', id);
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
+      if (error) throw error;
+
+      console.log(`[Cache] Partial invalidation for deleted subscription ID: ${id}`);
+      await removeCacheEntriesContainingGame(id);
     } catch (error) {
       console.error('Error deleting subscription:', error);
       throw error;
     }
   }
 };
-
+ 
 // Testimonials Service
 export const testimonialsService = {
   // Get all testimonials
