@@ -176,7 +176,7 @@ export const gamesService = {
       console.error('Error deleting game:', error);
       throw error;
     }
-  } 
+  }
 };
 
 // Subscriptions Service
