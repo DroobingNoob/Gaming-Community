@@ -1,5 +1,5 @@
 import { supabase, Game, Testimonial } from '../config/supabase';
-import { openDB } from 'idb';
+import { openDB } from 'idb'; 
 
 // Interface for filtering and pagination parameters
 export interface GameFilters {
