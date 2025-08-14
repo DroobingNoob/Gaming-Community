@@ -44,7 +44,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigation }) => {
           <div className="lg:col-span-2">
             <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-3 sm:space-y-0 sm:space-x-4 mb-4 sm:mb-6">
               <img 
-                src="https://res.cloudinary.com/dcodirzsc/image/upload/v1755162231/1000052957_oflogw.jpg" 
+                src="https://res.cloudinary.com/dcodirzsc/image/upload/v1755162231/1000052957_oflogw.jpg"  
                 alt="Gaming Community" 
                 className="w-16 h-16 xs:w-18 xs:h-18 sm:w-20 sm:h-20 md:w-22 md:h-22 object-contain bg-white/10 rounded-xl p-2 flex-shrink-0"
               />
