@@ -346,6 +346,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
     </div>
   </div>
 </div>
+      </div>
 
 
       {/* Order Summary */}
