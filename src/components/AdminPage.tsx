@@ -936,9 +936,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                 value={getCurrentEditionPricing().original_price}
                                 onChange={(e) => updateCurrentEditionPricing('original_price', parseFloat(e.target.value) || 0)}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                
+                                min="0"
                                 step="0.01"
-                                required
+                                required 
                               />
                             </div>
                             <div>
@@ -950,7 +950,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                 value={getCurrentEditionPricing().sale_price}
                                 onChange={(e) => updateCurrentEditionPricing('sale_price', parseFloat(e.target.value) || 0)}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                  
+                                min="0"
                                 step="0.01"
                                 required
                               />
@@ -969,7 +969,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                     value={getCurrentEditionPricing().rent_1_month || ''}
                                     onChange={(e) => updateCurrentEditionPricing('rent_1_month', parseFloat(e.target.value) || 0)}
                                     className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                    
+                                    min="0"
                                     step="0.01"
                                     placeholder="Optional"
                                   />
@@ -981,7 +981,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                     value={getCurrentEditionPricing().rent_3_months || ''}
                                     onChange={(e) => updateCurrentEditionPricing('rent_3_months', parseFloat(e.target.value) || 0)}
                                     className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                    
+                                    min="0"
                                     step="0.01"
                                     placeholder="Optional"
                                   />
@@ -993,7 +993,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                     value={getCurrentEditionPricing().rent_6_months || ''}
                                     onChange={(e) => updateCurrentEditionPricing('rent_6_months', parseFloat(e.target.value) || 0)}
                                     className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                    
+                                    min="0"
                                     step="0.01"
                                     placeholder="Optional"
                                   />
@@ -1005,7 +1005,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                     value={getCurrentEditionPricing().rent_12_months || ''}
                                     onChange={(e) => updateCurrentEditionPricing('rent_12_months', parseFloat(e.target.value) || 0)}
                                     className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                    
+                                    min="0"
                                     step="0.01"
                                     placeholder="Optional"
                                   />
@@ -1027,7 +1027,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                       value={getCurrentEditionPricing().permanent_offline_price || ''}
                                       onChange={(e) => updateCurrentEditionPricing('permanent_offline_price', parseFloat(e.target.value) || 0)}
                                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                      
+                                      min="0"
                                       step="0.01"
                                     />
                                   </div>
@@ -1040,7 +1040,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                       value={getCurrentEditionPricing().permanent_online_price || ''}
                                       onChange={(e) => updateCurrentEditionPricing('permanent_online_price', parseFloat(e.target.value) || 0)}
                                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                      
+                                      min="0"
                                       step="0.01"
                                     />
                                   </div>
@@ -1061,7 +1061,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                     value={getCurrentEditionPricing().rent_1_month || ''}
                                     onChange={(e) => updateCurrentEditionPricing('rent_1_month', parseFloat(e.target.value) || 0)}
                                     className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                    
+                                    min="0"
                                     step="0.01"
                                     placeholder="Optional"
                                   />
@@ -1073,7 +1073,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                     value={getCurrentEditionPricing().rent_3_months || ''}
                                     onChange={(e) => updateCurrentEditionPricing('rent_3_months', parseFloat(e.target.value) || 0)}
                                     className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                    
+                                    min="0"
                                     step="0.01"
                                     placeholder="Optional"
                                   />
@@ -1085,7 +1085,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                     value={getCurrentEditionPricing().rent_6_months || ''}
                                     onChange={(e) => updateCurrentEditionPricing('rent_6_months', parseFloat(e.target.value) || 0)}
                                     className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                    
+                                    min="0"
                                     step="0.01"
                                     placeholder="Optional"
                                   />
@@ -1097,7 +1097,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                     value={getCurrentEditionPricing().rent_12_months || ''}
                                     onChange={(e) => updateCurrentEditionPricing('rent_12_months', parseFloat(e.target.value) || 0)}
                                     className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                    
+                                    min="0"
                                     step="0.01"
                                     placeholder="Optional"
                                   />
