@@ -95,16 +95,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setCouponDiscount(subtotal * 0.1);
       toast.success('Newsletter discount applied! 10% off');
     } else if (coupon === 'MYSTERYBOX' && mysteryBoxEligible) {
-      setCouponDiscount(0); // No monetary discount, but eligible for mystery box 
+      setCouponDiscount(0); // No monetary discount, but eligible for mystery box
       toast.success('Mystery Box coupon applied! Free mystery game included');
     } else if (coupon === 'GAMINGCOMMUNITY100' && subtotal>=999) {
-      setCouponDiscount(100);
+      setCouponDiscount(subtotal -100);
       toast.success('Flash Sale discount applied! ₹100 off');
     } else {
       setCouponDiscount(0);
       toast.error('Invalid coupon code or not eligible');
     }
-  };
+  }; 
 
   const handleProceedToPayment = async () => {
     if (!customerName.trim()) {
@@ -264,90 +264,52 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
           </div>
         </div>
 
-     {/* Coupon Code */}
-<div>
-  <label className="block text-sm font-semibold text-gray-700 mb-2">
-    Coupon Code (Optional)
-  </label>
-  <div className="flex space-x-2">
-    <input
-      type="text"
-      value={appliedCoupon}
-      onChange={(e) => setAppliedCoupon(e.target.value.toUpperCase())}
-      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-      placeholder="Enter coupon code"
-    />
-    <button
-      onClick={handleApplyCoupon}
-      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl font-medium transition-colors"
-    >
-      Apply
-    </button>
-  </div>
- 
-  {/* Available Coupons */}
-  <div className="mt-3 space-y-2">
-    {hasNewsletterDiscount && (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Gift className="w-4 h-4 text-green-500" />
-          <span className="text-green-800 font-medium text-sm">
-            NEWSLETTER10 - 10% off (Available)
-          </span>
+        {/* Coupon Code */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Coupon Code (Optional)</label>
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              value={appliedCoupon}
+              onChange={(e) => setAppliedCoupon(e.target.value.toUpperCase())}
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+              placeholder="Enter coupon code"
+            />
+            <button
+              onClick={handleApplyCoupon}
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl font-medium transition-colors"
+            >
+              Apply
+            </button>
+          </div>
+          
+          {/* Available Coupons */}
+          <div className="mt-3 space-y-2">
+            {hasNewsletterDiscount && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <div className="flex items-center space-x-2">
+                  <Gift className="w-4 h-4 text-green-500" />
+                  <span className="text-green-800 font-medium text-sm">NEWSLETTER10 - 10% off (Available)</span>
+                </div>
+              </div>
+            )}
+            {mysteryBoxEligible && (
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                <div className="flex items-center space-x-2">
+                  <Gift className="w-4 h-4 text-purple-500" />
+                  <span className="text-purple-800 font-medium text-sm">MYSTERYBOX - Free Mystery Game (Available)</span>
+                </div>
+              </div>
+            )}
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+              <div className="flex items-center space-x-2">
+                <Gift className="w-4 h-4 text-orange-500" />
+                <span className="text-orange-800 font-medium text-sm">GAMINGCOMMUNITY100 - ₹100 off (Min ₹1000)</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <button
-          onClick={() => {
-            setAppliedCoupon("NEWSLETTER10");
-            handleApplyCoupon();
-          }}
-          className="text-sm bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg"
-        >
-          Apply
-        </button>
       </div>
-    )}
-
-    {mysteryBoxEligible && (
-      <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Gift className="w-4 h-4 text-purple-500" />
-          <span className="text-purple-800 font-medium text-sm">
-            MYSTERYBOX - Free Mystery Game (Available)
-          </span>
-        </div>
-        <button
-          onClick={() => {
-            setAppliedCoupon("MYSTERYBOX");
-            handleApplyCoupon();
-          }}
-          className="text-sm bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded-lg"
-        >
-          Apply
-        </button>
-      </div>
-    )}
-
-    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 flex items-center justify-between">
-      <div className="flex items-center space-x-2">
-        <Gift className="w-4 h-4 text-orange-500" />
-        <span className="text-orange-800 font-medium text-sm">
-          GAMINGCOMMUNITY100 - ₹100 off (Min ₹1000)
-        </span>
-      </div>
-      <button
-        onClick={() => {
-          setAppliedCoupon("GAMINGCOMMUNITY100");
-          handleApplyCoupon();
-        }}
-        className="text-sm bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-lg"
-      >
-        Apply
-      </button>
-    </div>
-  </div>
-</div>
-      </div>
-
 
       {/* Order Summary */}
       <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200">
