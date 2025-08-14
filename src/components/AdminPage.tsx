@@ -950,7 +950,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                                 value={getCurrentEditionPricing().sale_price}
                                 onChange={(e) => updateCurrentEditionPricing('sale_price', parseFloat(e.target.value) || 0)}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                                 
+                                  
                                 step="0.01"
                                 required
                               />
