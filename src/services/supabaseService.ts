@@ -21,7 +21,7 @@ export interface PaginatedResponse<T> {
 // Games Service
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 const DB_NAME = 'gamesCache';
-const STORE_NAME = 'games';
+const STORE_NAME = 'games'; 
 
 async function initDB() {
   return openDB(DB_NAME, 1, {
