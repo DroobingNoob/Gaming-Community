@@ -218,7 +218,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
     
     // Auto-close modal and complete order after a delay
     setTimeout(() => {
-      onOrderComplete();
+      // onOrderComplete(); 
       // onClose(); 
     }, 2000);
   };
