@@ -85,7 +85,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setCustomerMobile(user?.user_metadata?.mobile_number || '');
       setAppliedCoupon('');
       setCouponDiscount(0);
-      setOrderCode('');
+      // setOrderCode(''); 
       setCopiedOrderCode(false);
       setCopiedUpiId(false);
     }
