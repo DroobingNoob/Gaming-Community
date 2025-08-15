@@ -413,7 +413,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
           </div>
           <div className="flex items-start space-x-3">
             <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">5</span>
-            <span>Click "Send Payment Details" below to share your payment screenshot via WhatsApp</span>
+            <span>Click "Send Payment Details" below to share your payment details via WhatsApp</span>
           </div>
         </div>
       </div>
