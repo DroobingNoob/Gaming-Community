@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { gamesService, subscriptionsService, testimonialsService, GameFilters, PaginatedResponse } from '../services/supabaseService';
 import { Game, Testimonial, getUniqueGamesForCustomer } from '../config/supabase';
-
+ 
 // Hook for games data with server-side filtering and pagination
 export const useGames = (filters: GameFilters = {}) => {
   const [gamesResponse, setGamesResponse] = useState<PaginatedResponse<Game>>({
