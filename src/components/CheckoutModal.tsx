@@ -48,9 +48,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   let discountAmount = 0;
   if (hasNewsletterDiscount && appliedCoupon === 'NEWSLETTER10') {
     discountAmount = subtotal * 0.1; // 10% discount
-    if (discountAmount >50){
-      discountAmount = 50;
-    }
   } else if (appliedCoupon === 'MYSTERYBOX' && mysteryBoxEligible) {
     // Mystery box is free, no monetary discount but eligible for free game
   } else if (appliedCoupon === 'GAMINGCOMMUNITY100' && subtotal>=1000) {
@@ -95,8 +92,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     const coupon = appliedCoupon.toUpperCase();
     
     if (coupon === 'NEWSLETTER10' && hasNewsletterDiscount) {
-    const discount = subtotal * 0.1; 
-  setCouponDiscount(discount > 50 ? 50 : discount); 
+      setCouponDiscount(subtotal * 0.1);
       toast.success('Newsletter discount applied! 10% off');
     } else if (coupon === 'MYSTERYBOX' && mysteryBoxEligible) {
       setCouponDiscount(0); // No monetary discount, but eligible for mystery box
@@ -108,7 +104,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setCouponDiscount(0);
       toast.error('Invalid coupon code or not eligible');
     }
-  }; 
+  };
 
   const handleProceedToPayment = async () => {
     if (!customerName.trim()) {
@@ -413,7 +409,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
           </div>
           <div className="flex items-start space-x-3">
             <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">5</span>
-            <span>Click "Send Payment Details" below to share your payment details via WhatsApp</span>
+            <span>Click "Send Payment Details" below to share your payment screenshot via WhatsApp</span>
           </div>
         </div>
       </div>
@@ -430,8 +426,6 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
       <p className="text-xs text-gray-500 text-center">
         After payment, click the button above to send your payment screenshot and order details to our WhatsApp for quick verification and delivery.
       </p>
-    </div>
-  );
 
       {/* QR Code and UPI Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -494,20 +488,20 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
       </div>
 
       {/* Send Payment Details Button */}
-  //     <button
-  //       onClick={handleWhatsAppRedirect}
-  //       className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
-  //     >
-  //       <MessageCircle className="w-5 h-5" />
-  //       <span>Send Payment Details via WhatsApp</span>
-  //     </button>
+      {/* <button
+        onClick={handleWhatsAppRedirect}
+        className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
+      >
+        <MessageCircle className="w-5 h-5" />
+        <span>Send Payment Details via WhatsApp</span>
+      </button>
 
-  //     <p className="text-xs text-gray-500 text-center">
-  //       After payment, click the button above to send your payment screenshot and order details to our WhatsApp for quick verification and delivery.
-  //     </p>
-  //   </div>
-  // );
- 
+      <p className="text-xs text-gray-500 text-center">
+        After payment, click the button above to send your payment screenshot and order details to our WhatsApp for quick verification and delivery.
+      </p> */} 
+    </div>
+  );
+
   const renderConfirmation = () => (
     <div className="text-center space-y-6">
       <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
