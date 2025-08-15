@@ -23,6 +23,17 @@ const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 const DB_NAME = 'gamesCache';
 const STORE_NAME = 'games'; 
 
+function logEgress(data: any, label: string) {
+  try {
+    const sizeInBytes = new TextEncoder().encode(JSON.stringify(data)).length;
+    const sizeInKB = (sizeInBytes / 1024).toFixed(2);
+    const sizeInMB = (sizeInBytes / (1024 * 1024)).toFixed(2);
+    console.log(`[Egress Estimate] ${label}: ${sizeInKB} KB (${sizeInMB} MB)`);
+  } catch (err) {
+    console.error(`[Egress Estimate] Failed to measure:`, err);
+  }
+}
+
 async function initDB() {
   return openDB(DB_NAME, 1, {
     upgrade(db) {
@@ -124,6 +135,8 @@ export const gamesService = {
       const { data, error, count } = await query;
       if (error) throw error;
 
+      logEgress(data, "getAll Games");
+
       const result = {
         data: data || [],
         count: count || 0,
@@ -158,6 +171,9 @@ export const gamesService = {
         .limit(limitCount);
 
       if (error) throw error;
+
+      logEgress(data, "getAll Games");
+      
       await saveToCache(cacheKey, data || []);
       return data || [];
 
@@ -241,7 +257,7 @@ export const subscriptionsService = {
 
       const {
         searchQuery = '',
-        priceRange = [0, 10000],
+        priceRange = [0, 10000], 
         sortBy = 'name-asc',
         page = 1,
         limit = 24
