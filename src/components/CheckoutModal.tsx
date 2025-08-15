@@ -95,7 +95,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     const coupon = appliedCoupon.toUpperCase();
     
     if (coupon === 'NEWSLETTER10' && hasNewsletterDiscount) {
-    const discount = subtotal * 0.1;
+    const discount = subtotal * 0.1; 
   setCouponDiscount(discount > 50 ? 50 : discount); 
       toast.success('Newsletter discount applied! 10% off');
     } else if (coupon === 'MYSTERYBOX' && mysteryBoxEligible) {
