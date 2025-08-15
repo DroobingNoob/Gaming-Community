@@ -58,6 +58,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const total = Math.max(0, subtotal - discountAmount);
 
+  const handleClose = () => {
+  setCurrentStep('details'); // reset only on actual close
+  onClose();
+};
+
   // Generate unique order code
   const generateOrderCode = () => {
     const now = new Date();
@@ -75,7 +80,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
-      setCurrentStep('details');
+      // setCurrentStep('details');
       setCustomerName(user?.user_metadata?.full_name || '');
       setCustomerMobile(user?.user_metadata?.mobile_number || '');
       setAppliedCoupon('');
@@ -541,7 +546,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             </h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
           >
             <X className="w-5 h-5 sm:w-6 sm:h-6" />
