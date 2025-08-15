@@ -17,7 +17,7 @@ const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBa
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   
-  const itemsPerPage = 24;
+  const itemsPerPage = 12;
 
   // Filter and sort subscriptions
   const filteredAndSortedSubscriptions = useMemo(() => {
