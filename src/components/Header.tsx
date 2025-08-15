@@ -132,7 +132,8 @@ const Header: React.FC<HeaderProps> = ({
 
                 {/* Logo - Made Much More Prominent */}
                <div className="flex items-center justify-center">
-                  <img   src="https://res.cloudinary.com/dcodirzsc/image/upload/v1755162231/1000052957_oflogw.jpg"  
+                  <img 
+          src="https://res.cloudinary.com/dcodirzsc/image/upload/v1753761357/gaming_community_eykswy.jpg" 
                     alt="Gaming Community" 
                     className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-36 xl:h-36 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-xl cursor-pointer"
                     onClick={() => navigate('/')}
@@ -221,7 +222,7 @@ const Header: React.FC<HeaderProps> = ({
                 {/* Mobile Logo - Centered and Prominent */}
                <div className="flex justify-center w-full relative">
   <img 
-     src="https://res.cloudinary.com/dcodirzsc/image/upload/v1755162231/1000052957_oflogw.jpg"
+     src="https://res.cloudinary.com/dcodirzsc/image/upload/v1753761357/gaming_community_eykswy.jpg"
     alt="Gaming Community"
    className="w-16 h-16 xs:w-18 xs:h-18 sm:w-20 sm:h-20 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg cursor-pointer relative left-2 sm:left-4 md:left-0"
     onClick={() => navigate('/')}
