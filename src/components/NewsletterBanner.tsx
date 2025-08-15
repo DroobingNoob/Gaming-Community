@@ -23,7 +23,7 @@ const NewsletterBanner: React.FC<NewsletterBannerProps> = ({ onSignupClick }) =>
             </div>
             <div>
               <span className="font-bold text-sm sm:text-base">
-                🎮 Login & Get 10% OFF Your First Order!
+                🎮 Login & Get 10% OFF Your First Order(Max ₹50)!
               </span>
               <span className="hidden sm:inline text-white/90 ml-2 text-sm">
                 Join our newsletter for exclusive gaming deals
