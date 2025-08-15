@@ -81,13 +81,13 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       // setCurrentStep('details');
-      setCustomerName(user?.user_metadata?.full_name || '');
-      setCustomerMobile(user?.user_metadata?.mobile_number || '');
-      setAppliedCoupon('');
-      setCouponDiscount(0);
+      // setCustomerName(user?.user_metadata?.full_name || '');
+      // setCustomerMobile(user?.user_metadata?.mobile_number || '');
+      // setAppliedCoupon('');
+      // setCouponDiscount(0);
       // setOrderCode(''); 
-      setCopiedOrderCode(false);
-      setCopiedUpiId(false);
+      // setCopiedOrderCode(false);
+      // setCopiedUpiId(false); 
     }
   }, [isOpen, user]);
 
