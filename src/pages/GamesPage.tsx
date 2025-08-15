@@ -16,7 +16,7 @@ const GamesPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   
-  const itemsPerPage = 24;
+  const itemsPerPage = 12;
 
   // Use server-side filtering and pagination
   const { games, totalCount, totalPages, loading, error } = useGames({
