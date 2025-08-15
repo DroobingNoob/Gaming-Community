@@ -59,6 +59,14 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const total = Math.max(0, subtotal - discountAmount);
 
   const handleClose = () => {
+     setCurrentStep('details');
+      setCustomerName(user?.user_metadata?.full_name || '');
+      setCustomerMobile(user?.user_metadata?.mobile_number || '');
+      setAppliedCoupon('');
+      setCouponDiscount(0); 
+      setOrderCode(''); 
+      setCopiedOrderCode(false);
+      setCopiedUpiId(false); 
   setCurrentStep('details'); // reset only on actual close
   onClose();
 };
