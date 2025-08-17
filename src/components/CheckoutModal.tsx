@@ -441,8 +441,9 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             <span>Click "Send Payment Details" below to share your payment screenshot via WhatsApp</span>
           </div>
         </div>
+       </motion.div> 
       </div>
-        </motion.div>
+       
 
         {/* Send Payment Details Button */}
       <button
