@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGames } from '../hooks/useSupabaseData';
 import { Game, getGameDisplayPrice, getGameDiscountPercentage } from '../config/supabase';
 import Loader from '../components/Loader';
+import { useNavigationType } from "react-router-dom";
 
 const GamesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ const GamesPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   
   const itemsPerPage = 12;
+
+   const navigationType = useNavigationType();
 
   // Use server-side filtering and pagination
   const { games, totalCount, totalPages, loading, error } = useGames({
