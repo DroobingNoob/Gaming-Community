@@ -435,7 +435,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
 }
 `}
 </style>
- 
+ {/* Send Payment Details Button */}
        <button
         onClick={handleWhatsAppRedirect}
         className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
@@ -511,7 +511,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
       </div>
 
       {/* Send Payment Details Button */}
-      <button
+      {/* <button
         onClick={handleWhatsAppRedirect}
         className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
       >
@@ -521,7 +521,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
 
       <p className="text-xs text-gray-500 text-center">
         After payment, click the button above to send your payment screenshot and order details to our WhatsApp for quick verification and delivery.
-      </p>
+      </p> */}
     </div>
   );
 
