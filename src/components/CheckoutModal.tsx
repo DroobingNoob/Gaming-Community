@@ -303,6 +303,12 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                   <Gift className="w-4 h-4 text-green-500" />
                   <span className="text-green-800 font-medium text-sm">NEWSLETTER10 - 10% off (Available)</span>
                 </div>
+                  <button
+          onClick={() => setAppliedCoupon("NEWSLETTER10")}
+          className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-md"
+        >
+          Use
+        </button>
               </div>
             )}
             {mysteryBoxEligible && (
