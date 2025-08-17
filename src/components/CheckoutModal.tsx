@@ -576,7 +576,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             </h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={onClickClose}
             className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
           >
             <X className="w-5 h-5 sm:w-6 sm:h-6" />
