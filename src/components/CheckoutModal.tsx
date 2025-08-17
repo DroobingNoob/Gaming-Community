@@ -384,15 +384,16 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
         </div>
       </div>
 
-    {/* Payment Instructions with Shining Border */}
+{/* Payment Instructions with Shining Border */}
 <div
   style={{
     position: "relative",
     borderRadius: "12px",
     padding: "2px",
-    background: "linear-gradient(90deg, #22c55e, #10b981, #22c55e)",
-    backgroundSize: "200% 200%",
-    animation: "shine 3s linear infinite",
+    background:
+      "linear-gradient(90deg, #22c55e, #10b981, #ffffff, #10b981, #22c55e)", // added white for shine
+    backgroundSize: "300% 300%",
+    animation: "shine 4s linear infinite",
   }}
 >
   <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6">
