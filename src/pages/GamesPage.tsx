@@ -28,6 +28,13 @@ const GamesPage: React.FC = () => {
     limit: itemsPerPage
   });
 
+   useEffect(() => {
+    const savedPage = sessionStorage.getItem("gamesPage");
+    if (savedPage) {
+      setCurrentPage(parseInt(savedPage));
+    }
+  }, []); 
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
