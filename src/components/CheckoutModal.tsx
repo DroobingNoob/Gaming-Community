@@ -471,7 +471,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
         className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
       >
         <MessageCircle className="w-5 h-5" />
-        <span>Click to Send Payment Details via WhatsApp</span>
+        <span>Click to Place Order on WhatsApp</span>
       </button>
 
       <p className="text-xs text-gray-500 text-center">
