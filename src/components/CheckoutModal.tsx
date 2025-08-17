@@ -330,13 +330,13 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                 <Gift className="w-4 h-4 text-orange-500" />
                 <span className="text-orange-800 font-medium text-sm">GAMINGCOMMUNITY100 - ₹100 off (Min ₹1000)</span>
               </div>
-            </div>
-             <button
+                 <button
         onClick={() => setAppliedCoupon("GAMINGCOMMUNITY100")}
         className="text-xs bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md"
       >
         Use
-      </button> 
+      </button>  
+            </div>
           </div>
         </div>
       </div>
