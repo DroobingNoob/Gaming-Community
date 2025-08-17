@@ -317,6 +317,12 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                   <Gift className="w-4 h-4 text-purple-500" />
                   <span className="text-purple-800 font-medium text-sm">MYSTERYBOX - Free Mystery Game (Available)</span>
                 </div>
+                  <button
+          onClick={() => setAppliedCoupon("MYSTERYBOX")}
+          className="text-xs bg-purple-500 hover:bg-purple-600 text-white px-2 py-1 rounded-md"
+        >
+          Use
+        </button>
               </div>
             )}
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
