@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
 import { useGames } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
+import { useNavigationType } from "react-router-dom";
 
 interface AllGamesPageProps {
   onGameClick: (game: Game) => void;
@@ -18,8 +19,40 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+
+  const navigationType = useNavigationType();
   
   const itemsPerPage = 12;
+
+    useEffect(() => {
+    if (navigationType === "POP") {
+      // Back navigation → restore from sessionStorage
+      const savedSearch = sessionStorage.getItem("gamesSearch") || "";
+      const savedPlatform = sessionStorage.getItem("gamesPlatform") || "";
+      const savedSort = sessionStorage.getItem("gamesSort") || "newest";
+
+      setSearchQuery(savedSearch);
+      setSelectedPlatform(savedPlatform);
+      setSortBy(savedSort);
+    } else {
+      // Fresh navigation → reset filters
+      sessionStorage.removeItem("gamesSearch");
+      sessionStorage.removeItem("gamesPlatform");
+      sessionStorage.removeItem("gamesSort");
+
+      setSearchQuery("");
+      setSelectedPlatform("");
+      setSortBy("newest");
+    }
+  }, [navigationType]);
+
+  // ✅ Save whenever filters change
+  useEffect(() => {
+    sessionStorage.setItem("gamesSearch", searchQuery);
+    sessionStorage.setItem("gamesPlatform", selectedPlatform);
+    sessionStorage.setItem("gamesSort", sortBy);
+  }, [searchQuery, selectedPlatform, sortBy]);
+ 
    
   // Filter and sort games
   const filteredAndSortedGames = useMemo(() => {
