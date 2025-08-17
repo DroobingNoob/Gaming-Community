@@ -75,7 +75,21 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
-      setCurrentStep('details');
+      // setCurrentStep('details');
+      // setCustomerName(user?.user_metadata?.full_name || '');
+      // setCustomerMobile(user?.user_metadata?.mobile_number || '');
+      // setAppliedCoupon('');
+      // setCouponDiscount(0);
+      // setOrderCode('');
+      // setCopiedOrderCode(false);
+      // setCopiedUpiId(false);
+    }
+  }, [isOpen, user]);
+
+  if (!isOpen) return null;
+
+  const onClickClose = () =>{
+     setCurrentStep('details');
       setCustomerName(user?.user_metadata?.full_name || '');
       setCustomerMobile(user?.user_metadata?.mobile_number || '');
       setAppliedCoupon('');
@@ -83,10 +97,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setOrderCode('');
       setCopiedOrderCode(false);
       setCopiedUpiId(false);
-    }
-  }, [isOpen, user]);
-
-  if (!isOpen) return null;
+    onClose();
+  }
 
   const handleApplyCoupon = () => {
     const coupon = appliedCoupon.toUpperCase();
