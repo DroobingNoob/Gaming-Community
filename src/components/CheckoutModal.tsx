@@ -384,36 +384,57 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
         </div>
       </div>
 
-      {/* Payment Instructions */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
-        <h4 className="font-bold text-green-800 mb-4 flex items-center space-x-2">
-          <Clock className="w-5 h-5" />
-          <span>Payment Instructions</span>
-        </h4>
-        <div className="space-y-3 text-sm text-green-700">
-          <div className="flex items-start space-x-3">
-            <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
-            <span>Scan the QR code below or use the UPI ID to make payment</span>
-          </div>
-          <div className="flex items-start space-x-3">
-            <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
-            <span>Enter the amount: <strong>₹{total.toFixed(2)}</strong></span>
-          </div>
-          <div className="flex items-start space-x-3">
-            <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
-            <span>Add your order code <strong>{orderCode}</strong> in the payment remarks/description</span>
-          </div>
-          <div className="flex items-start space-x-3">
-            <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">4</span>
-            <span>Take a screenshot of the successful payment</span>
-          </div>
-          <div className="flex items-start space-x-3">
-            <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">5</span>
-            <span>Click "Send Payment Details" below to share your payment screenshot via WhatsApp</span>
-          </div>
-        </div>
+    {/* Payment Instructions with Shining Border */}
+<div
+  style={{
+    position: "relative",
+    borderRadius: "12px",
+    padding: "2px",
+    background: "linear-gradient(90deg, #22c55e, #10b981, #22c55e)",
+    backgroundSize: "200% 200%",
+    animation: "shine 3s linear infinite",
+  }}
+>
+  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6">
+    <h4 className="font-bold text-green-800 mb-4 flex items-center space-x-2">
+      <Clock className="w-5 h-5" />
+      <span>Payment Instructions</span>
+    </h4>
+    <div className="space-y-3 text-sm text-green-700">
+      <div className="flex items-start space-x-3">
+        <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
+        <span>Scan the QR code below or use the UPI ID to make payment</span>
       </div>
+      <div className="flex items-start space-x-3">
+        <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
+        <span>Enter the amount: <strong>₹{total.toFixed(2)}</strong></span>
+      </div>
+      <div className="flex items-start space-x-3">
+        <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
+        <span>Add your order code <strong>{orderCode}</strong> in the payment remarks/description</span>
+      </div>
+      <div className="flex items-start space-x-3">
+        <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">4</span>
+        <span>Take a screenshot of the successful payment</span>
+      </div>
+      <div className="flex items-start space-x-3">
+        <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">5</span>
+        <span>Click "Send Payment Details" below to share your payment screenshot via WhatsApp</span>
+      </div>
+    </div>
+  </div>
+</div>
 
+<style>
+{`
+@keyframes shine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+`}
+</style>
+ 
       {/* QR Code and UPI Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* QR Code */}
