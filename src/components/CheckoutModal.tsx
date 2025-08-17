@@ -322,7 +322,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
           className="text-xs bg-purple-500 hover:bg-purple-600 text-white px-2 py-1 rounded-md"
         >
           Use
-        </button>
+        </button> 
               </div>
             )}
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
