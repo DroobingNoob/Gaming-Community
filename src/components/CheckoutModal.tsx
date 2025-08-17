@@ -308,7 +308,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
           className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-md"
         >
           Use
-        </button>
+        </button> 
               </div>
             )}
             {mysteryBoxEligible && (
