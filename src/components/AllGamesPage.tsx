@@ -2,13 +2,12 @@ import React, { useState, useMemo } from 'react';
 import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
 import { useGames } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
-import { useNavigationType } from "react-router-dom";
 
 interface AllGamesPageProps {
   onGameClick: (game: Game) => void;
   onBackToHome: () => void;
 }
-
+ 
 const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }) => {
   const { games, loading, error } = useGames();
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,41 +18,8 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
-
-  const navigationType = useNavigationType();
   
   const itemsPerPage = 12;
-
-    useEffect(() => {
-    if (navigationType === "POP") {
-      // Back navigation → restore from sessionStorage
-      const savedSearch = sessionStorage.getItem("gamesSearch") || "";
-      const savedPlatform = sessionStorage.getItem("gamesPlatform") || "";
-      const savedSort = sessionStorage.getItem("gamesSort") || "newest";
-
-      setSearchQuery(savedSearch);
-      setSelectedPlatform(savedPlatform);
-      setSortBy(savedSort);
-      window.scrollTo({ top: 0, behavior: "smooth" }); 
-    } else {
-      // Fresh navigation → reset filters
-      sessionStorage.removeItem("gamesSearch");
-      sessionStorage.removeItem("gamesPlatform");
-      sessionStorage.removeItem("gamesSort");
-
-      setSearchQuery("");
-      setSelectedPlatform("");
-      setSortBy("newest");
-    }
-  }, [navigationType]);
-
-  // ✅ Save whenever filters change
-  useEffect(() => {
-    sessionStorage.setItem("gamesSearch", searchQuery);
-    sessionStorage.setItem("gamesPlatform", selectedPlatform);
-    sessionStorage.setItem("gamesSort", sortBy);
-  }, [searchQuery, selectedPlatform, sortBy]);
- 
    
   // Filter and sort games
   const filteredAndSortedGames = useMemo(() => {
@@ -107,7 +73,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                 <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Back</span>
               </button>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Gamesi</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Games</h1>
             </div>
           </div>
           <div className="text-center py-12">
@@ -132,7 +98,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                 <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Back</span>
               </button>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Gamesi</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Games</h1>
             </div>
           </div>
           <div className="text-center py-12">
