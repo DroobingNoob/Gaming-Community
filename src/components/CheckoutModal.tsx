@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, User, Phone, ShoppingBag, Gift, Copy, Check, MessageCircle, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { BackendService } from '../services/backendService';
-import { motion } from "framer-motion";
-
-
+ 
 interface CartItem {
   id: string;
   title: string;
@@ -60,19 +58,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const total = Math.max(0, subtotal - discountAmount);
 
-  const handleClose = () => {
-     setCurrentStep('details');
-      setCustomerName(user?.user_metadata?.full_name || '');
-      setCustomerMobile(user?.user_metadata?.mobile_number || '');
-      setAppliedCoupon('');
-      setCouponDiscount(0); 
-      setOrderCode(''); 
-      setCopiedOrderCode(false);
-      setCopiedUpiId(false); 
-  setCurrentStep('details'); // reset only on actual close
-  onClose();
-};
-
   // Generate unique order code
   const generateOrderCode = () => {
     const now = new Date();
@@ -90,14 +75,14 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
-      // setCurrentStep('details');
-      // setCustomerName(user?.user_metadata?.full_name || '');
-      // setCustomerMobile(user?.user_metadata?.mobile_number || '');
-      // setAppliedCoupon('');
-      // setCouponDiscount(0);
-      // setOrderCode(''); 
-      // setCopiedOrderCode(false);
-      // setCopiedUpiId(false); 
+      setCurrentStep('details');
+      setCustomerName(user?.user_metadata?.full_name || '');
+      setCustomerMobile(user?.user_metadata?.mobile_number || '');
+      setAppliedCoupon('');
+      setCouponDiscount(0);
+      setOrderCode('');
+      setCopiedOrderCode(false);
+      setCopiedUpiId(false);
     }
   }, [isOpen, user]);
 
@@ -228,8 +213,8 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
     
     // Auto-close modal and complete order after a delay
     setTimeout(() => {
-      // onOrderComplete(); 
-      // onClose(); 
+      onOrderComplete();
+      onClose();
     }, 2000);
   };
 
@@ -400,25 +385,11 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
       </div>
 
       {/* Payment Instructions */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200"> 
-     <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6 }}
-  className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200 relative"
->
-  <motion.div
-    animate={{ scale: [1, 1.05, 1] }}
-    transition={{ repeat: Infinity, duration: 2 }}
-    className="absolute -top-3 -right-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full shadow-lg"
-  >
-    Read Me 👀
-  </motion.div>
-
-  <h4 className="font-bold text-green-800 mb-4 flex items-center space-x-2">
-    <Clock className="w-5 h-5 animate-pulse" />
-    <span>Payment Instructions</span>
-  </h4>
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+        <h4 className="font-bold text-green-800 mb-4 flex items-center space-x-2">
+          <Clock className="w-5 h-5" />
+          <span>Payment Instructions</span>
+        </h4>
         <div className="space-y-3 text-sm text-green-700">
           <div className="flex items-start space-x-3">
             <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
@@ -441,22 +412,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             <span>Click "Send Payment Details" below to share your payment screenshot via WhatsApp</span>
           </div>
         </div>
-       </motion.div> 
       </div>
-       
-
-        {/* Send Payment Details Button */}
-      <button
-        onClick={handleWhatsAppRedirect}
-        className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
-      >
-        <MessageCircle className="w-5 h-5" />
-        <span>Send Payment Details via WhatsApp</span>
-      </button>
-
-      <p className="text-xs text-gray-500 text-center">
-        After payment, click the button above to send your payment screenshot and order details to our WhatsApp for quick verification and delivery.
-      </p>
 
       {/* QR Code and UPI Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -519,7 +475,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
       </div>
 
       {/* Send Payment Details Button */}
-      {/* <button
+      <button
         onClick={handleWhatsAppRedirect}
         className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
       >
@@ -529,7 +485,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
 
       <p className="text-xs text-gray-500 text-center">
         After payment, click the button above to send your payment screenshot and order details to our WhatsApp for quick verification and delivery.
-      </p> */} 
+      </p>
     </div>
   );
 
@@ -572,7 +528,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             </h2>
           </div>
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
           >
             <X className="w-5 h-5 sm:w-6 sm:h-6" />
