@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { X, User, Phone, ShoppingBag, Gift, Copy, Check, MessageCircle, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { BackendService } from '../services/backendService';
+import { motion } from "framer-motion";
+
 
 interface CartItem {
   id: string;
