@@ -435,7 +435,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
 }
 `}
 </style>
-
+ 
        <button
         onClick={handleWhatsAppRedirect}
         className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2"
