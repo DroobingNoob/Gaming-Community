@@ -57,7 +57,7 @@ const GamesPage: React.FC = () => {
     sessionStorage.setItem("gamesPage", page.toString()); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
+ 
 
   const handleGameClick = (game: Game) => {
     sessionStorage.setItem("gamesPage", currentPage.toString()); 
