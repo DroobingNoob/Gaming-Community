@@ -60,6 +60,7 @@ const GamesPage: React.FC = () => {
 
 
   const handleGameClick = (game: Game) => {
+    sessionStorage.setItem("gamesPage", currentPage.toString()); 
     navigate(`/games/${game.id}`);
   };
 
