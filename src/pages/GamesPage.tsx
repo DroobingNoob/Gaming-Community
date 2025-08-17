@@ -54,6 +54,7 @@ const GamesPage: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    sessionStorage.setItem("gamesPage", page.toString()); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
