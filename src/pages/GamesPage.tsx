@@ -36,16 +36,21 @@ const GamesPage: React.FC = () => {
 }, [searchQuery, selectedPlatform, priceRange, sortBy]); 
 
     useEffect(() => {
-    if (navigationType === "POP") {
-      const savedPage = sessionStorage.getItem("gamesPage");
-      if (savedPage) {
-        setCurrentPage(parseInt(savedPage, 10));
-      }
+  if (navigationType === "POP") {
+    // User came back (browser back/forward)
+    const savedPage = sessionStorage.getItem("gamesPage");
+    if (savedPage) {
+      setCurrentPage(parseInt(savedPage, 10));
     } else {
-      sessionStorage.removeItem("gamesPage");
       setCurrentPage(1);
     }
-  }, [navigationType]); 
+  } else {
+    // Fresh visit (homepage → games, or direct URL)
+    sessionStorage.removeItem("gamesPage");
+    setCurrentPage(1);
+  }
+}, [navigationType]);
+ 
 
   const handleSetPage = () =>{
      sessionStorage.setItem("gamesPage", currentPage.toString()); 
