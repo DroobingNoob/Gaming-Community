@@ -47,15 +47,16 @@ const GamesPage: React.FC = () => {
     }
   }, [navigationType]); 
 
+  const handleSetPage = () =>{
+     sessionStorage.setItem("gamesPage", currentPage.toString()); 
+  } 
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
- handleSetPage();
+    handleSetPage();
   };
 
-  const handleSetPage = () =>{
-     sessionStorage.setItem("gamesPage", currentPage.toString()); 
-  }
 
   const handleGameClick = (game: Game) => {
     navigate(`/games/${game.id}`);
