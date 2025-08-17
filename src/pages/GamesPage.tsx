@@ -31,6 +31,10 @@ const GamesPage: React.FC = () => {
     limit: itemsPerPage
   });
 
+  useEffect(() => {
+  setCurrentPage(1);
+}, [searchQuery, selectedPlatform, priceRange, sortBy]); 
+
     useEffect(() => {
     if (navigationType === "POP") {
       // ✅ Back/forward navigation → restore saved page
@@ -68,7 +72,7 @@ const GamesPage: React.FC = () => {
                 <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Back</span>
               </button>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Gamesi</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Games</h1>
             </div>
           </div>
           <Loader size="large" message="Loading amazing games..." fullScreen={false} />
@@ -90,7 +94,7 @@ const GamesPage: React.FC = () => {
                 <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Back</span>
               </button>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Gamesi</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">All Games</h1>
             </div>
           </div>
           <div className="text-center py-12">
