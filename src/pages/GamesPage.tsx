@@ -32,7 +32,7 @@ const GamesPage: React.FC = () => {
   });
 
   useEffect(() => {
-  // setCurrentPage(1); 
+  setCurrentPage(1);  
 }, [searchQuery, selectedPlatform, priceRange, sortBy]); 
 
     useEffect(() => {
