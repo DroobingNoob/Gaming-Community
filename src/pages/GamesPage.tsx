@@ -29,6 +29,7 @@ const GamesPage: React.FC = () => {
   });
 
    useEffect(() => {
+     if(sessionStorage.getItem("gamesPage"))
     const savedPage = sessionStorage?.getItem("gamesPage");
     if (savedPage) {
       setCurrentPage(parseInt(savedPage));
