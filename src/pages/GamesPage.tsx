@@ -31,12 +31,19 @@ const GamesPage: React.FC = () => {
     limit: itemsPerPage
   });
 
-   useEffect(() => {
-    const savedPage = sessionStorage?.getItem("gamesPage");
-    if (savedPage) {
-      setCurrentPage(parseInt(savedPage));
+    useEffect(() => {
+    if (navigationType === "POP") {
+      // ✅ Back/forward navigation → restore saved page
+      const savedPage = sessionStorage.getItem("gamesPage");
+      if (savedPage) {
+        setCurrentPage(parseInt(savedPage, 10));
+      }
+    } else {
+      // ✅ Fresh navigation → reset to page 1
+      sessionStorage.removeItem("gamesPage");
+      setCurrentPage(1);
     }
-  }, []); 
+  }, [navigationType]); 
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
