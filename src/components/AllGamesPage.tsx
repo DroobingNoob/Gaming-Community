@@ -34,6 +34,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
       setSearchQuery(savedSearch);
       setSelectedPlatform(savedPlatform);
       setSortBy(savedSort);
+      window.scrollTo({ top: 0, behavior: "smooth" }); 
     } else {
       // Fresh navigation → reset filters
       sessionStorage.removeItem("gamesSearch");
