@@ -448,8 +448,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
       <p className="text-xs text-gray-500 text-center">
         After payment, click the button above to send your payment screenshot and order details to our WhatsApp for quick verification and delivery.
       </p>
-    </div> 
- 
+    
       {/* QR Code and UPI Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* QR Code */}
