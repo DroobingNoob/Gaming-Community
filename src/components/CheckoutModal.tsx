@@ -400,25 +400,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
       </div>
 
       {/* Payment Instructions */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
-        <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6 }}
-  className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200 relative"
->
-  <motion.div
-    animate={{ scale: [1, 1.05, 1] }}
-    transition={{ repeat: Infinity, duration: 2 }}
-    className="absolute -top-3 -right-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full shadow-lg"
-  >
-    Read Me 👀
-  </motion.div>
-
-  <h4 className="font-bold text-green-800 mb-4 flex items-center space-x-2">
-    <Clock className="w-5 h-5 animate-pulse" />
-    <span>Payment Instructions</span>
-  </h4>
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200"> 
         <h4 className="font-bold text-green-800 mb-4 flex items-center space-x-2">
           <Clock className="w-5 h-5" />
           <span>Payment Instructions</span>
