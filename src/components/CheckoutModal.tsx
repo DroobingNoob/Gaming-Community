@@ -110,7 +110,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setCouponDiscount(0); // No monetary discount, but eligible for mystery box
       toast.success('Mystery Box coupon applied! Free mystery game included');
     } else if (coupon === 'GAMINGCOMMUNITY100' && subtotal>=999) {
-      setCouponDiscount(subtotal -100);
+      setCouponDiscount(100);
       toast.success('Flash Sale discount applied! ₹100 off');
     } else {
       setCouponDiscount(0);
