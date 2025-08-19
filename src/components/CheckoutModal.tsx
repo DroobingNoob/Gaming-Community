@@ -198,7 +198,7 @@ if (result.success) {
 // setCurrentStep("payment"); 
 // toast.success('Order created successfully! Please complete the payment.');
 
-
+ 
       // Submit order to backend
       // const result = await BackendService.createOrder(orderData);
       
