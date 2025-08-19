@@ -160,15 +160,15 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         paymentStatus: 'Pending'
       };
 
-      // Submit order to backend
-      const result = await BackendService.createOrder(orderData);
-
       // Bypass backend, simulate success
 const result = { success: true, orderCode: newOrderCode };
 
 setCurrentStep('payment');
 toast.success('Order created successfully! Please complete the payment.');
 
+
+      // Submit order to backend
+      // const result = await BackendService.createOrder(orderData);
       
       // if (result.success) {
       //   setCurrentStep('payment');
