@@ -201,7 +201,7 @@ toast.success('Order created successfully! Please complete the payment.');
   };
 
   const handleWhatsAppRedirect = () => {
-    const phoneNumber = '+91 9266514434';
+    const phoneNumber = '+919266514434';
     
     // Prepare order details message
     const itemsList = cartItems.map(item => 
