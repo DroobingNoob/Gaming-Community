@@ -185,6 +185,15 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       // Bypass backend, simulate success
 const result = { success: true, orderCode: newOrderCode };
 
+       const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors", // Apps Script often requires no-cors
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(orderData)
+    });
+
 await saveOrderToGoogleSheets(orderData);
 setCurrentStep("payment"); 
 toast.success('Order created successfully! Please complete the payment.');
