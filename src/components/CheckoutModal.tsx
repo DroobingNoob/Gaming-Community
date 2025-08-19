@@ -186,7 +186,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 const result = { success: true, orderCode: newOrderCode };
 
 await saveOrderToGoogleSheets(orderData);
-setCurrentStep("payment");
+setCurrentStep("payment"); 
 toast.success('Order created successfully! Please complete the payment.');
 
 
