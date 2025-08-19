@@ -118,28 +118,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   };
 
-  async function saveOrderToGoogleSheets(orderData) {
-  try {
-    const response = await fetch(
-      "https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "addOrder",
-          data: orderData,
-        }),
-      }
-    );
-
-    if (!response.ok) throw new Error("Failed to save order");
-
-    console.log("✅ Order saved to Google Sheets");
-  } catch (err) {
-    console.error("❌ Failed to save order to Google Sheets:", err);
-  }
-}
-
   const handleProceedToPayment = async () => {
     if (!customerName.trim()) {
       toast.error('Please enter your name');
@@ -182,37 +160,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         paymentStatus: 'Pending'
       };
 
-      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec"; 
+   
+      Bypass backend, simulate success
+const result = { success: true, orderCode: newOrderCode };  
 
-      // Bypass backend, simulate success
-// const result = { success: true, orderCode: newOrderCode };  
 
-     const response = await fetch(SCRIPT_URL, {
-  method: "POST",
-        mode: "no-cors", 
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    action: "addOrder",
-    data: orderData
-  })
-});
-
-// read raw text first
-const text = await response.text();
-console.log("Raw response:", text);
-
-// if script wrapped JSON as string, parse twice
-let result;
-try {
-  result = JSON.parse(text);
-  if (typeof result === "string") {
-    result = JSON.parse(result);
-  }
-} catch (err) {
-  console.error("Failed to parse response:", err);
-  toast.error("Invalid response from server");
-  return;
-} 
 setCurrentStep("payment"); 
 toast.success('Order created successfully! Please complete the payment.');
 
