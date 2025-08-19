@@ -162,39 +162,20 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
    
      // Bypass backend, simulate success
-const result = { success: true, orderCode: newOrderCode };  
+// const result = { success: true, orderCode: newOrderCode };  
 
-setCurrentStep("payment"); 
-toast.success('Order created successfully! Please complete the payment.');
-
-      try {
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec';
-    const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: "no-cors", 
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        action: 'addOrder',
-        data: orderData
-      })
-    });
-  } catch (error) {
-    console.error('Error submitting to Google Sheets:', error);
-    return false;
-  } 
-
+// setCurrentStep("payment"); 
+// toast.success('Order created successfully! Please complete the payment.');
 
       // Submit order to backend
-      // const result = await BackendService.createOrder(orderData);
+      const result = await BackendService.createOrder(orderData);
       
-      // if (result.success) {
-      //   setCurrentStep('payment');
-      //   toast.success('Order created successfully! Please complete the payment.');
-      // } else {
-      //   throw new Error('Failed to create order');
-      // }
+      if (result.success) {
+        setCurrentStep('payment');
+        toast.success('Order created successfully! Please complete the payment.');
+      } else {
+        throw new Error('Failed to create order');
+      } 
     } catch (error) {
       console.error('Error creating order:', error);
       toast.error('Failed to create order. Please try again.');
