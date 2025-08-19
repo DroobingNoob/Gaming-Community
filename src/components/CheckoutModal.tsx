@@ -187,18 +187,31 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       // Bypass backend, simulate success
 // const result = { success: true, orderCode: newOrderCode };  
 
-      const response = await fetch(SCRIPT_URL, {
+     const response = await fetch(SCRIPT_URL, {
   method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
     action: "addOrder",
     data: orderData
   })
 });
 
-const result = await response.json(); 
+// read raw text first
+const text = await response.text();
+console.log("Raw response:", text);
+
+// if script wrapped JSON as string, parse twice
+let result;
+try {
+  result = JSON.parse(text);
+  if (typeof result === "string") {
+    result = JSON.parse(result);
+  }
+} catch (err) {
+  console.error("Failed to parse response:", err);
+  toast.error("Invalid response from server");
+  return;
+} 
 setCurrentStep("payment"); 
 toast.success('Order created successfully! Please complete the payment.');
 
