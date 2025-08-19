@@ -161,7 +161,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       };
 
    
-      Bypass backend, simulate success
+     // Bypass backend, simulate success
 const result = { success: true, orderCode: newOrderCode };  
 
 
