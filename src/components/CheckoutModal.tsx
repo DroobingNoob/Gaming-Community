@@ -233,10 +233,10 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
     setCurrentStep('confirmation');
     
     // Auto-close modal and complete order after a delay
-    setTimeout(() => {
-      onOrderComplete();
-      onClose();
-    }, 2000);
+    // setTimeout(() => {
+    //   onOrderComplete();
+    //   onClose();
+    // }, 2000); 
   };
 
   const renderCustomerDetails = () => (
