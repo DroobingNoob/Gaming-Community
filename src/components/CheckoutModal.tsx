@@ -164,9 +164,39 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
      // Bypass backend, simulate success
 const result = { success: true, orderCode: newOrderCode };  
 
+      const response = await fetch(
+  "https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      action: "addOrder", // 👈 must match what your Apps Script expects
+      data: orderData,
+    }),
+  }
+);
 
-setCurrentStep("payment"); 
-toast.success('Order created successfully! Please complete the payment.');
+if (!response.ok) {
+  const errorText = await response.text();
+  console.error("Order creation failed:", errorText);
+  toast.error("Failed to create order. Please try again.");
+  return;
+}
+
+const result = await response.json();
+
+if (result.success) {
+  setCurrentStep("payment");
+  toast.success("Order created successfully! Please complete the payment.");
+} else {
+  toast.error("Order could not be created. Try again.");
+}
+ 
+
+// setCurrentStep("payment"); 
+// toast.success('Order created successfully! Please complete the payment.');
 
 
       // Submit order to backend
