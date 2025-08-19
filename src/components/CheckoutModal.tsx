@@ -167,6 +167,24 @@ const result = { success: true, orderCode: newOrderCode };
 setCurrentStep("payment"); 
 toast.success('Order created successfully! Please complete the payment.');
 
+      try {
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec';
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'addOrder',
+        data: orderData
+      })
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('Error submitting to Google Sheets:', error);
+    return false;
+  }
+
 
       // Submit order to backend
       // const result = await BackendService.createOrder(orderData);
