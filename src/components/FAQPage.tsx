@@ -86,7 +86,7 @@ const FAQPage: React.FC<FAQPageProps> = ({ onBackToHome }) => {
   };
 
   const handleWhatsAppContact = () => {
-    const phoneNumber = '9266514434';
+    const phoneNumber = '+91 9266514434';
     const message = 'Hi! I have a question about your gaming services.';
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
