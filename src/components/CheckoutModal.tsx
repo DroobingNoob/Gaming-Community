@@ -180,7 +180,6 @@ toast.success('Order created successfully! Please complete the payment.');
         data: orderData
       })
     });
-    return response.ok;
   } catch (error) {
     console.error('Error submitting to Google Sheets:', error);
     return false;
