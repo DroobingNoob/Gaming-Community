@@ -118,6 +118,28 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   };
 
+  async function saveOrderToGoogleSheets(orderData) {
+  try {
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "addOrder",
+          data: orderData,
+        }),
+      }
+    );
+
+    if (!response.ok) throw new Error("Failed to save order");
+
+    console.log("✅ Order saved to Google Sheets");
+  } catch (err) {
+    console.error("❌ Failed to save order to Google Sheets:", err);
+  }
+}
+
   const handleProceedToPayment = async () => {
     if (!customerName.trim()) {
       toast.error('Please enter your name');
@@ -163,7 +185,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       // Bypass backend, simulate success
 const result = { success: true, orderCode: newOrderCode };
 
-setCurrentStep('payment');
+await saveOrderToGoogleSheets(orderData);
+setCurrentStep("payment");
 toast.success('Order created successfully! Please complete the payment.');
 
 
