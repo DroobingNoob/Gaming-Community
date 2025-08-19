@@ -185,7 +185,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec"; 
 
       // Bypass backend, simulate success
-const result = { success: true, orderCode: newOrderCode };
+// const result = { success: true, orderCode: newOrderCode };  
 
       const response = await fetch(SCRIPT_URL, {
   method: "POST",
