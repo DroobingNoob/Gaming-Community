@@ -201,7 +201,7 @@ toast.success('Order created successfully! Please complete the payment.');
     } finally {
       setIsProcessing(false);
     }
-  };
+  }; 
 
   const copyToClipboard = (text: string, type: 'orderCode' | 'upiId') => {
     navigator.clipboard.writeText(text).then(() => {
