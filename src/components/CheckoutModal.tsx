@@ -182,6 +182,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         paymentStatus: 'Pending'
       };
 
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec"; 
+
       // Bypass backend, simulate success
 const result = { success: true, orderCode: newOrderCode };
 
