@@ -162,7 +162,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
    
      // Bypass backend, simulate success
-const result = { success: true, orderCode: newOrderCode };  
+// const result = { success: true, orderCode: newOrderCode };  
 
       const response = await fetch(
   "https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec",
@@ -185,7 +185,7 @@ if (!response.ok) {
   return;
 }
 
-const result = await response.json();
+// const result = await response.json(); 
 
 if (result.success) {
   setCurrentStep("payment");
