@@ -183,7 +183,7 @@ toast.success('Order created successfully! Please complete the payment.');
   } catch (error) {
     console.error('Error submitting to Google Sheets:', error);
     return false;
-  }
+  } 
 
 
       // Submit order to backend
