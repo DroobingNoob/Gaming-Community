@@ -91,7 +91,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigation }) => {
             {/* Social Links */}
             <div className="flex space-x-3 sm:space-x-4 justify-center sm:justify-start">
               <a
-                href="https://instagram.com/gammingcommunity.community"
+                href="https://instagram.com/gamming.community"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gradient-to-r from-gray-800 to-gray-700 hover:from-cyan-400 hover:to-orange-500 p-2 sm:p-3 rounded-xl transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-xl"
