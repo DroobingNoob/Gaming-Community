@@ -171,7 +171,7 @@ toast.success('Order created successfully! Please complete the payment.');
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRiqJDoZP-k5sZhoI_JB-V-MI3Xr1WCSpnNkuYYmbkI2PLzYCphK-fk7IPjzJFJyaIxg/exec';
     const response = await fetch(SCRIPT_URL, {
       method: 'POST',
-      mode: "no-cors",
+      mode: "no-cors", 
       headers: {
         'Content-Type': 'application/json'
       },
