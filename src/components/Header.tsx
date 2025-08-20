@@ -78,7 +78,7 @@ const Header: React.FC<HeaderProps> = ({
   const handleSearch = () => {
     if (searchQuery.trim()) {
       // Navigate to all games page with search query
-      navigate('/games');
+       navigate('/games', { state: { search: searchQuery.trim() } }); 
       setIsSearchExpanded(false);
     }
   };
