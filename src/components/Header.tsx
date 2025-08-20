@@ -39,8 +39,6 @@ const Header: React.FC<HeaderProps> = ({
   // Combine games and subscriptions for search
   const allItems = [...(games || []), ...(subscriptions || [])];
 
-  const location = useLocation();
-
   useEffect(() => {
   if (location.state?.search) {
     setTempSearchQuery(location.state.search); // optional: show in input
