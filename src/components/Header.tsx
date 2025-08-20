@@ -41,7 +41,6 @@ const Header: React.FC<HeaderProps> = ({
 
   useEffect(() => {
   if (location.state?.search) {
-    setTempSearchQuery(location.state.search); // optional: show in input
     setSearchQuery(location.state.search);
     handleSearch();// trigger search
   }
