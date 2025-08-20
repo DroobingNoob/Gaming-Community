@@ -42,7 +42,6 @@ const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
   if (location.state?.search) {
     setSearchQuery(location.state.search);
-    handleSearch();// trigger search
   }
 }, [location.state]);
 
