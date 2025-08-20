@@ -3,7 +3,6 @@ import { Search, ShoppingCart, User, Menu, X, Shield, LogOut, Gift } from 'lucid
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useGames, useSubscriptions } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
-import { useLocation } from 'react-router-dom';
 
 interface HeaderProps {
   onLoginClick: () => void;
