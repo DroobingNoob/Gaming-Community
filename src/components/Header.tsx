@@ -3,6 +3,7 @@ import { Search, ShoppingCart, User, Menu, X, Shield, LogOut, Gift } from 'lucid
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useGames, useSubscriptions } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
+import { useLocation } from 'react-router-dom';
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -38,6 +39,16 @@ const Header: React.FC<HeaderProps> = ({
  
   // Combine games and subscriptions for search
   const allItems = [...(games || []), ...(subscriptions || [])];
+
+  const location = useLocation();
+
+  useEffect(() => {
+  if (location.state?.search) {
+    setTempSearchQuery(location.state.search); // optional: show in input
+    setSearchQuery(location.state.search);
+    handleSearch();// trigger search
+  }
+}, [location.state]);
 
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
