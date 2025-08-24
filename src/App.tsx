@@ -516,9 +516,9 @@ function App() {
         <FlashSaleStrip />
 
         {/* Newsletter Banner - Show for non-logged-in users or logged-in users without newsletter discount */}
-        {(showNewsletterBanner || (isLoggedIn && !user?.user_metadata?.newsletter_subscribed)) && (
+        {/* {(showNewsletterBanner || (isLoggedIn && !user?.user_metadata?.newsletter_subscribed)) && (
           <NewsletterBanner onSignupClick={handleNewsletterBannerClick} />
-        )}
+        )} */} 
 
         {/* Header - Immediately below Flash Sale Strip */}
         <Header
