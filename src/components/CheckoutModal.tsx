@@ -51,7 +51,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   // } else 
     if (appliedCoupon === 'MYSTERYBOX' && mysteryBoxEligible) {
     // Mystery box is free, no monetary discount but eligible for free game
-  } else if (appliedCoupon === 'GAMINGCOMMUNITY100' && subtotal>=1000) {
+  } else if (appliedCoupon === 'PLAY100' && subtotal>=1299) {
     discountAmount = 100; // 15% discount from flash sale
   } else if (couponDiscount > 0) {
     discountAmount = couponDiscount;
@@ -111,7 +111,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       if (coupon === 'MYSTERYBOX' && mysteryBoxEligible) {
       setCouponDiscount(0); // No monetary discount, but eligible for mystery box
       toast.success('Mystery Box coupon applied! Free mystery game included');
-    } else if (coupon === 'GAMINGCOMMUNITY100' && subtotal>=999) {
+    } else if (coupon === 'PLAY100' && subtotal>=1299) {
       setCouponDiscount(100);
       toast.success('Flash Sale discount applied! ₹100 off');
     } else {
@@ -337,7 +337,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
               <div className="flex items-center space-x-2">
                 <Gift className="w-4 h-4 text-orange-500" />
-                <span className="text-orange-800 font-medium text-sm">GAMINGCOMMUNITY100 - ₹100 off (Min ₹1000)</span>
+                <span className="text-orange-800 font-medium text-sm">PLAY100 - ₹100 off (Min ₹1299)</span>
               </div>
                  <button
         onClick={() => setAppliedCoupon("GAMINGCOMMUNITY100")}
