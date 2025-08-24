@@ -46,9 +46,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   
   // Apply discounts
   let discountAmount = 0;
-  if (hasNewsletterDiscount && appliedCoupon === 'NEWSLETTER10') {
-    discountAmount = subtotal * 0.1; // 10% discount
-  } else if (appliedCoupon === 'MYSTERYBOX' && mysteryBoxEligible) {
+  // if (hasNewsletterDiscount && appliedCoupon === 'NEWSLETTER10') {
+  //   discountAmount = subtotal * 0.1; // 10% discount
+  // } else 
+    if (appliedCoupon === 'MYSTERYBOX' && mysteryBoxEligible) {
     // Mystery box is free, no monetary discount but eligible for free game
   } else if (appliedCoupon === 'GAMINGCOMMUNITY100' && subtotal>=1000) {
     discountAmount = 100; // 15% discount from flash sale
