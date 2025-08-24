@@ -104,10 +104,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const handleApplyCoupon = () => {
     const coupon = appliedCoupon.toUpperCase();
     
-    if (coupon === 'NEWSLETTER10' && hasNewsletterDiscount) {
-      setCouponDiscount(subtotal * 0.1);
-      toast.success('Newsletter discount applied! 10% off');
-    } else if (coupon === 'MYSTERYBOX' && mysteryBoxEligible) {
+    // if (coupon === 'NEWSLETTER10' && hasNewsletterDiscount) {
+    //   setCouponDiscount(subtotal * 0.1);
+    //   toast.success('Newsletter discount applied! 10% off');
+    // } else  
+      if (coupon === 'MYSTERYBOX' && mysteryBoxEligible) {
       setCouponDiscount(0); // No monetary discount, but eligible for mystery box
       toast.success('Mystery Box coupon applied! Free mystery game included');
     } else if (coupon === 'GAMINGCOMMUNITY100' && subtotal>=999) {
