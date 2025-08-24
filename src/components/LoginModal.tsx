@@ -123,7 +123,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
           </p>
 
           {/* Newsletter Discount Promo */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200 mb-6">
+          {/* <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200 mb-6">
             <div className="flex items-center justify-center space-x-2 mb-2">
               <Gift className="w-5 h-5 text-green-500" />
               <h3 className="font-bold text-green-800">10% OFF Your First Order!</h3>
@@ -131,7 +131,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
             <p className="text-green-700 text-sm">
               Sign up for our newsletter after login to get 10% off your first purchase!
             </p>
-          </div>
+          </div> */} 
 
           {/* Google Login - Primary Option */}
           <button
