@@ -345,7 +345,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
         disabled={total.toFixed(2)<1299}
       >
         Use
-      </button>  ) : (<span>Not Eligible</span>)} 
+      </button>  ) : (<span>Not Eligible</span>)}
             </div>
           </div>
         </div>
