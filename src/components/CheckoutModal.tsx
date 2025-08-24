@@ -340,7 +340,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                 <span className="text-orange-800 font-medium text-sm">PLAY100 - ₹100 off (Min ₹1299)</span>
               </div>
                  <button
-        onClick={() => setAppliedCoupon("GAMINGCOMMUNITY100")}
+        onClick={() => setAppliedCoupon("PLAY100")}
         className="text-xs bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md"
       >
         Use
