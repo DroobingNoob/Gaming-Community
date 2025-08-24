@@ -155,12 +155,12 @@ const Header: React.FC<HeaderProps> = ({
                         <span className="text-green-700 font-medium text-sm">
                           {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
                         </span>
-                        {hasNewsletterDiscount && (
+                        {/* {hasNewsletterDiscount && (
                           <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
                             <Gift className="w-3 h-3" />
                             <span>10% OFF</span>
                           </div>
-                        )}
+                        )} */} 
                       </div>
                       <button
                         onClick={() => onNavigation('logout')}
