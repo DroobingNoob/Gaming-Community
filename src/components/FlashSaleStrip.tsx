@@ -105,4 +105,4 @@ const FlashSaleStrip: React.FC = () => {
 };
 
 export default FlashSaleStrip;
- 
+  
