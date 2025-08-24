@@ -557,12 +557,12 @@ function App() {
           onLogin={handleLogin}
         />
 
-        <NewsletterModal
+        {/* <NewsletterModal
           isOpen={isNewsletterModalOpen}
           onClose={() => setIsNewsletterModalOpen(false)}
           onSignup={handleNewsletterSignup}
           userEmail={user?.email}
-        />
+        /> */} 
 
         <CartModal
           isOpen={isCartModalOpen}
