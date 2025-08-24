@@ -342,7 +342,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                  <button
         onClick={() => setAppliedCoupon("PLAY100")}
         className="text-xs bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md"
-                   disabled={total.toFixed(2)<1299}
+        disabled={total.toFixed(2)<1299}
       >
         Use
       </button>  
