@@ -94,7 +94,7 @@ const FlashSaleStrip: React.FC = () => {
 
           {/* Animated underline */}
           <motion.div
-            animate={{ scaleX: [1, 1.2, 1] }}
+            animate={{ scaleX: [1, 1, 1] }}
             transition={{ repeat: Infinity, duration: 2 }}
             className="h-0.5 mt-2 bg-gradient-to-r from-yellow-400 via-white to-yellow-400"
           />
