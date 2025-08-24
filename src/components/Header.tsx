@@ -273,12 +273,12 @@ const Header: React.FC<HeaderProps> = ({
                       <div className="mt-4 space-y-2">
                         <div className="py-3 px-2 text-green-600 bg-green-50 rounded-lg flex items-center justify-between">
                           <span>Welcome, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}!</span>
-                          {hasNewsletterDiscount && (
+                          {/* {hasNewsletterDiscount && (
                             <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
                               <Gift className="w-3 h-3" />
                               <span>10% OFF</span>
                             </div>
-                          )}
+                          )} */} 
                         </div>
                         <button
                           onClick={() => {
