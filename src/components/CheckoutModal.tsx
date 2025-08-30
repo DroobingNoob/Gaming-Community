@@ -218,7 +218,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 ${itemsList}
 
 💰 *Payment Summary:*
-Subtotal: ₹${subtotal}${discountAmount > 0 ? `\nDiscount: -₹${discountAmount}` : ''}${appliedCoupon ? `\nCoupon: ${appliedCoupon}` : ''}${mysteryBoxEligible && appliedCoupon === 'MYSTERYBOX' ? '\n🎁 Mystery Box: FREE' : ''}
+Subtotal: ₹${subtotal}${discountAmount > 0 ? `\nDiscount: -₹${discountAmount}` : ''}${appliedCoupon && discountAmount > 0 ? `\nCoupon: ${appliedCoupon}` : ''}${mysteryBoxEligible && appliedCoupon === 'MYSTERYBOX' ? '\n🎁 Mystery Box: FREE' : ''}
 *Total Paid: ₹${total}*
 
 ✅ *Payment Status:* Completed via UPI
