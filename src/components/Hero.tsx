@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Gift, Trophy, Star, ClipboardCopy } from 'lucide-react';
-
-
+import { useNavigate } from 'react-router-dom';
 
 interface HeroProps {
   onShopBestsellers: () => void;
@@ -13,6 +12,7 @@ const Hero: React.FC<HeroProps> = ({ onShopBestsellers, onBrowseCategories }) =>
   const [copied, setCopied] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  const navigate = useNavigate();
 
   const copyToClipboard = () => {
   navigator.clipboard.writeText("MYSTERYBOX").then(() => {
