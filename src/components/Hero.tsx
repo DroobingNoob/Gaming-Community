@@ -71,7 +71,7 @@ const goToPrevSlide = () => {
       image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080",
       overlay: "bg-gradient-to-br from-orange-900/95 via-red-900/90 to-orange-900/85",
       buttonText: "Browse Games",
-      buttonAction: onBrowseCategories,
+      buttonAction: navigate('/subscriptions'),
       isPromo: false
     }
   ];
