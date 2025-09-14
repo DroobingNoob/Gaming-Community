@@ -91,10 +91,11 @@ const Header: React.FC<HeaderProps> = ({
 
   const navItems = [
     { name: 'Home', id: 'home' },
+    { name: 'Browse Games', id: 'games' },
     { name: 'Categories', id: 'categories' },
     { name: 'FAQ', id: 'faq' },
-    { name: 'Contact', id: 'contact' },
-    { name: 'Browse Games', id: 'games' }
+    { name: 'Contact', id: 'contact' }
+    
   ];
 
   // Add admin option if user is admin
