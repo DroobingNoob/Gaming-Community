@@ -112,8 +112,7 @@ const Header: React.FC<HeaderProps> = ({
       const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, '_blank');
     }else if (itemId === 'games') {
-      navigate("/games")
-;    }
+      navigate("/games");    }
     else {
       onNavigation(itemId);
     }
