@@ -93,7 +93,8 @@ const Header: React.FC<HeaderProps> = ({
     { name: 'Home', id: 'home' },
     { name: 'Categories', id: 'categories' },
     { name: 'FAQ', id: 'faq' },
-    { name: 'Contact', id: 'contact' }
+    { name: 'Contact', id: 'contact' },
+    { name: 'Browse Games', id: 'games' }
   ];
 
   // Add admin option if user is admin
