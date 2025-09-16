@@ -46,40 +46,47 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto">
           {categories.map((category) => (
             <div
-              key={category.id}
-              className="group cursor-pointer"
-              onClick={category.onClick}
-            >
-              <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/80 to-gray-50/80 backdrop-blur-sm hover:from-cyan-50/80 hover:to-orange-50/80 transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-3 shadow-lg hover:shadow-2xl border border-white/20">
-                {/* Background Image */}
-                <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                
-                {/* Content */}
-                <div className="relative p-6 sm:p-8 md:p-12 text-center">
-                  <div className="text-cyan-500 group-hover:text-orange-500 transition-colors duration-300 mb-4 sm:mb-6 flex justify-center bg-gradient-to-r from-cyan-100 to-blue-100 group-hover:from-orange-100 group-hover:to-red-100 w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full items-center mx-auto">
-                    {category.icon}
-                  </div>
-                  
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">
-                    {category.name}
-                  </h3>
-                  
-                  <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base md:text-lg">
-                    {category.description}
-                  </p>
-                  
-                  <div className="inline-flex items-center space-x-2 bg-white/70 backdrop-blur-sm rounded-full px-4 sm:px-6 py-2 sm:py-3 shadow-lg">
-                    <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
-                      {category.gameCount} Games
-                    </span>
-                  </div>
-                </div>
+  key={category.id}
+  className="group cursor-pointer transform transition duration-300 hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-cyan-400/30 focus:outline-none focus:ring-4 focus:ring-cyan-300 rounded-xl"
+  onClick={category.onClick}
+  tabIndex={0}
+  role="button"
+>
+  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/80 to-gray-50/80 backdrop-blur-sm transition-all duration-300">
+    {/* Background Image */}
+    <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+      <img
+        src={category.image}
+        alt={category.name}
+        className="w-full h-full object-cover"
+      />
+    </div>
+
+    {/* Content */}
+    <div className="relative p-6 sm:p-8 md:p-12 text-center">
+      <div className="text-cyan-500 group-hover:text-orange-500 transition-colors duration-300 mb-4 sm:mb-6 flex justify-center bg-gradient-to-r from-cyan-100 to-blue-100 group-hover:from-orange-100 group-hover:to-red-100 w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full items-center mx-auto">
+        {category.icon}
+      </div>
+
+      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-3 sm:mb-4 group-hover:underline">
+        {category.name}
+      </h3>
+
+      <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base md:text-lg">
+        {category.description}
+      </p>
+
+      <div className="inline-flex items-center space-x-2 bg-white border border-cyan-300 text-cyan-700 font-semibold rounded-full px-4 py-2">
+        {category.gameCount} Games
+      </div>
+
+      <button className="mt-4 inline-flex items-center justify-center px-4 py-2 text-sm sm:text-base font-medium text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-orange-500 hover:to-pink-500 rounded-full shadow transition-transform duration-200 group-hover:scale-105">
+        Browse Now →
+      </button>
+    </div>
+  </div>
+</div>
+
 
                 {/* Hover Effect Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-cyan-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl sm:rounded-2xl" />
