@@ -51,7 +51,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
               className="group cursor-pointer"
               onClick={category.onClick}
             > 
-              <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/80 to-gray-50/80 backdrop-blur-sm hover:from-cyan-50/80 hover:to-orange-50/80 transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-3 shadow-lg hover:shadow-2xl border-2 border-cyan-400">
+              <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/80 to-gray-50/80 backdrop-blur-sm hover:from-cyan-50/80 hover:to-orange-50/80 transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-3 shadow-lg hover:shadow-2xl border-2 border-[#7DF9FF]">
                 {/* Background Image */}
                 <div className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity duration-300">
                   <img
