@@ -16,8 +16,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
       name: "PlayStation Games",
       icon: <PlayCircle className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />,
       description: "Click to Browse PS4 & PS5 exclusive titles",
-      image: "https://www.pexels.com/photo/person-holding-white-and-black-xbox-one-game-controller-3945683?auto=compress&cs=tinysrgb&w=400&h=300",
-      
+      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=400&h=300",
       gameCount: "300+",
       onClick: () => navigate('/games')
     },
