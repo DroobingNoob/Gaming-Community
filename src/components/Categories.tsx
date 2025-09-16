@@ -78,13 +78,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
                     <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
                       {category.gameCount} Games
                     </span>
-                  </div>
-                  <p className="text-gray-500 text-xs sm:text-sm mt-2 italic">
-  Tap to explore <div className="absolute bottom-4 right-4 p-2 bg-cyan-500 text-white rounded-full shadow-lg">
-  →
-</div>
-</p>
-
+                  </div> 
                 </div>
 
                 {/* Hover Effect Overlay */}
