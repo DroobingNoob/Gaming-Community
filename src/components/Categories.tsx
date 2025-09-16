@@ -53,7 +53,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
             > 
               <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/80 to-gray-50/80 backdrop-blur-sm hover:from-cyan-50/80 hover:to-orange-50/80 transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-3 shadow-lg hover:shadow-2xl border-2 border-cyan-400">
                 {/* Background Image */}
-                <div className="absolute inset-0 opacity-15 group-hover:opacity-30 transition-opacity duration-300">
+                <div className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity duration-300">
                   <img
                     src={category.image}
                     alt={category.name}
