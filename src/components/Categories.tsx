@@ -80,7 +80,9 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
                     </span>
                   </div>
                   <p className="text-gray-500 text-xs sm:text-sm mt-2 italic">
-  Tap to explore
+  Tap to explore <div className="absolute bottom-4 right-4 p-2 bg-cyan-500 text-white rounded-full shadow-lg">
+  →
+</div>
 </p>
 
                 </div>
