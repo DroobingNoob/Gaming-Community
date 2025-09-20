@@ -9,7 +9,7 @@ interface AdminPageProps {
 }
 
 interface EditionPricing {
-  edition: 'Standard' | 'Premium' | 'Deluxe';
+  edition: 'Standard' | 'Premium' | 'Deluxe' | 'Ultimate';
   original_price: number;
   sale_price: number;
   rent_1_month?: number;
@@ -49,8 +49,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   });
 
   // Edition management state
-  const [availableEditions, setAvailableEditions] = useState<('Standard' | 'Premium' | 'Deluxe')[]>(['Standard']);
-  const [selectedEdition, setSelectedEdition] = useState<'Standard' | 'Premium' | 'Deluxe'>('Standard');
+  const [availableEditions, setAvailableEditions] = useState<('Standard' | 'Premium' | 'Deluxe' | 'Ultimate')[]>(['Standard']);
+  const [selectedEdition, setSelectedEdition] = useState<'Standard' | 'Premium' | 'Deluxe' | 'Ultimate'>('Standard');
   const [editionPricings, setEditionPricings] = useState<{ [key: string]: EditionPricing }>({
     'Standard': {
       edition: 'Standard',
@@ -197,7 +197,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     setSelectedEdition(edition);
     setEditionPricings({
       [edition]: {
-        edition: edition as 'Standard' | 'Premium' | 'Deluxe',
+        edition: edition as 'Standard' | 'Premium' | 'Deluxe' | 'Ultimate',
         original_price: gameItem.original_price,
         sale_price: gameItem.sale_price,
         rent_1_month: gameItem.rent_1_month || 0,
@@ -218,7 +218,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
     setIsModalOpen(true);
   };
 
-  const handleEditionCheckboxChange = (edition: 'Standard' | 'Premium' | 'Deluxe', checked: boolean) => {
+  const handleEditionCheckboxChange = (edition: 'Standard' | 'Premium' | 'Deluxe' | 'Ultimate', checked: boolean) => {
     if (checked) {
       setAvailableEditions(prev => [...prev, edition]);
       setEditionPricings(prev => ({
@@ -884,7 +884,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">Available Editions</label>
                           <div className="grid grid-cols-3 gap-2 mb-4">
-                            {['Standard', 'Premium', 'Deluxe'].map((edition) => (
+                            {['Standard', 'Premium', 'Deluxe' | 'Ultimate'].map((edition) => (
                               <label key={edition} className="flex items-center space-x-2">
                                 <input
                                   type="checkbox"
