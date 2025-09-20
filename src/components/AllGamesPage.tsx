@@ -180,6 +180,7 @@ const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }
                   <option value="all">All Platforms</option>
                   <option value="PS5">PlayStation 5</option>
                   <option value="PS4">PlayStation 4</option>
+                  <option value="PC">PC</option>
                   <option value="PSVR2">PlayStation VR 2</option>
                 </select>
               </div>
