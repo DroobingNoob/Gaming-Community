@@ -207,16 +207,9 @@ const CartModal: React.FC<CartModalProps> = ({
                           className="w-full aspect-square object-cover"
                         />
                         {discountPercentage > 0 && (
-                          <>
-                            <div className="absolute top-1 right-1 bg-gradient-to-r from-orange-500 to-red-500 text-white px-1.5 py-0.5 rounded-full text-xs font-bold">
-                              -{discountPercentage}%
-                            </div>
-                            {game.edition && game.edition !== 'Standard' && (
-                              <div className="text-xs text-purple-600 font-medium">
-                                {game.edition} Edition
-                              </div>
-                            )}
-                          </>
+                          <div className="absolute top-1 right-1 bg-gradient-to-r from-orange-500 to-red-500 text-white px-1.5 py-0.5 rounded-full text-xs font-bold">
+                            -{discountPercentage}%
+                          </div>
                         )}
                       </div>
                       <div className="p-2 sm:p-3">

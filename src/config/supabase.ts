@@ -9,7 +9,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export interface Game {
   id?: string;
   title: string;
-  edition?: 'Standard' | 'Premium' | 'Ultimate' | 'Deluxe'; // All four editions
+  edition?: 'Standard' | 'Premium'; // Only Standard and Premium editions
   base_game_id?: string; // Links different editions of the same game
   edition_features?: string[]; // Edition-specific features
   image: string;
@@ -101,8 +101,8 @@ export const getGameEditions = (games: Game[], baseGameId: string): Game[] => {
   }
   
   return editions.sort((a, b) => {
-    // Sort by edition: Standard first, then Premium, Ultimate, Deluxe
-    const editionOrder = { 'Standard': 1, 'Premium': 2, 'Ultimate': 3, 'Deluxe': 4 };
+    // Sort by edition: Standard first, then Premium
+    const editionOrder = { 'Standard': 1, 'Premium': 2 };
     const aOrder = editionOrder[a.edition as keyof typeof editionOrder] || 999;
     const bOrder = editionOrder[b.edition as keyof typeof editionOrder] || 999;
     return aOrder - bOrder;
@@ -183,7 +183,7 @@ export const findAllEditionsByGameId = (games: Game[], gameId: string): Game[] =
   const editions = relatedByBaseId.length > sameTitle.length ? relatedByBaseId : sameTitle;
   
   return editions.sort((a, b) => {
-    const editionOrder = { 'Standard': 1, 'Premium': 2, 'Ultimate': 3, 'Deluxe': 4 };
+    const editionOrder = { 'Standard': 1, 'Premium': 2, 'Deluxe': 3 };
     const aOrder = editionOrder[a.edition as keyof typeof editionOrder] || 999;
     const bOrder = editionOrder[b.edition as keyof typeof editionOrder] || 999;
     return aOrder - bOrder;
