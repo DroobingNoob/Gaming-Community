@@ -884,7 +884,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">Available Editions</label>
                           <div className="grid grid-cols-3 gap-2 mb-4">
-                            {['Standard', 'Premium', 'Deluxe','Ultimate'].map((edition) => (
+                            {['Standard', 'Premium', 'Deluxe', 'Ultimate'].map((edition) => (
                               <label key={edition} className="flex items-center space-x-2">
                                 <input
                                   type="checkbox"
