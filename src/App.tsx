@@ -151,7 +151,7 @@ function App() {
         setUser(session.user);
         setIsLoggedIn(true);
         // Check if user is admin (you can customize this logic)
-        setIsAdmin(session.user.email === 'communitygamiing1@gmail.com' || session.user.user_metadata?.role === 'admin');
+        setIsAdmin(session.user.email === 'communitygamiing1@gmail.com' || session.user.email === 'aayushdasgupta0408@gmail.com'||session.user.user_metadata?.role === 'admin');
         
         // Check newsletter eligibility
         checkNewsletterEligibility(session.user);
@@ -176,7 +176,7 @@ function App() {
         setShowNewsletterBanner(false);
         
         // Check if user is admin (you can customize this logic)
-        setIsAdmin(session.user.email === 'communitygamiing1@gmail.com' || session.user.user_metadata?.role === 'admin');
+        setIsAdmin(session.user.email === 'communitygamiing1@gmail.com' || session.user.email === 'aayushdasgupta0408@gmail.com'||session.user.user_metadata?.role === 'admin');
         
         if (event === 'SIGNED_IN' && !hasShownLoginToast.current) {
           toast.success('Successfully signed in!');
