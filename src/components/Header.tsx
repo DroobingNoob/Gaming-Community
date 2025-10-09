@@ -342,7 +342,7 @@ const Header: React.FC<HeaderProps> = ({
               </button>
 
               {/* Platform Filter Dropdown */}
-              <div className="flex-shrink-0 w-[20%] sm:w-auto">
+              <div className="flex-shrink-0 w-[10%] sm:w-auto">
               <select
                 value={platformFilter}
                 onChange={(e) => setPlatformFilter(e.target.value)}
