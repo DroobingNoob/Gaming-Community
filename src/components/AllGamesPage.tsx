@@ -1,23 +1,36 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
 import { useGames } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
+import { useLocation } from 'react-router-dom';
 
 interface AllGamesPageProps {
   onGameClick: (game: Game) => void;
   onBackToHome: () => void;
 }
- 
+
 const AllGamesPage: React.FC<AllGamesPageProps> = ({ onGameClick, onBackToHome }) => {
-  const { games, loading, error } = useGames();
+  const location = useLocation();
+  const { games, loading, error } = useGames({ limit: 1000 });
   const [searchQuery, setSearchQuery] = useState('');
-   const [tempSearchQuery, setTempSearchQuery] = useState('');
+  const [tempSearchQuery, setTempSearchQuery] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [sortBy, setSortBy] = useState('name-asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+
+  // Handle search from header
+  useEffect(() => {
+    if (location.state?.search) {
+      setSearchQuery(location.state.search);
+      setTempSearchQuery(location.state.search);
+    }
+    if (location.state?.platform) {
+      setSelectedPlatform(location.state.platform);
+    }
+  }, [location.state]);
   
   const itemsPerPage = 12;
    

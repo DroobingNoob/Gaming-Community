@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
 import { useSubscriptions } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
+import { useLocation } from 'react-router-dom';
 
 interface SubscriptionsPageProps {
   onGameClick: (game: Game) => void;
@@ -9,13 +10,21 @@ interface SubscriptionsPageProps {
 }
 
 const SubscriptionsPage: React.FC<SubscriptionsPageProps> = ({ onGameClick, onBackToHome }) => {
-  const { subscriptions, loading, error } = useSubscriptions();
+  const location = useLocation();
+  const { subscriptions, loading, error } = useSubscriptions({ limit: 1000 });
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [sortBy, setSortBy] = useState('name-asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+
+  // Handle search from header
+  useEffect(() => {
+    if (location.state?.search) {
+      setSearchQuery(location.state.search);
+    }
+  }, [location.state]);
   
   const itemsPerPage = 12;
 

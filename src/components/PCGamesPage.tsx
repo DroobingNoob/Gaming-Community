@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ArrowLeft, Search, Filter, Grid, List } from 'lucide-react';
 import { useGames } from '../hooks/useSupabaseData';
 import { Game } from '../config/supabase';
+import { useLocation } from 'react-router-dom';
 
 interface PCGamesPageProps {
   onGameClick: (game: Game) => void;
@@ -9,6 +10,7 @@ interface PCGamesPageProps {
 }
 
 const PCGamesPage: React.FC<PCGamesPageProps> = ({ onGameClick, onBackToHome }) => {
+  const location = useLocation();
   const { games, loading, error } = useGames({ limit: 1000, priceRange: [0, 100000] });
   const [searchQuery, setSearchQuery] = useState('');
   const [tempSearchQuery, setTempSearchQuery] = useState('');
@@ -17,6 +19,14 @@ const PCGamesPage: React.FC<PCGamesPageProps> = ({ onGameClick, onBackToHome }) 
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+
+  // Handle search from header
+  useEffect(() => {
+    if (location.state?.search) {
+      setSearchQuery(location.state.search);
+      setTempSearchQuery(location.state.search);
+    }
+  }, [location.state]);
 
   const itemsPerPage = 12;
 

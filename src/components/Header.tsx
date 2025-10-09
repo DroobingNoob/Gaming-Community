@@ -32,10 +32,11 @@ const Header: React.FC<HeaderProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [searchSuggestions, setSearchSuggestions] = useState<Game[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [platformFilter, setPlatformFilter] = useState<string>('all');
 
   const { games } = useGames({ limit: 1000 });
   const { subscriptions } = useSubscriptions({ limit: 100 }); // Limit search suggestions
- 
+
   // Combine games and subscriptions for search
   const allItems = [...(games || []), ...(subscriptions || [])];
 
@@ -47,16 +48,28 @@ const Header: React.FC<HeaderProps> = ({
 
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
-      const filtered = allItems.filter(item =>
+      let filtered = allItems.filter(item =>
         item.title.toLowerCase().includes(searchQuery.toLowerCase())
-      ); // Limit to 5 suggestions
+      );
+
+      // Apply platform filter
+      if (platformFilter !== 'all') {
+        if (platformFilter === 'subscription') {
+          filtered = filtered.filter(item => item.category === 'subscription');
+        } else {
+          filtered = filtered.filter(item =>
+            item.category === 'game' && item.platform.includes(platformFilter)
+          );
+        }
+      }
+
       setSearchSuggestions(filtered);
       setShowSuggestions(true);
     } else {
       setSearchSuggestions([]);
       setShowSuggestions(false);
     }
-  }, [searchQuery, allItems]);
+  }, [searchQuery, platformFilter, allItems]);
 
   const handleSearchClick = () => {
     setIsSearchExpanded(true);
@@ -83,8 +96,14 @@ const Header: React.FC<HeaderProps> = ({
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      // Navigate to all games page with search query
-       navigate('/games', { state: { search: searchQuery.trim() } }); 
+      // Navigate based on platform filter
+      if (platformFilter === 'subscription') {
+        navigate('/subscriptions', { state: { search: searchQuery.trim() } });
+      } else if (platformFilter === 'PC') {
+        navigate('/pc-games', { state: { search: searchQuery.trim() } });
+      } else {
+        navigate('/games', { state: { search: searchQuery.trim(), platform: platformFilter } });
+      }
       setIsSearchExpanded(false);
     }
   };
@@ -321,6 +340,20 @@ const Header: React.FC<HeaderProps> = ({
               >
                 <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
+
+              {/* Platform Filter Dropdown */}
+              <select
+                value={platformFilter}
+                onChange={(e) => setPlatformFilter(e.target.value)}
+                className="px-3 py-2 sm:py-3 border-2 border-cyan-400 rounded-full focus:outline-none focus:border-orange-400 transition-colors text-sm sm:text-base bg-white"
+              >
+                <option value="all">All</option>
+                <option value="PS5">PS5</option>
+                <option value="PS4">PS4</option>
+                <option value="PC">PC</option>
+                <option value="subscription">Subscriptions</option>
+              </select>
+
               <div className="flex-1 relative">
                 <input
                   type="text"
