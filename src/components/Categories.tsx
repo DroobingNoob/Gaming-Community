@@ -86,7 +86,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
                   
                   <div className="inline-flex items-center space-x-2 bg-white/70 backdrop-blur-sm rounded-full px-4 sm:px-6 py-2 sm:py-3 shadow-lg">
                     <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
-                      {category.gameCount} Games
+                     {category.gameCount}  {category.name !=="subscription" ? Games : Subscriptions}
                     </span>
                   </div> 
                 </div>
