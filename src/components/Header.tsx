@@ -332,77 +332,87 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         ) : (
           /* Expanded Search */
-          <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <button
-                onClick={handleSearchClose}
-                className="text-cyan-600 hover:text-orange-500 transition-colors p-1"
-              >
-                <X className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
+          /* Expanded Search */
+<div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+  <div className="flex items-center justify-between gap-2 sm:gap-4">
+    {/* Close Button */}
+    <button
+      onClick={handleSearchClose}
+      className="text-cyan-600 hover:text-orange-500 transition-colors p-1"
+    >
+      <X className="w-5 h-5 sm:w-6 sm:h-6" />
+    </button>
 
-              {/* Platform Filter Dropdown */}
-              <div className="flex-shrink-0 w-[10%] sm:w-auto">
-              <select
-                value={platformFilter}
-                onChange={(e) => setPlatformFilter(e.target.value)}
-                className="px-3 py-2 sm:py-3 border-2 border-cyan-400 rounded-full focus:outline-none focus:border-orange-400 transition-colors text-sm sm:text-base bg-white"
-              >
-                <option value="all">All</option>
-                <option value="PS5">PS5</option>
-                <option value="PS4">PS4</option>
-                <option value="PC">PC</option>
-                <option value="subscription">Subscriptions</option>
-              </select>
-                 </div>
+    {/* Platform Filter Dropdown */}
+    <div className="w-1/4 sm:w-1/6">
+      <select
+        value={platformFilter}
+        onChange={(e) => setPlatformFilter(e.target.value)}
+        className="w-full px-3 py-2 border-2 border-cyan-400 rounded-full focus:outline-none focus:border-orange-400 transition-colors text-sm sm:text-base bg-white"
+      >
+        <option value="all">All</option>
+        <option value="PS5">PS5</option>
+        <option value="PS4">PS4</option>
+        <option value="PC">PC</option>
+        <option value="subscription">Subs</option>
+      </select>
+    </div>
 
-              <div className="flex-1 relative w-[68%]">
-                <input
-                  type="text"
-                  placeholder="Search for games..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  className="w-full pl-8 sm:pl-10 pr-4 py-2 sm:py-3 border-2 border-cyan-400 rounded-full focus:outline-none focus:border-orange-400 transition-colors text-sm sm:text-lg"
-                  autoFocus
-                />
-                <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-4 h-4 sm:w-5 sm:h-5" />
-                
-                {/* Search Suggestions */}
-                {showSuggestions && searchSuggestions.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 z-50 max-h-64 overflow-y-auto">
-                    {searchSuggestions.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => handleSuggestionClick(item)}
-                        className="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors text-left"
-                      >
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="w-10 h-10 object-cover rounded"
-                        />
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-800">{item.title}</div>
-                          <div className="text-sm text-gray-500">
-                            ₹{item.category === 'game' ? item.rent_1_month || item.original_price : item.sale_price} • {item.platform.join(', ')}
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div className="w-[10%]">
-              <button 
-                onClick={handleSearch}
-                className="bg-cyan-400 hover:bg-orange-500 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-base"
-              >
-                Search
-              </button>
+    {/* Search Input */}
+    <div className="relative flex-1">
+      <input
+        type="text"
+        placeholder="Search for games..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+        className="w-full pl-8 pr-4 py-2 border-2 border-cyan-400 rounded-full focus:outline-none focus:border-orange-400 transition-colors text-sm sm:text-lg"
+        autoFocus
+      />
+      <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-400 w-4 h-4 sm:w-5 sm:h-5" />
+
+      {/* Search Suggestions */}
+      {showSuggestions && searchSuggestions.length > 0 && (
+        <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 z-50 max-h-64 overflow-y-auto">
+          {searchSuggestions.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleSuggestionClick(item)}
+              className="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors text-left"
+            >
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-10 h-10 object-cover rounded"
+              />
+              <div className="flex-1">
+                <div className="font-medium text-gray-800">{item.title}</div>
+                <div className="text-sm text-gray-500">
+                  ₹
+                  {item.category === 'game'
+                    ? item.rent_1_month || item.original_price
+                    : item.sale_price}{' '}
+                  • {item.platform.join(', ')}
                 </div>
-            </div>
-          </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+
+    {/* Search Button */}
+    <div className="w-auto">
+      <button
+        onClick={handleSearch}
+        className="bg-cyan-400 hover:bg-orange-500 text-white px-4 sm:px-6 py-2 rounded-full font-medium transition-colors text-sm sm:text-base whitespace-nowrap"
+      >
+        Search
+      </button>
+    </div>
+  </div>
+</div>
+
         )}
       </header>
 
