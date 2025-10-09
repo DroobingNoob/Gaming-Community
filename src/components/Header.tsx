@@ -342,6 +342,7 @@ const Header: React.FC<HeaderProps> = ({
               </button>
 
               {/* Platform Filter Dropdown */}
+              <div className="flex-shrink-0 w-[32%] sm:w-auto">
               <select
                 value={platformFilter}
                 onChange={(e) => setPlatformFilter(e.target.value)}
@@ -353,8 +354,9 @@ const Header: React.FC<HeaderProps> = ({
                 <option value="PC">PC</option>
                 <option value="subscription">Subscriptions</option>
               </select>
+                 </div>
 
-              <div className="flex-1 relative">
+              <div className="flex-1 relative w-[68%]">
                 <input
                   type="text"
                   placeholder="Search for games..."
