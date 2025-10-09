@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlayCircle, Crown } from 'lucide-react';
+import { PlayCircle, Crown, Monitor } from 'lucide-react';
 
 interface CategoriesProps {
   onViewAllGames: () => void;
@@ -17,12 +17,21 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
       icon: <PlayCircle className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />,
       description: "Click to Browse PS4, PS5 & PC Games",
       image: "https://images.pexels.com/photos/2106216/pexels-photo-2106216.jpeg?auto=compress&cs=tinysrgb&w=400&h=300",
-      
+
       gameCount: "500+",
       onClick: () => navigate('/games')
     },
     {
       id: 2,
+      name: "PC Games",
+      icon: <Monitor className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />,
+      description: "Click to Browse PC Games",
+      image: "https://images.pexels.com/photos/1337247/pexels-photo-1337247.jpeg?auto=compress&cs=tinysrgb&w=400&h=300",
+      gameCount: "200+",
+      onClick: () => navigate('/pc-games')
+    },
+    {
+      id: 3,
       name: "Subscriptions",
       icon: <Crown className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />,
       description: "Click to Browse Subscriptions",
@@ -44,7 +53,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto">
           {categories.map((category) => (
             <div
               key={category.id}

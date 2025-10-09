@@ -16,6 +16,7 @@ import FloatingCartButton from './components/FloatingCartButton';
 // Page Components
 import HomePage from './pages/HomePage';
 import GamesPage from './pages/GamesPage';
+import PCGamesPage from './pages/PCGamesPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import ProductPage from './pages/ProductPage';
 import AdminPage from './pages/AdminPage';
@@ -537,6 +538,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage onNavigation={handleNavigation} />} />
             <Route path="/games" element={<GamesPage />} />
+            <Route path="/pc-games" element={<PCGamesPage />} />
             <Route path="/games/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
             <Route path="/subscriptions" element={<SubscriptionsPage />} />
             <Route path="/subscriptions/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
