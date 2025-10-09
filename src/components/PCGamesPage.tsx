@@ -9,10 +9,10 @@ interface PCGamesPageProps {
 }
 
 const PCGamesPage: React.FC<PCGamesPageProps> = ({ onGameClick, onBackToHome }) => {
-  const { games, loading, error } = useGames();
+  const { games, loading, error } = useGames({ limit: 1000, priceRange: [0, 100000] });
   const [searchQuery, setSearchQuery] = useState('');
   const [tempSearchQuery, setTempSearchQuery] = useState('');
-  const [priceRange, setPriceRange] = useState([0, 10000]);
+  const [priceRange, setPriceRange] = useState([0, 100000]);
   const [sortBy, setSortBy] = useState('name-asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -22,7 +22,11 @@ const PCGamesPage: React.FC<PCGamesPageProps> = ({ onGameClick, onBackToHome }) 
 
   // Filter PC games only
   const pcGames = useMemo(() => {
-    return games.filter(game => game.platform.includes('PC'));
+    const filtered = games.filter(game => game.platform.includes('PC'));
+    console.log('Total games loaded:', games.length);
+    console.log('PC games filtered:', filtered.length);
+    console.log('PC games:', filtered);
+    return filtered;
   }, [games]);
 
   // Filter and sort PC games
@@ -181,7 +185,7 @@ const PCGamesPage: React.FC<PCGamesPageProps> = ({ onGameClick, onBackToHome }) 
                   <input
                     type="range"
                     min="0"
-                    max="10000"
+                    max="100000"
                     value={priceRange[0]}
                     onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
                     className="w-full"
@@ -189,7 +193,7 @@ const PCGamesPage: React.FC<PCGamesPageProps> = ({ onGameClick, onBackToHome }) 
                   <input
                     type="range"
                     min="0"
-                    max="10000"
+                    max="100000"
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
                     className="w-full"
