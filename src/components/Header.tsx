@@ -393,7 +393,7 @@ const Header: React.FC<HeaderProps> = ({
                   </div>
                 )}
               </div>
-              <div w-[10]>
+              <div w-[10%]>
               <button 
                 onClick={handleSearch}
                 className="bg-cyan-400 hover:bg-orange-500 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-base"
