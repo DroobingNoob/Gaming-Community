@@ -71,7 +71,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
                 </div>
                 
                 {/* Content */}
-                <div className="relative p-6 sm:p-8 md:p-12 text-center">
+                {/* <div className="relative p-6 sm:p-8 md:p-12 text-center">
                   <div className="text-cyan-500 group-hover:text-orange-500 transition-colors duration-300 mb-4 sm:mb-6 flex justify-center bg-gradient-to-r from-cyan-100 to-blue-100 group-hover:from-orange-100 group-hover:to-red-100 w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full items-center mx-auto">
                     {category.icon}
                   </div>
@@ -89,7 +89,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
                      {category.gameCount}  {category.name !=="Subscriptions" ? "Games" : "Subscriptions"}
                     </span>
                   </div> 
-                </div>
+                </div> */} 
 
                 {/* Hover Effect Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-cyan-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl sm:rounded-2xl" />
