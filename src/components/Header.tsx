@@ -407,7 +407,7 @@ const Header: React.FC<HeaderProps> = ({
         onClick={handleSearch}
         className="bg-cyan-400 hover:bg-orange-500 text-white px-4 sm:px-6 py-2 rounded-full font-medium transition-colors text-sm sm:text-base whitespace-nowrap"
       >
-         <Search className="w-5 h-5 sm:w-6 sm:h-6" />
+         <Search className="w-3 h-3 sm:w-6 sm:h-6" />
       </button>
     </div>
   </div>
