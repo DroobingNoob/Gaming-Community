@@ -354,7 +354,7 @@ const Header: React.FC<HeaderProps> = ({
         <option value="PS5">PS5</option>
         <option value="PS4">PS4</option>
         <option value="PC">PC</option>
-        <option value="subscription">Subscription</option>
+        <option value="subscription">Subs</option>
       </select>
     </div>
 
