@@ -60,12 +60,13 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigation }) => {
       />
       <TrustIndicators />
       <Vouches />
+       <div id="categories">
+        <Categories onViewAllGames={handleViewAllGames} onViewSubscriptions={handleViewSubscriptions} />
+      </div>
       <div id="bestsellers">
         <BestSellers onGameClick={handleGameClick} />
       </div>
-      <div id="categories">
-        <Categories onViewAllGames={handleViewAllGames} onViewSubscriptions={handleViewSubscriptions} />
-      </div>
+     
     </>
   );
 };
