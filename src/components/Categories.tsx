@@ -118,7 +118,11 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
             <div
               key={category.id}
               onClick={category.onClick}
-              className="group cursor-pointer relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border-2 border-[#7DF9FF]"
+              className=" group relative overflow-hidden rounded-xl sm:rounded-2xl 
+    shadow-md hover:shadow-cyan-400/40 border-2 border-transparent 
+    hover:border-cyan-400 cursor-pointer 
+    transform hover:-translate-y-2 active:scale-95 
+    transition-all duration-300 ease-out"
             >
               <img
                 src={category.image}
