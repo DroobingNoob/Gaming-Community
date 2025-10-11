@@ -26,7 +26,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
       name: "PC Games",
       icon: <Monitor className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />,
       description: "Click to Browse PC Games",
-      image: "https://images.pexels.com/photos/1337247/pexels-photo-1337247.jpeg?auto=compress&cs=tinysrgb&w=400&h=300",
+      image: "https://res.cloudinary.com/dcodirzsc/image/upload/v1760146508/Windows_kkerxv.jpg",
       gameCount: "200+",
       onClick: () => navigate('/pc-games')
     },
