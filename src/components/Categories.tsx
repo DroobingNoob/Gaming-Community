@@ -134,11 +134,11 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
               {/* Hover overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent 
     opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
-     
-  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-lg sm:text-xl font-semibold tracking-wide opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-lg sm:text-xl font-semibold tracking-wide opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">
     {category.name}
   </div>
+     
+  
           ))}
         </div>
       </div>
