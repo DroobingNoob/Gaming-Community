@@ -35,7 +35,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
       name: "Subscriptions",
       icon: <Crown className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />,
       description: "Click to Browse Subscriptions",
-      image: "https://images.pexels.com/photos/2007647/pexels-photo-2007647.jpeg?auto=compress&cs=tinysrgb&w=400&h=300",
+      image: "https://res.cloudinary.com/dcodirzsc/image/upload/v1760146504/OTT_kvcbso.jpg",
       gameCount: "10+",
       onClick: () => navigate('/subscriptions')
     }
