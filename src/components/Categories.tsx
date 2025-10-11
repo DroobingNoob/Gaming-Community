@@ -122,7 +122,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
     shadow-md hover:shadow-cyan-400/40 border-2 border-transparent 
     hover:border-cyan-400 cursor-pointer 
     transform hover:-translate-y-2 active:scale-95 
-    transition-all duration-300 ease-out border border-black"
+    transition-all duration-300 ease-out"
             >
               <img
                 src={category.image}
