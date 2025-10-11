@@ -113,7 +113,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
         </div>
 
         {/* Image Cards Only */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto border border-black">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto">
           {categories.map((category) => (
             <div
               key={category.id}
@@ -122,7 +122,7 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
     shadow-md hover:shadow-cyan-400/40 border-2 border-transparent 
     hover:border-cyan-400 cursor-pointer 
     transform hover:-translate-y-2 active:scale-95 
-    transition-all duration-300 ease-out"
+    transition-all duration-300 ease-out border border-black"
             >
               <img
                 src={category.image}
