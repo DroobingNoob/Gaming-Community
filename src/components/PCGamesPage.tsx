@@ -43,7 +43,8 @@ const PCGamesPage: React.FC<PCGamesPageProps> = ({ onGameClick, onBackToHome }) 
   const filteredAndSortedGames = useMemo(() => {
     let filtered = pcGames.filter(game => {
       const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesPrice = game.sale_price >= priceRange[0] && game.sale_price <= priceRange[1];
+      const price = game.permanent_offline_price || 0;
+      const matchesPrice = price >= priceRange[0] && price <= priceRange[1];
 
       return matchesSearch && matchesPrice;
     });
@@ -56,9 +57,9 @@ const PCGamesPage: React.FC<PCGamesPageProps> = ({ onGameClick, onBackToHome }) 
         case 'name-desc':
           return b.title.localeCompare(a.title);
         case 'price-low':
-          return a.sale_price - b.sale_price;
+          return (a.permanent_offline_price || 0) - (b.permanent_offline_price || 0);
         case 'price-high':
-          return b.sale_price - a.sale_price;
+          return (b.permanent_offline_price || 0) - (a.permanent_offline_price || 0);
         default:
           return 0;
       }

@@ -118,7 +118,6 @@ export const gamesService = {
 
       if (searchQuery) query = query.ilike('title', `%${searchQuery}%`);
       if (platform !== 'all') query = query.contains('platform', [platform]);
-      query = query.gte('rent_1_month', priceRange[0]).lte('rent_1_month', priceRange[1]);
 
       switch (sortBy) {
         case 'name-asc': query = query.order('title', { ascending: true }); break;
