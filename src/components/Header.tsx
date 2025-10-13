@@ -344,7 +344,7 @@ const Header: React.FC<HeaderProps> = ({
     </button>
 
     {/* Platform Filter Dropdown */}
-    <div className="w-[8%] sm:w-1/6">
+    <div className="w-3/8 sm:w-1/6">
       <select
         value={platformFilter}
         onChange={(e) => setPlatformFilter(e.target.value)}
@@ -359,7 +359,7 @@ const Header: React.FC<HeaderProps> = ({
     </div>
 
     {/* Search Input */}
-    <div className="relative flex-1 w-[92%] sm:flex-1">
+    <div className="relative flex-1 w-[92%] sm:flex-1"> 
       <input
         type="text"
         placeholder="Search for games..."
