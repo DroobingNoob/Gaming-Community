@@ -359,7 +359,7 @@ const Header: React.FC<HeaderProps> = ({
     </div>
 
     {/* Search Input */}
-    <div className="relative flex-1 w-[100%] sm:flex-1"> 
+    <div className="relative flex-1 w-[100%] sm:flex-1">  
       <input
         type="text"
         placeholder="Search for games..."
