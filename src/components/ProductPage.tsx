@@ -29,7 +29,12 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [activeAccordion, setActiveAccordion] = useState<string | null>('details');
   const [isImageSticky, setIsImageSticky] = useState(true);
   const [selectedPlatform, setSelectedPlatform] = useState(product.platform[0] || 'PS5');
-  const [selectedType, setSelectedType] = useState(product.type[0] || 'Rent');
+
+  // Check if game is PC-only (has permanent_offline_price but no rent_1_month)
+  const isPCGame = product.permanent_offline_price && !product.rent_1_month;
+  const defaultType = isPCGame ? 'Permanent Offline' : (product.type[0] || 'Rent');
+
+  const [selectedType, setSelectedType] = useState(defaultType);
   const [selectedRentDuration, setSelectedRentDuration] = useState<'1_month' | '2_months' | '3_months' | '6_months'>('1_month');
 
   // Get related products from database
@@ -113,13 +118,13 @@ const ProductPage: React.FC<ProductPageProps> = ({
         '3_months': product.rent_3_months || 0,
         '6_months': product.rent_6_months || 0
       };
-      return rentPrices[selectedRentDuration];
+      return rentPrices[selectedRentDuration] || 0;
     } else if (selectedType === 'Permanent Offline') {
-      return product.permanent_offline_price || product.sale_price;
+      return product.permanent_offline_price || product.sale_price || 0;
     } else if (selectedType === 'Permanent Offline + Online') {
-      return product.permanent_online_price || product.sale_price;
+      return product.permanent_online_price || product.sale_price || 0;
     }
-    return product.sale_price;
+    return product.sale_price || 0;
   };
 
   const getTypeDescription = () => {
@@ -271,19 +276,25 @@ This option is best suited for single-player games or customers who prefer offli
                   <div className="mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-3">Type</label>
                     <div className="space-y-3">
-                      {product.type.map((type) => (
-                        <button
-                          key={type}
-                          onClick={() => setSelectedType(type)}
-                          className={`w-full px-6 py-3 rounded-xl font-medium transition-all duration-300 text-left ${
-                            selectedType === type
-                              ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          {type}
-                        </button>
-                      ))}
+                      {product.type
+                        .filter(type => {
+                          // Filter out Rent option if no rental prices are available (PC games)
+                          if (type === 'Rent' && !product.rent_1_month) return false;
+                          return true;
+                        })
+                        .map((type) => (
+                          <button
+                            key={type}
+                            onClick={() => setSelectedType(type)}
+                            className={`w-full px-6 py-3 rounded-xl font-medium transition-all duration-300 text-left ${
+                              selectedType === type
+                                ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            {type}
+                          </button>
+                        ))}
                     </div>
                   </div>
                 )}

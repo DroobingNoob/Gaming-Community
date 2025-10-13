@@ -67,8 +67,13 @@ export const getGameDisplayPrice = (game: Game, selectedType: string, selectedRe
   } else if (selectedType === 'Permanent Offline + Online') {
     return game.permanent_online_price || game.original_price;
   }
-  
-  // Default to 1 month rent price for games
+
+  // Default: Check if PC game (has permanent_offline_price but no rent_1_month)
+  if (game.permanent_offline_price && !game.rent_1_month) {
+    return game.permanent_offline_price;
+  }
+
+  // Otherwise default to 1 month rent price for games
   return game.rent_1_month || game.original_price;
 };
 
