@@ -333,7 +333,7 @@ const Header: React.FC<HeaderProps> = ({
         ) : (
           /* Expanded Search */
           /* Expanded Search */
-<div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
+<div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
   <div className="flex items-center justify-between gap-1 sm:gap-4">
     {/* Close Button */}
     <button
