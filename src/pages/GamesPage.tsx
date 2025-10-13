@@ -229,7 +229,7 @@ const GamesPage: React.FC = () => {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-sm"
                 >
-                  <option value="name-asc">Name (A-Z)</option>
+                  <option value="name-asc">Name (A-Z)</option> 
                   <option value="name-desc">Name (Z-A)</option>
                   <option value="price-low">Price (Low to High)</option>
                   <option value="price-high">Price (High to Low)</option>
