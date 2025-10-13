@@ -143,16 +143,23 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
                     itemsPerSlide === 2 ? 'grid-cols-2' : 
                     'grid-cols-3'
                   }`}>
-                    {bestsellers 
-                      .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide) 
+                    {bestsellers
+                      .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide)
                       .map((game) => {
-                        // For games, show 1 month rent price by default, for subscriptions show sale_price
-                        const displayPrice = game.category === 'game' 
-                          ? getGameDisplayPrice(game, 'Rent', '1_month')
+                        // Check if PC game (has permanent_offline_price but no rent_1_month)
+                        const isPCGame = game.permanent_offline_price && !game.rent_1_month;
+
+                        // For PC games, show permanent_offline_price; for other games show 1 month rent; for subscriptions show sale_price
+                        const displayPrice = game.category === 'game'
+                          ? (isPCGame
+                              ? getGameDisplayPrice(game, 'Permanent Offline')
+                              : getGameDisplayPrice(game, 'Rent', '1_month'))
                           : game.sale_price;
-                        
+
                         const discountPercentage = game.category === 'game'
-                          ? getGameDiscountPercentage(game, 'Rent', '1_month')
+                          ? (isPCGame
+                              ? getGameDiscountPercentage(game, 'Permanent Offline')
+                              : getGameDiscountPercentage(game, 'Rent', '1_month'))
                           : game.discount;
 
                         return (
