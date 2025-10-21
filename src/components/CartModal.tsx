@@ -155,7 +155,7 @@ const CartModal: React.FC<CartModalProps> = ({
                    with coupon <span className="font-bold">FESTIVALOFF</span>!
                 </div>
               )}
-              {total >= 1299 && total < 3000 && (
+              {total >= 799 && total < 3000 && (
                 <div className="bg-gradient-to-r from-orange-100 to-yellow-100 border border-orange-300 text-orange-900 rounded-xl p-3 sm:p-4 shadow-md text-sm sm:text-base font-medium text-center">
                   🎁 Almost there! Shop for just ₹{(3000 - total).toFixed(0)} more 
                   and unlock a <span className="font-bold text-orange-700">Mystery Free Game</span> 🎮
