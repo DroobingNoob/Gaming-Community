@@ -48,7 +48,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   let discountAmount = 0;
   // if (hasNewsletterDiscount && appliedCoupon === 'NEWSLETTER10') {
   //   discountAmount = subtotal * 0.1; // 10% discount
-  // } else 
+  // } else  
     if (appliedCoupon === 'MYSTERYBOX' && mysteryBoxEligible) {
     // Mystery box is free, no monetary discount but eligible for free game
   } else if (appliedCoupon === 'FESTIVALOFF' && subtotal>=799) {
