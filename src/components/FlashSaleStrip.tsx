@@ -29,7 +29,7 @@ const FlashSaleStrip: React.FC = () => {
   const format = (n: number) => n.toString().padStart(2, "0");
 
   const handleCopyCoupon = () => {
-    navigator.clipboard.writeText("PLAY100");
+    navigator.clipboard.writeText("FESTIVALOFF");
     setCopiedCoupon(true);
     setTimeout(() => setCopiedCoupon(false), 2000);
   };
@@ -55,7 +55,7 @@ const FlashSaleStrip: React.FC = () => {
             >
               <Zap className="w-5 h-5 text-yellow-300 animate-pulse" />
               <span className="font-extrabold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-white animate-pulse">
-                🔥 FLASH SALE: ₹100 OFF
+                🔥 FLASH SALE:10% OFF UPTO 150
               </span>
             </motion.div>
 
@@ -83,7 +83,7 @@ const FlashSaleStrip: React.FC = () => {
               transition={{ repeat: Infinity, duration: 2 }}
               className="flex items-center gap-2 border-2 border-dashed border-yellow-300 rounded-full px-4 py-1 hover:bg-yellow-300 hover:text-red-600 transition-colors"
             >
-              <span className="font-mono text-xs sm:text-sm">PLAY100</span>
+              <span className="font-mono text-xs sm:text-sm">FESTIVALOFF</span>
               {copiedCoupon ? (
                 <Check className="w-4 h-4 text-green-400" />
               ) : (
