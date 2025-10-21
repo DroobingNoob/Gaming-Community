@@ -118,7 +118,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         else {
           setCouponDiscount(150);
         }
-      toast.success('Flash Sale discount applied! ₹100 off');
+      toast.success('Flash Sale discount applied! ₹10% off');
     } else {
       setCouponDiscount(0);
       toast.error('Invalid coupon code or not eligible');
