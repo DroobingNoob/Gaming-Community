@@ -151,8 +151,8 @@ const CartModal: React.FC<CartModalProps> = ({
               {total < 1299 && (
                 <div className="bg-gradient-to-r from-cyan-100 to-blue-100 border border-cyan-300 text-cyan-900 rounded-xl p-3 sm:p-4 shadow-md text-sm sm:text-base font-medium text-center">
                   💡 Pro Tip: Add products worth ₹{(799 - total).toFixed(0)} more and get 
-                  <span className="font-bold text-cyan-700"> 10% OFF UPTO ₹150</span> 
-                  with coupon <span className="font-bold">FESTIVALOFF</span>!
+                  <span className="font-bold text-cyan-700"> 10% OFF UPTO ₹150 </span> 
+                   with coupon <span className="font-bold">FESTIVALOFF</span>!
                 </div>
               )}
               {total >= 1299 && total < 3000 && (
