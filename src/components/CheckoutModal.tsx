@@ -407,7 +407,9 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
     <div className="space-y-6">
       <div className="text-center mb-6">
         <h3 className="text-xl font-bold text-gray-800 mb-2">Complete Your Payment</h3>
-        <p className="text-gray-600">Scan the QR code or use the UPI ID to pay</p>
+        <p className="text-gray-600">Scan the QR code   {" "}
+          {/* or use the UPI ID  */}
+          to pay</p>
       </div>
 
       {/* Order Code Display */}
