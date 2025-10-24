@@ -449,9 +449,9 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
     <div className="space-y-3 text-sm text-green-700">
       <div className="flex items-start space-x-3">
         <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
-        <span>Scan the QR code below 
+        <span>Scan the QR code below  
           {/* or use the UPI ID  */} 
-          to make payment</span>
+           to make payment</span>
       </div>
       <div className="flex items-start space-x-3">
         <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
