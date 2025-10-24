@@ -511,7 +511,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
         </div>
 
         {/* UPI ID */}
-        <div className="text-center">
+        {/* <div className="text-center">
           <h4 className="font-bold text-gray-800 mb-4">Or Use UPI ID</h4>
           <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
             <div className="space-y-4">
@@ -523,10 +523,10 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                     onClick={() => copyToClipboard('9069043750@Yes', 'upiId')}
                     className="text-blue-500 hover:text-blue-700 transition-colors"
                   >
-                    {copiedUpiId ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                    {copiedUpiId ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />} 
                   </button>
                 </div>
-              </div>
+              </div> */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
                 <div className="bg-gray-50 rounded-lg p-3">
