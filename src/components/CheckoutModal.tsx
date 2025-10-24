@@ -510,8 +510,8 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
           </div>
         </div>
  
-        {/* UPI ID */}
-        <div className="text-center">
+        {/* UPI ID */} 
+        {/* <div className="text-center">
           <h4 className="font-bold text-gray-800 mb-4">Or Use UPI ID</h4>
           <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
             <div className="space-y-4">
@@ -541,7 +541,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div> 
 
       {/* Important Note */}
