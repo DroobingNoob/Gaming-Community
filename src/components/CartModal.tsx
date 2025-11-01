@@ -148,7 +148,7 @@ const CartModal: React.FC<CartModalProps> = ({
           {cartItems.length > 0 && (
             <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-blue-50">
                 {/* Pro Tip Banner */}
-              {total < 799 && (
+              {/* {total < 799 && (
                 <div className="bg-gradient-to-r from-cyan-100 to-blue-100 border border-cyan-300 text-cyan-900 rounded-xl p-3 sm:p-4 shadow-md text-sm sm:text-base font-medium text-center">
                   💡 Pro Tip: Add products worth ₹{(799 - total).toFixed(0)} more and get 
                   <span className="font-bold text-cyan-700"> 10% OFF UPTO ₹150 </span> 
@@ -160,7 +160,7 @@ const CartModal: React.FC<CartModalProps> = ({
                   🎁 Almost there! Shop for just ₹{(3000 - total).toFixed(0)} more 
                   and unlock a <span className="font-bold text-orange-700">Mystery Free Game</span> 🎮
                 </div>
-              )}
+              )} */} 
  
               <div className="flex justify-between items-center mb-3 sm:mb-4">
                 <span className="text-lg sm:text-xl font-bold text-gray-800">Total:</span>
