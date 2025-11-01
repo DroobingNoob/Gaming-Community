@@ -507,14 +507,14 @@ function App() {
       toast.error('Failed to remove item. Please try again.');
     }
   };
-
+ 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
         {/* Flash Sale Strip - At the very top with highest z-index */}
-        <FlashSaleStrip />
+        {/* <FlashSaleStrip /> */}
 
         {/* Newsletter Banner - Show for non-logged-in users or logged-in users without newsletter discount */}
         {/* {(showNewsletterBanner || (isLoggedIn && !user?.user_metadata?.newsletter_subscribed)) && (
