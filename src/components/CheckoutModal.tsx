@@ -324,7 +324,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
           Use
         </button> 
               </div>
-            )} */}  
+            )} */} 
             {/* {mysteryBoxEligible && (
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                 <div className="flex items-center space-x-2">
@@ -338,8 +338,8 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
           Use
         </button> 
               </div>
-            )}
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+            )} */}
+            {/* <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
               <div className="flex items-center space-x-2">
                 <Gift className="w-4 h-4 text-orange-500" />
                 <span className="text-orange-800 font-medium text-sm">FESTIVALOFF - 10% off UPTO 150 (Min ₹799)</span>
@@ -350,8 +350,8 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
         disabled={total.toFixed(2)<799}
       >
         Use
-      </button>  ) : (<span>Not Eligible</span>)} */}
-            </div>
+      </button>  ) : (<span>Not Eligible</span>)}
+            </div> */} 
           </div>
         </div>
       </div>
