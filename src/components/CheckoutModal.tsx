@@ -291,7 +291,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
         </div>
 
         {/* Coupon Code */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">Coupon Code (Optional)</label>
           <div className="flex space-x-2">
             <input
@@ -307,7 +307,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             >
               Apply
             </button>
-          </div>
+          </div> */} 
           
           {/* Available Coupons */}
           <div className="mt-3 space-y-2">
