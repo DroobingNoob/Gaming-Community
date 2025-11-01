@@ -324,8 +324,8 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
           Use
         </button> 
               </div>
-            )} */} 
-            {mysteryBoxEligible && (
+            )} */}  
+            {/* {mysteryBoxEligible && (
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                 <div className="flex items-center space-x-2">
                   <Gift className="w-4 h-4 text-purple-500" />
@@ -350,7 +350,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
         disabled={total.toFixed(2)<799}
       >
         Use
-      </button>  ) : (<span>Not Eligible</span>)}
+      </button>  ) : (<span>Not Eligible</span>)} */}
             </div>
           </div>
         </div>
