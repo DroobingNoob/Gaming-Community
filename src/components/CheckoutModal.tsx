@@ -325,7 +325,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
         </button> 
               </div>
             )} */} 
-            {mysteryBoxEligible && (
+            {/* {mysteryBoxEligible && (
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
                 <div className="flex items-center space-x-2">
                   <Gift className="w-4 h-4 text-purple-500" />
@@ -353,8 +353,8 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
       </button>  ) : (<span>Not Eligible</span>)}
             </div>
           </div>
-        </div>
-      </div>
+        </div> 
+      </div> */}
 
       {/* Order Summary */}
       <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200">
