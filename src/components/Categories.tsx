@@ -30,12 +30,12 @@ const Categories: React.FC<CategoriesProps> = ({ onViewAllGames, onViewSubscript
       gameCount: "200+",
       onClick: () => navigate('/pc-games')
     },
-    {
+    { 
       id: 3,
       name: "Subscriptions",
       icon: <Crown className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />,
       description: "Click to Browse Subscriptions",
-      image: "https://res.cloudinary.com/dcodirzsc/image/upload/v1760146504/OTT_kvcbso.jpg",
+      image: "https://res.cloudinary.com/dcodirzsc/image/upload/v1762136186/IMG-20251102-WA0003_fhqhji.jpg",
       gameCount: "10+",
       onClick: () => navigate('/subscriptions')
     }
