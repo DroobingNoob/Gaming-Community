@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, Upload, X, Check, AlertCircle, Search } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, X, Check, AlertCircle, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAllGames, useGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
 import { gamesService, subscriptionsService, testimonialsService } from '../services/supabaseService';
@@ -33,8 +33,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const [testimonialsCurrentPage, setTestimonialsCurrentPage] = useState(1);
   
   const itemsPerPage = 9;
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
   // Form state for games/subscriptions
   const [formData, setFormData] = useState<Partial<Game>>({
@@ -270,43 +268,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
   const removeFeatureFromCurrentEdition = (index: number) => {
     const currentFeatures = editionPricings[selectedEdition]?.edition_features || [];
     updateCurrentEditionPricing('edition_features', currentFeatures.filter((_, i) => i !== index));
-  };
-
-  const handleImageUpload = async (file: File): Promise<string> => {
-    try {
-      setIsUploading(true);
-      setUploadProgress(0);
-
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'gaming_community');
-
-      const response = await fetch(
-        'https://api.cloudinary.com/v1_1/dcodirzsc/image/upload',
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      const data = await response.json();
-      setUploadProgress(100);
-      
-      setTimeout(() => {
-        setIsUploading(false);
-        setUploadProgress(0);
-      }, 1000);
-
-      return data.secure_url;
-    } catch (error) {
-      setIsUploading(false);
-      setUploadProgress(0);
-      throw error;
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1173,70 +1134,40 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                     </>
                   )}
 
-                  {/* Image Upload */}
+                  {/* Image URL Input */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {activeTab === 'testimonials' ? 'Screenshot Image' : 'Game Image'}
+                      {activeTab === 'testimonials' ? 'Screenshot Image URL' : 'Game Image URL'}
                     </label>
-                    
-                    {/* Upload Area */}
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-cyan-400 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            try {
-                              const imageUrl = await handleImageUpload(file);
-                              setFormData(prev => ({ ...prev, image: imageUrl }));
-                              toast.success('Image uploaded successfully!');
-                            } catch (error) {
-                              toast.error('Failed to upload image. Please try again.');
-                            }
-                          }
-                        }}
-                        className="hidden"
-                        id="image-upload"
-                      />
-                      <label htmlFor="image-upload" className="cursor-pointer">
-                        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600">Click to upload image</p>
-                        <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 10MB</p>
-                      </label>
-                      
-                      {isUploading && (
-                        <div className="mt-4">
-                          <div className="bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-cyan-500 h-2 rounded-full transition-all duration-300"
-                              style={{ width: `${uploadProgress}%` }}
-                            ></div>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-2">Uploading... {uploadProgress}%</p>
-                        </div>
-                      )}
-                    </div>
 
-                    {/* Manual URL Input */}
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Or enter image URL manually</label>
-                      <input
-                        type="url"
-                        value={formData.image}
-                        onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                        placeholder="https://example.com/image.jpg"
-                      />
-                    </div>
+                    <input
+                      type="url"
+                      value={formData.image}
+                      onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                      placeholder="https://example.com/image.jpg"
+                      required
+                    />
+
+                    <p className="text-xs text-gray-500 mt-2">Enter a direct URL to the image (must start with https://)</p>
 
                     {/* Image Preview */}
                     {formData.image && (
                       <div className="mt-4">
+                        <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
                         <img
                           src={formData.image}
                           alt="Preview"
-                          className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                          className="w-full max-w-sm h-48 object-cover rounded-lg border border-gray-200"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            toast.error('Invalid image URL. Please check the URL and try again.');
+                          }}
+                          onLoad={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'block';
+                          }}
                         />
                       </div>
                     )}
