@@ -223,12 +223,14 @@ This option is best suited for single-player games or customers who prefer offli
             {/* Left Column - Product Image (Sticky) */}
             <div className={`${isImageSticky ? 'sticky top-8' : ''} h-fit`}>
               <div className="flex justify-center">
-                <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/20 w-full max-w-md">
+                <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/20 w-full max-w-2xl">
                   <div className="relative w-full aspect-square overflow-hidden rounded-2xl">
                     <img
                       src={product.image}
                       alt={product.title}
                       className="absolute inset-0 w-full h-full object-cover"
+                      loading="eager"
+                      decoding="async"
                     />
                   </div>
                 </div>
@@ -498,12 +500,14 @@ This option is best suited for single-player games or customers who prefer offli
           <div className="space-y-6 sm:space-y-8">
             {/* Product Image */}
             <div className="flex justify-center">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl border border-white/20 w-full max-w-xs sm:max-w-sm">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl border border-white/20 w-full max-w-md sm:max-w-lg">
                 <div className="relative w-full aspect-square overflow-hidden rounded-xl sm:rounded-2xl">
                   <img
                     src={product.image}
                     alt={product.title}
                     className="absolute inset-0 w-full h-full object-cover"
+                    loading="eager"
+                    decoding="async"
                   />
                 </div>
               </div>

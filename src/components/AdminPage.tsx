@@ -1149,6 +1149,16 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
                       required
                     />
 
+                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-xs text-blue-800 font-semibold mb-1">📷 Image Quality Recommendations:</p>
+                      <ul className="text-xs text-blue-700 space-y-1">
+                        <li>• <strong>Minimum size:</strong> 800x800 pixels (square format preferred)</li>
+                        <li>• <strong>Recommended:</strong> 1200x1200 pixels or higher for best quality</li>
+                        <li>• <strong>Format:</strong> JPG or PNG (keep file size under 500KB for fast loading)</li>
+                        <li>• <strong>Aspect ratio:</strong> 1:1 (square) works best across all pages</li>
+                      </ul>
+                    </div>
+
                     <p className="text-xs text-gray-500 mt-2">Enter a direct URL to the image (must start with https://)</p>
 
                     {/* Image Preview */}
