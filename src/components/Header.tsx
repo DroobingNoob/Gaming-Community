@@ -257,7 +257,7 @@ const Header: React.FC<HeaderProps> = ({
     onClick={() => navigate('/')}
   />
 </div>
-
+ 
                 <div className="flex items-center space-x-2">
                   <button onClick={handleSearchClick} className="text-cyan-600 p-1">
                     <Search className="w-4 h-4" />
