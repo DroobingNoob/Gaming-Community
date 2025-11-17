@@ -223,12 +223,14 @@ This option is best suited for single-player games or customers who prefer offli
             {/* Left Column - Product Image (Sticky) */}
             <div className={`${isImageSticky ? 'sticky top-8' : ''} h-fit`}>
               <div className="flex justify-center">
-                <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/20">
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="w-full max-w-md aspect-square object-cover rounded-2xl"
-                  />
+                <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/20 w-full max-w-md">
+                  <div className="relative w-full aspect-square overflow-hidden rounded-2xl">
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -496,12 +498,14 @@ This option is best suited for single-player games or customers who prefer offli
           <div className="space-y-6 sm:space-y-8">
             {/* Product Image */}
             <div className="flex justify-center">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl border border-white/20">
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  className="w-full max-w-xs sm:max-w-sm aspect-square object-cover rounded-xl sm:rounded-2xl"
-                />
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl border border-white/20 w-full max-w-xs sm:max-w-sm">
+                <div className="relative w-full aspect-square overflow-hidden rounded-xl sm:rounded-2xl">
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
               </div>
             </div>
 
@@ -739,16 +743,18 @@ This option is best suited for single-player games or customers who prefer offli
             <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">You May Also Like</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               {relatedProducts.map((item) => (
-                <div 
-                  key={item.id} 
+                <div
+                  key={item.id}
                   className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 sm:hover:-translate-y-2"
                   onClick={() => onGameClick(item)}
                 >
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full aspect-square object-cover"
-                  />
+                  <div className="relative w-full aspect-square overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
                   <div className="p-3 sm:p-4">
                     <h4 className="font-bold text-gray-800 text-xs sm:text-sm mb-2 line-clamp-2">
                       {item.title}
