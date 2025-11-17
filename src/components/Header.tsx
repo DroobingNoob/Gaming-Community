@@ -162,7 +162,7 @@ const Header: React.FC<HeaderProps> = ({
                 {/* Logo - Made Much More Prominent */}
                <div className="flex items-center justify-center">
                   <img 
-          src="https://res.cloudinary.com/dcodirzsc/image/upload/v1753761357/gaming_community_eykswy.jpg" 
+          src="https://ibb.co/99pbBvXS" 
                     alt="Gaming Community" 
                     className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-36 xl:h-36 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-xl cursor-pointer"
                     onClick={() => navigate('/')}
@@ -251,7 +251,7 @@ const Header: React.FC<HeaderProps> = ({
                 {/* Mobile Logo - Centered and Prominent */}
                <div className="flex justify-center w-full relative">
   <img 
-     src="https://res.cloudinary.com/dcodirzsc/image/upload/v1753761357/gaming_community_eykswy.jpg"
+     src="https://ibb.co/99pbBvXS"
     alt="Gaming Community"
    className="w-16 h-16 xs:w-18 xs:h-18 sm:w-20 sm:h-20 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg cursor-pointer relative left-2 sm:left-4 md:left-0"
     onClick={() => navigate('/')}
@@ -262,7 +262,7 @@ const Header: React.FC<HeaderProps> = ({
                   <button onClick={handleSearchClick} className="text-cyan-600 p-1">
                     <Search className="w-4 h-4" />
                   </button>
-                  <button onClick={onCartClick} className="relative text-cyan-600 p-1">
+                  <button onClick={onCartClick} className="relative text-cyan-600 p-1"> 
                     <ShoppingCart className="w-4 h-4" />
                     {cartItemCount > 0 && (
                       <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
