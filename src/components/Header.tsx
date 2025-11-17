@@ -251,7 +251,7 @@ const Header: React.FC<HeaderProps> = ({
                 {/* Mobile Logo - Centered and Prominent */}
                <div className="flex justify-center w-full relative">
   <img 
-     src="https://ibb.co/99pbBvXS"
+     src="https://i.ibb.co/Z6fBvJs7/IMG-20250814-112209-181.webp"
     alt="Gaming Community"
    className="w-16 h-16 xs:w-18 xs:h-18 sm:w-20 sm:h-20 object-contain hover:scale-105 transition-transform duration-300 shadow-lg rounded-lg cursor-pointer relative left-2 sm:left-4 md:left-0"
     onClick={() => navigate('/')}
