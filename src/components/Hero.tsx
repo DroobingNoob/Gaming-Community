@@ -211,11 +211,11 @@ const goToAllGames = () => {
           }`}
         >
           {slide.isBanner ? (
-            <div className="w-full h-full">
+            <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
               <img
                 src={slide.image}
                 alt="Banner"
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-contain"
               />
             </div>
           ) : (
