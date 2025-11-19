@@ -259,8 +259,8 @@ const goToAllGames = () => {
       {/* Promotional Badge */}
      {/* Slide-Specific Badges (hidden on mobile) */}
 <div className="hidden sm:block">
-  {/* Slide 0: Mystery Box */}
-  {currentSlide === 0 && (
+  {/* Slide 0: Mystery Box */} 
+  {/* {currentSlide === 0 && (
     <>
       <div className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 left-2 sm:left-3 md:left-4 lg:left-6 xl:left-8">
         <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-1.5 md:py-2 lg:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold shadow-lg animate-pulse">
@@ -273,7 +273,7 @@ const goToAllGames = () => {
         </div>
       </div>
     </>
-  )}
+  )} */}
 
   {/* Slide 1: Banner - No badges */}
   {/* Slide 2: Premium Gaming */}
