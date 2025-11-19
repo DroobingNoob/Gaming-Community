@@ -56,7 +56,7 @@ const goToAllGames = () => {
     //   buttonAction: onShopBestsellers,
     //   isPromo: true
     // },
-    {
+    { 
     title: "",
     subtitle: "",
     description: "",
