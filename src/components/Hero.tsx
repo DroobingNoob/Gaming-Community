@@ -56,16 +56,17 @@ const goToAllGames = () => {
     //   buttonAction: onShopBestsellers,
     //   isPromo: true
     // },
-    { 
+    {
     title: "",
     subtitle: "",
     description: "",
     couponCode: "",
-    image: "https://i.ibb.co/5g6g3wRq/90banner.jpg",
-    overlay: "bg-black/40",
-    buttonText: "", 
+    image: "/90banner.jpg",
+    overlay: "",
+    buttonText: "",
     buttonAction: () => {},
     isPromo: false,
+    isBanner: true,
   }, 
     {
       title: "🎮 PREMIUM GAMING 🎮",
@@ -92,10 +93,14 @@ const goToAllGames = () => {
   ];
 
   const renderSlideContent = (slide: any) => {
+    if (slide.isBanner) {
+      return null;
+    }
+
     return (
       <div className="text-white w-full max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-3xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Promotional Badge */}
- 
+
        <h1 className="whitespace-nowrap text-center text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-6xl font-black mb-2 xs:mb-3 sm:mb-4 md:mb-6 leading-tight tracking-tight">
   {slide.title}
 </h1>
@@ -205,16 +210,26 @@ const goToAllGames = () => {
             index === currentSlide ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <div
-            className="w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${slide.image})` }}
-          >
-            <div className={`w-full h-full ${slide.overlay} flex items-center justify-center`}>
-              <div className="container mx-auto px-2 sm:px-3 md:px-4 h-full flex items-center justify-center">
-                {renderSlideContent(slide)}
+          {slide.isBanner ? (
+            <div className="w-full h-full">
+              <img
+                src={slide.image}
+                alt="Banner"
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
+          ) : (
+            <div
+              className="w-full h-full bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${slide.image})` }}
+            >
+              <div className={`w-full h-full ${slide.overlay} flex items-center justify-center`}>
+                <div className="container mx-auto px-2 sm:px-3 md:px-4 h-full flex items-center justify-center">
+                  {renderSlideContent(slide)}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       ))}
 
@@ -260,7 +275,8 @@ const goToAllGames = () => {
     </>
   )}
 
-  {/* Slide 1: Premium Gaming */}
+  {/* Slide 1: Banner - No badges */}
+  {/* Slide 2: Premium Gaming */}
   {currentSlide === 1 && (
     <>
       <div className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 left-2 sm:left-3 md:left-4 lg:left-6 xl:left-8">
@@ -276,7 +292,7 @@ const goToAllGames = () => {
     </>
   )}
 
-  {/* Slide 2: Instant Delivery */}
+  {/* Slide 3: Instant Delivery */}
   {currentSlide === 2 && (
     <>
       <div className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 left-2 sm:left-3 md:left-4 lg:left-6 xl:left-8">
