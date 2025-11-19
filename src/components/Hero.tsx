@@ -45,17 +45,28 @@ const goToAllGames = () => {
   }, [isHovered]);
 
   const slides = [
+    // {
+    //   title: "🎁 MYSTERY BOX DEAL! 🎁",
+    //   subtitle: "",
+    //   description: "Get a FREE Mystery Game with your order!",
+    //   couponCode: "MYSTERYBOX",
+    //   image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080",
+    //   overlay: "bg-gradient-to-br from-purple-900/95 via-indigo-900/90 to-purple-900/85",
+    //   buttonText: "Claim Mystery Box",
+    //   buttonAction: onShopBestsellers,
+    //   isPromo: true
+    // },
     {
-      title: "🎁 MYSTERY BOX DEAL! 🎁",
-      subtitle: "",
-      description: "Get a FREE Mystery Game with your order!",
-      couponCode: "MYSTERYBOX",
-      image: "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080",
-      overlay: "bg-gradient-to-br from-purple-900/95 via-indigo-900/90 to-purple-900/85",
-      buttonText: "Claim Mystery Box",
-      buttonAction: onShopBestsellers,
-      isPromo: true
-    },
+    title: "",
+    subtitle: "",
+    description: "",
+    couponCode: "",
+    image: "https://i.ibb.co/Fq0ZPxqR/1-20251011-020740-0000-1.jpg",
+    overlay: "bg-black/40",
+    buttonText: "",
+    buttonAction: () => {},
+    isPromo: false,
+  },
     {
       title: "🎮 PREMIUM GAMING 🎮",
       subtitle: "Best Games, Best Prices",
