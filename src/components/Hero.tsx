@@ -66,7 +66,7 @@ const goToAllGames = () => {
     buttonText: "",
     buttonAction: () => {},
     isPromo: false,
-  },
+  }, 
     {
       title: "🎮 PREMIUM GAMING 🎮",
       subtitle: "Best Games, Best Prices",
