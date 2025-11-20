@@ -67,6 +67,18 @@ const goToAllGames = () => {
     buttonAction: () => {},
     isPromo: false,
     isBanner: true,
+  },
+  {
+    title: "",
+    subtitle: "",
+    description: "",
+    couponCode: "",
+    image: "/Black and White Modern Black Friday Sale Banner (1024 x 768 mm)_20251117_152755_0000-min.jpg",
+    overlay: "",
+    buttonText: "",
+    buttonAction: () => {},
+    isPromo: false,
+    isBanner: true,
   }, 
     {
       title: "🎮 PREMIUM GAMING 🎮",
