@@ -93,13 +93,15 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     onClose();
   }
 
-  const handleApplyCoupon = () => {
-    const coupon = appliedCoupon.toUpperCase();
+  const handleApplyCoupon = (couponCode?: string) => {
+    const coupon = (couponCode || appliedCoupon).toUpperCase();
 
     if (coupon === 'BLKFRY200' && subtotal >= 2000) {
+      setAppliedCoupon('BLKFRY200');
       setCouponDiscount(200);
       toast.success('Black Friday discount applied! ₹200 off');
     } else if (coupon === 'BLKFRY100' && subtotal >= 1500) {
+      setAppliedCoupon('BLKFRY100');
       setCouponDiscount(100);
       toast.success('Black Friday discount applied! ₹100 off');
     } else {
@@ -308,7 +310,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                 </div>
                 {subtotal >= 2000 ? (
                   <button
-                    onClick={() => { setAppliedCoupon("BLKFRY200"); handleApplyCoupon(); }}
+                    onClick={() => handleApplyCoupon('BLKFRY200')}
                     className="text-xs bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md"
                   >
                     Use
@@ -326,7 +328,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                 </div>
                 {subtotal >= 1500 ? (
                   <button
-                    onClick={() => { setAppliedCoupon("BLKFRY100"); handleApplyCoupon(); }}
+                    onClick={() => handleApplyCoupon('BLKFRY100')}
                     className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-md"
                   >
                     Use
