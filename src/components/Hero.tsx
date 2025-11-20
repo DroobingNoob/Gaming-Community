@@ -73,7 +73,7 @@ const goToAllGames = () => {
     subtitle: "",
     description: "",
     couponCode: "",
-    image: "/Black and White Modern Black Friday Sale Banner (1024 x 768 mm)_20251117_152755_0000-min.jpg",
+    image: "/black_friday.jpg",
     overlay: "",
     buttonText: "",
     buttonAction: () => {},
