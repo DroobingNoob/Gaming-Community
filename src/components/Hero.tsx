@@ -293,7 +293,7 @@ const goToAllGames = () => {
 
   {/* Slide 1: Banner - No badges */}
   {/* Slide 2: Premium Gaming */}
-  {currentSlide === 1 && (
+  {currentSlide === 2 && (
     <>
       <div className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 left-2 sm:left-3 md:left-4 lg:left-6 xl:left-8">
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-1.5 md:py-2 lg:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold shadow-lg animate-pulse">
@@ -309,7 +309,7 @@ const goToAllGames = () => {
   )}
 
   {/* Slide 3: Instant Delivery */}
-  {currentSlide === 2 && (
+  {currentSlide === 3 && (
     <>
       <div className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 left-2 sm:left-3 md:left-4 lg:left-6 xl:left-8">
         <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-1.5 md:py-2 lg:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold shadow-lg animate-pulse">
