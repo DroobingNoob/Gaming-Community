@@ -148,19 +148,19 @@ const CartModal: React.FC<CartModalProps> = ({
           {cartItems.length > 0 && (
             <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-blue-50">
                 {/* Pro Tip Banner */}
-              {/* {total < 799 && (
-                <div className="bg-gradient-to-r from-cyan-100 to-blue-100 border border-cyan-300 text-cyan-900 rounded-xl p-3 sm:p-4 shadow-md text-sm sm:text-base font-medium text-center">
-                  💡 Pro Tip: Add products worth ₹{(799 - total).toFixed(0)} more and get 
-                  <span className="font-bold text-cyan-700"> 10% OFF UPTO ₹150 </span> 
-                   with coupon <span className="font-bold">FESTIVALOFF</span>!
+              {total < 1500 && (
+                <div className="bg-gradient-to-r from-red-100 to-orange-100 border border-red-300 text-red-900 rounded-xl p-3 sm:p-4 shadow-md text-sm sm:text-base font-medium text-center mb-4">
+                  💡 Pro Tip: Add products worth ₹{(1500 - total).toFixed(0)} more and get
+                  <span className="font-bold text-red-700"> ₹100 OFF </span>
+                   with coupon <span className="font-bold">BLKFRY100</span>!
                 </div>
               )}
-              {total >= 799 && total < 3000 && (
-                <div className="bg-gradient-to-r from-orange-100 to-yellow-100 border border-orange-300 text-orange-900 rounded-xl p-3 sm:p-4 shadow-md text-sm sm:text-base font-medium text-center">
-                  🎁 Almost there! Shop for just ₹{(3000 - total).toFixed(0)} more 
-                  and unlock a <span className="font-bold text-orange-700">Mystery Free Game</span> 🎮
+              {total >= 1500 && total < 2000 && (
+                <div className="bg-gradient-to-r from-orange-100 to-yellow-100 border border-orange-300 text-orange-900 rounded-xl p-3 sm:p-4 shadow-md text-sm sm:text-base font-medium text-center mb-4">
+                  🎁 Almost there! Shop for just ₹{(2000 - total).toFixed(0)} more
+                  and get <span className="font-bold text-orange-700">₹200 OFF</span> with <span className="font-bold">BLKFRY200</span>!
                 </div>
-              )} */} 
+              )} 
  
               <div className="flex justify-between items-center mb-3 sm:mb-4">
                 <span className="text-lg sm:text-xl font-bold text-gray-800">Total:</span>

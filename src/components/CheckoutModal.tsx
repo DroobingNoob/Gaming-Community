@@ -42,18 +42,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const mysteryBoxEligible = subtotal >= 3000;
   
   // Apply discounts
   let discountAmount = 0;
-  // if (hasNewsletterDiscount && appliedCoupon === 'NEWSLETTER10') {
-  //   discountAmount = subtotal * 0.1; // 10% discount
-  // } else  
-    if (appliedCoupon === 'MYSTERYBOX' && mysteryBoxEligible) {
-    // Mystery box is free, no monetary discount but eligible for free game
-  } else if (appliedCoupon === 'FESTIVALOFF' && subtotal>=799) {
-    discountAmount = 0.1 * subtotal < 150 ? 0.1 * subtotal : 150; // 15% discount from flash sale
-  } else if (couponDiscount > 0) {
+  if (couponDiscount > 0) {
     discountAmount = couponDiscount;
   }
 
@@ -103,25 +95,22 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleApplyCoupon = () => {
     const coupon = appliedCoupon.toUpperCase();
-    
-    // if (coupon === 'NEWSLETTER10' && hasNewsletterDiscount) {
-    //   setCouponDiscount(subtotal * 0.1);
-    //   toast.success('Newsletter discount applied! 10% off');
-    // } else  
-      if (coupon === 'MYSTERYBOX' && mysteryBoxEligible) {
-      setCouponDiscount(0); // No monetary discount, but eligible for mystery box
-      toast.success('Mystery Box coupon applied! Free mystery game included');
-    } else if (coupon === 'FESTIVALOFF' && subtotal>=799) {
-        if(subtotal * 0.1 < 150){
-      setCouponDiscount(0.1*subtotal);
-        }
-        else {
-          setCouponDiscount(150);
-        }
-      toast.success('Flash Sale discount applied! 10% off');
+
+    if (coupon === 'BLKFRY200' && subtotal >= 2000) {
+      setCouponDiscount(200);
+      toast.success('Black Friday discount applied! ₹200 off');
+    } else if (coupon === 'BLKFRY100' && subtotal >= 1500) {
+      setCouponDiscount(100);
+      toast.success('Black Friday discount applied! ₹100 off');
     } else {
       setCouponDiscount(0);
-      toast.error('Invalid coupon code or not eligible');
+      if (coupon === 'BLKFRY200') {
+        toast.error('Minimum cart value of ₹2000 required for BLKFRY200');
+      } else if (coupon === 'BLKFRY100') {
+        toast.error('Minimum cart value of ₹1500 required for BLKFRY100');
+      } else {
+        toast.error('Invalid coupon code');
+      }
     }
   };
 
@@ -162,7 +151,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         discountAmount: discountAmount,
         totalAmount: total,
         status: 'Payment Pending',
-        mysteryBoxEligible: mysteryBoxEligible && appliedCoupon === 'MYSTERYBOX',
+        mysteryBoxEligible: false,
         paymentMethod: 'UPI',
         paymentStatus: 'Pending'
       };
@@ -292,7 +281,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
 
         {/* Coupon Code */}
         <div>
-          {/* <label className="block text-sm font-semibold text-gray-700 mb-2">Coupon Code (Optional)</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Coupon Code (Optional)</label>
           <div className="flex space-x-2">
             <input
               type="text"
@@ -307,51 +296,46 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             >
               Apply
             </button>
-          </div> */} 
-          
+          </div>
+
           {/* Available Coupons */}
           <div className="mt-3 space-y-2">
-            {/* {hasNewsletterDiscount && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <Gift className="w-4 h-4 text-green-500" />
-                  <span className="text-green-800 font-medium text-sm">NEWSLETTER10 - 10% off (Available)</span>
+                  <Gift className="w-4 h-4 text-orange-500" />
+                  <span className="text-orange-800 font-medium text-sm">BLKFRY200 - ₹200 off (Min ₹2000)</span>
                 </div>
+                {subtotal >= 2000 ? (
                   <button
-          onClick={() => setAppliedCoupon("NEWSLETTER10")}
-          className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-md"
-        >
-          Use
-        </button> 
+                    onClick={() => { setAppliedCoupon("BLKFRY200"); handleApplyCoupon(); }}
+                    className="text-xs bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md"
+                  >
+                    Use
+                  </button>
+                ) : (
+                  <span className="text-xs text-orange-600">Not Eligible</span>
+                )}
               </div>
-            )} */} 
-            {/* {mysteryBoxEligible && (
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+            </div>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <Gift className="w-4 h-4 text-purple-500" />
-                  <span className="text-purple-800 font-medium text-sm">MYSTERYBOX - Free Mystery Game (Available)</span>
+                  <Gift className="w-4 h-4 text-red-500" />
+                  <span className="text-red-800 font-medium text-sm">BLKFRY100 - ₹100 off (Min ₹1500)</span>
                 </div>
-                  <button 
-          onClick={() => setAppliedCoupon("MYSTERYBOX")}
-          className="text-xs bg-purple-500 hover:bg-purple-600 text-white px-2 py-1 rounded-md"
-        >
-          Use
-        </button> 
+                {subtotal >= 1500 ? (
+                  <button
+                    onClick={() => { setAppliedCoupon("BLKFRY100"); handleApplyCoupon(); }}
+                    className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-md"
+                  >
+                    Use
+                  </button>
+                ) : (
+                  <span className="text-xs text-red-600">Not Eligible</span>
+                )}
               </div>
-            )} */}
-            {/* <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-              <div className="flex items-center space-x-2">
-                <Gift className="w-4 h-4 text-orange-500" />
-                <span className="text-orange-800 font-medium text-sm">FESTIVALOFF - 10% off UPTO 150 (Min ₹799)</span>
-              </div>
-              {subtotal.toFixed(2) >= 799 ? (<button
-        onClick={() => setAppliedCoupon("FESTIVALOFF")}
-        className="text-xs bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md"
-        disabled={total.toFixed(2)<799}
-      >
-        Use
-      </button>  ) : (<span>Not Eligible</span>)}
-            </div> */} 
+            </div>
           </div>
         </div>
       </div>
@@ -368,12 +352,6 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             <div className="flex justify-between text-green-600">
               <span>Discount {appliedCoupon && `(${appliedCoupon})`}</span>
               <span>-₹{discountAmount.toFixed(2)}</span>
-            </div>
-          )}
-          {mysteryBoxEligible && appliedCoupon === 'MYSTERYBOX' && (
-            <div className="flex justify-between text-purple-600">
-              <span>🎁 Mystery Box Game</span>
-              <span>FREE</span>
             </div>
           )}
           <div className="border-t pt-2 flex justify-between font-bold text-lg">
