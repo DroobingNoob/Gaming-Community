@@ -223,7 +223,11 @@ const goToAllGames = () => {
           }`}
         >
           {slide.isBanner ? (
-            <div className="w-full h-full bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 flex items-center justify-center">
+            <div className={`w-full h-full flex items-center justify-center ${
+              slide.image.includes('black_friday')
+                ? 'bg-[#0a0a0a]'
+                : 'bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950'
+            }`}>
               <img
                 src={slide.image}
                 alt="Banner"
