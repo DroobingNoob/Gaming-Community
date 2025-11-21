@@ -197,7 +197,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   const handleWhatsAppRedirect = () => {
-    const phoneNumber = '+919266514434';
+    const phoneNumber = '919266514434';
     
     // Prepare order details message
     const itemsList = cartItems.map(item => 
