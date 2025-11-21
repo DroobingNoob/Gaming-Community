@@ -51,7 +51,7 @@ const FlashSaleStrip: React.FC = () => {
 
             <div className="relative px-3 py-3 sm:py-4">
               <div className="max-w-7xl mx-auto">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4"> 
                   <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
                     <motion.div
                       animate={{ scale: [1, 1.05, 1] }}
