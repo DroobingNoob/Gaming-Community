@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Clock, Zap, X, Copy, Check } from "lucide-react";
+import { Clock, Copy, Check, Tag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const FlashSaleStrip: React.FC = () => {
@@ -29,7 +29,7 @@ const FlashSaleStrip: React.FC = () => {
   const format = (n: number) => n.toString().padStart(2, "0");
 
   const handleCopyCoupon = () => {
-    navigator.clipboard.writeText("FESTIVALOFF");
+    navigator.clipboard.writeText("BLKFRY200");
     setCopiedCoupon(true);
     setTimeout(() => setCopiedCoupon(false), 2000);
   };
@@ -40,64 +40,81 @@ const FlashSaleStrip: React.FC = () => {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ y: -60, opacity: 0 }}
+          initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -60, opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="sticky top-0 left-0 w-full z-[60] bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-yellow-300 font-bold shadow-lg px-4 py-2"
+          exit={{ y: -100, opacity: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="sticky top-0 left-0 w-full z-[60] bg-black text-white shadow-2xl"
         >
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm sm:text-base">
-            {/* Flash Sale Text */}
-            <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="flex items-center gap-2"
-            >
-              <Zap className="w-5 h-5 text-yellow-300 animate-pulse" />
-              <span className="font-extrabold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-white animate-pulse">
-                🔥 FLASH SALE:10% OFF UPTO 150
-              </span>
-            </motion.div>
+          <div className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 via-red-600/20 to-orange-600/20 animate-pulse"></div>
 
-            {/* Timer */}
-            <div className="flex items-center gap-2 bg-black/40 rounded-full px-3 py-1 font-mono text-sm shadow-md">
-              <Clock className="w-4 h-4 text-yellow-300" />
-              <span className="text-yellow-100 drop-shadow-lg">
-                {format(timeLeft.hours)}
-              </span>
-              <span>:</span>
-              <span className="text-yellow-100 drop-shadow-lg">
-                {format(timeLeft.minutes)}
-              </span>
-              <span>:</span>
-              <span className="text-yellow-100 drop-shadow-lg">
-                {format(timeLeft.seconds)}
-              </span>
+            <div className="relative px-3 py-3 sm:py-4">
+              <div className="max-w-7xl mx-auto">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+                  <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <motion.div
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
+                      <div className="flex flex-col">
+                        <span className="text-lg sm:text-xl md:text-2xl font-black tracking-tight text-white drop-shadow-lg">
+                          BLACK FRIDAY SALE
+                        </span>
+                        <span className="text-xs sm:text-sm text-orange-400 font-semibold">
+                          ₹200 OFF on orders ₹2000+
+                        </span>
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg px-3 py-2 shadow-lg">
+                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      <div className="flex items-center gap-1 font-mono text-base sm:text-lg font-bold">
+                        <span className="text-white">{format(timeLeft.hours)}</span>
+                        <span className="text-orange-200">:</span>
+                        <span className="text-white">{format(timeLeft.minutes)}</span>
+                        <span className="text-orange-200">:</span>
+                        <span className="text-white">{format(timeLeft.seconds)}</span>
+                      </div>
+                    </div>
+
+                    <motion.button
+                      onClick={handleCopyCoupon}
+                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.05 }}
+                      className="relative group"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg blur-sm group-hover:blur-md transition-all"></div>
+                      <div className="relative flex items-center gap-2 bg-white text-black rounded-lg px-4 py-2 font-bold border-2 border-dashed border-orange-500">
+                        <span className="text-sm sm:text-base font-mono tracking-wider">BLKFRY200</span>
+                        {copiedCoupon ? (
+                          <Check className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <Copy className="w-4 h-4 text-orange-600" />
+                        )}
+                      </div>
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Coupon */}
-            <motion.button
-              onClick={handleCopyCoupon}
-              whileTap={{ scale: 0.9 }}
-              animate={{ y: [0, -2, 0] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="flex items-center gap-2 border-2 border-dashed border-yellow-300 rounded-full px-4 py-1 hover:bg-yellow-300 hover:text-red-600 transition-colors"
-            >
-              <span className="font-mono text-xs sm:text-sm">FESTIVALOFF</span>
-              {copiedCoupon ? (
-                <Check className="w-4 h-4 text-green-400" />
-              ) : (
-                <Copy className="w-4 h-4 text-yellow-300" />
-              )}
-            </motion.button>
+            <motion.div
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              className="h-1 bg-gradient-to-r from-orange-500 via-red-600 via-orange-500 to-red-600 bg-[length:200%_100%]"
+            />
           </div>
-
-          {/* Animated underline */}
-          <motion.div
-            animate={{ scaleX: [1, 1, 1] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="h-0.5 mt-2 bg-gradient-to-r from-yellow-400 via-white to-yellow-400"
-          />
         </motion.div>
       )}
     </AnimatePresence>
