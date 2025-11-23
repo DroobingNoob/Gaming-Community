@@ -35,6 +35,7 @@ interface CartItem {
   image: string;
   platform: string;
   type: string;
+  edition?: string;
 }
 
 // Error Boundary Component
@@ -440,7 +441,8 @@ function App() {
           quantity: 1,
           image: product.image,
           platform: platform,
-          type: type
+          type: type,
+          edition: product.edition
         };
         setCartItems(items => [...items, newCartItem]);
       }

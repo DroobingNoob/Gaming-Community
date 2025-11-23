@@ -7,11 +7,12 @@ import { useNavigate } from 'react-router-dom';
 interface CartItem {
   id: string;
   title: string;
-  price: number; 
+  price: number;
   quantity: number;
   image: string;
   platform: string;
   type: string;
+  edition?: string;
 }
 
 interface CartModalProps {

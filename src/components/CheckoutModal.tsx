@@ -11,6 +11,7 @@ interface CartItem {
   image: string;
   platform: string;
   type: string;
+  edition?: string;
 }
 
 interface CheckoutModalProps {
@@ -141,7 +142,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         customerName: customerName.trim(),
         customerMobile: customerMobile.trim(),
         items: cartItems.map(item => ({
-          title: item.title,
+          title: item.edition && item.edition !== 'Standard' ? `${item.title} [${item.edition} Edition]` : item.title,
           platform: item.platform,
           type: item.type,
           price: item.price,
@@ -206,9 +207,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     const phoneNumber = '9266514434';
     
     // Prepare order details message
-    const itemsList = cartItems.map(item => 
-      `• ${item.title} (${item.platform} - ${item.type}) - ₹${item.price} x ${item.quantity} = ₹${item.price * item.quantity}`
-    ).join('\n');
+    const itemsList = cartItems.map(item => {
+      const editionText = item.edition && item.edition !== 'Standard' ? ` [${item.edition} Edition]` : '';
+      return `• ${item.title}${editionText} (${item.platform} - ${item.type}) - ₹${item.price} x ${item.quantity} = ₹${item.price * item.quantity}`;
+    }).join('\n');
 
     const message = `🎮 *GAMING COMMUNITY - ORDER DETAILS*
 
