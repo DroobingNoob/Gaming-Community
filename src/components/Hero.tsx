@@ -73,7 +73,7 @@ const goToAllGames = () => {
     subtitle: "",
     description: "",
     couponCode: "",
-    image: "/black_friday.jpg",
+    image: "/purple modern 11.11 50 discount instagram post (1024 x 768 mm)_20251203_125637_0000.jpg",
     overlay: "",
     buttonText: "",
     buttonAction: () => {},
@@ -224,8 +224,8 @@ const goToAllGames = () => {
         >
           {slide.isBanner ? (
             <div className={`w-full h-full flex items-center justify-center ${
-              slide.image.includes('black_friday')
-                ? 'bg-[#0a0a0a]'
+              slide.image.includes('purple modern')
+                ? 'bg-white'
                 : 'bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950'
             }`}>
               <img
