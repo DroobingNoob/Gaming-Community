@@ -97,20 +97,14 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const handleApplyCoupon = (couponCode?: string) => {
     const coupon = (couponCode || appliedCoupon).toUpperCase();
 
-    if (coupon === 'BLKFRY200' && subtotal >= 2000) {
-      setAppliedCoupon('BLKFRY200');
+    if (coupon === 'YEAREND25' && subtotal >= 1000) {
+      setAppliedCoupon('YEAREND25');
       setCouponDiscount(200);
-      toast.success('Black Friday discount applied! ₹200 off');
-    } else if (coupon === 'BLKFRY100' && subtotal >= 1500) {
-      setAppliedCoupon('BLKFRY100');
-      setCouponDiscount(100);
-      toast.success('Black Friday discount applied! ₹100 off');
+      toast.success('Year End discount applied! ₹200 off');
     } else {
       setCouponDiscount(0);
-      if (coupon === 'BLKFRY200') {
-        toast.error('Minimum cart value of ₹2000 required for BLKFRY200');
-      } else if (coupon === 'BLKFRY100') {
-        toast.error('Minimum cart value of ₹1500 required for BLKFRY100');
+      if (coupon === 'YEAREND25') {
+        toast.error('Minimum cart value of ₹1000 required for YEAREND25');
       } else {
         toast.error('Invalid coupon code');
       }
@@ -314,7 +308,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Gift className="w-4 h-4 text-orange-500" />
-                  <span className="text-orange-800 font-medium text-sm">BLKFRY200 - ₹200 off (Min ₹2000)</span>
+                  <span className="text-orange-800 font-medium text-sm">YEAREND25 - ₹200 off (Min ₹2000)</span>
                 </div>
                 {subtotal >= 2000 ? (
                   <button
