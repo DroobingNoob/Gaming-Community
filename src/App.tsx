@@ -317,7 +317,7 @@ function App() {
         setHasNewsletterDiscount(false);
       }
       
-      toast.success('Order placed successfully! You will receive your games within 15 minutes.');
+      toast.success('Order placed successfully!'); 
     } catch (error) {
       console.error('Error completing order:', error);
       toast.error('Order completed but there was an issue clearing the cart.');
