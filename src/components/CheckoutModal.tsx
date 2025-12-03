@@ -551,9 +551,9 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
         <h4 className="font-bold text-green-800 mb-3">What happens next?</h4>
         <div className="space-y-2 text-sm text-green-700 text-left">
-          <p>• Our team will verify your payment within 15 minutes</p>
+          <p>• Our team will verify your payment within 3 hours during normal load. If there are many orders, delivery may take upto 12 hours.</p>
           <p>• You'll receive your game access details via WhatsApp</p>
-          <p>• Setup support is available 24/7 if needed</p>
+          <p>• Setup support is available if needed</p>
         </div>
       </div>
       <p className="text-sm text-gray-600">
