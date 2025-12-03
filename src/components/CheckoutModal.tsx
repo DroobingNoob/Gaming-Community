@@ -98,9 +98,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     const coupon = (couponCode || appliedCoupon).toUpperCase();
 
     if (coupon === 'YEAREND25' && subtotal >= 1000) {
+      const discount = Math.min(Math.floor(subtotal * 0.1), 200);
       setAppliedCoupon('YEAREND25');
-      setCouponDiscount(200);
-      toast.success('Year End discount applied! ₹200 off');
+      setCouponDiscount(discount);
+      toast.success(`Year End discount applied! ₹${discount} off`);
     } else {
       setCouponDiscount(0);
       if (coupon === 'YEAREND25') {
@@ -304,39 +305,21 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
 
           {/* Available Coupons */}
           <div className="mt-3 space-y-2">
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <Gift className="w-4 h-4 text-orange-500" />
-                  <span className="text-orange-800 font-medium text-sm">YEAREND25 - ₹200 off (Min ₹2000)</span>
+                  <Gift className="w-4 h-4 text-green-500" />
+                  <span className="text-green-800 font-medium text-sm">YEAREND25 - 10% off (Max ₹200, Min ₹1000)</span>
                 </div>
-                {subtotal >= 2000 ? (
+                {subtotal >= 1000 ? (
                   <button
-                    onClick={() => handleApplyCoupon('BLKFRY200')}
-                    className="text-xs bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md"
+                    onClick={() => handleApplyCoupon('YEAREND25')}
+                    className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-md"
                   >
                     Use
                   </button>
                 ) : (
-                  <span className="text-xs text-orange-600">Not Eligible</span>
-                )}
-              </div>
-            </div>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Gift className="w-4 h-4 text-red-500" />
-                  <span className="text-red-800 font-medium text-sm">BLKFRY100 - ₹100 off (Min ₹1500)</span>
-                </div>
-                {subtotal >= 1500 ? (
-                  <button
-                    onClick={() => handleApplyCoupon('BLKFRY100')}
-                    className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-md"
-                  >
-                    Use
-                  </button>
-                ) : (
-                  <span className="text-xs text-red-600">Not Eligible</span>
+                  <span className="text-xs text-green-600">Not Eligible</span>
                 )}
               </div>
             </div>

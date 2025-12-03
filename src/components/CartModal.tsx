@@ -149,17 +149,11 @@ const CartModal: React.FC<CartModalProps> = ({
           {cartItems.length > 0 && (
             <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-blue-50">
                 {/* Pro Tip Banner */}
-              {total < 1500 && (
-                <div className="bg-gradient-to-r from-red-100 to-orange-100 border border-red-300 text-red-900 rounded-xl p-3 sm:p-4 shadow-md text-sm sm:text-base font-medium text-center mb-4">
-                  💡 Pro Tip: Add products worth ₹{(1500 - total).toFixed(0)} more and get
-                  <span className="font-bold text-red-700"> ₹100 OFF </span>
-                   with coupon <span className="font-bold">BLKFRY100</span>!
-                </div>
-              )}
-              {total >= 1500 && total < 2000 && (
-                <div className="bg-gradient-to-r from-orange-100 to-yellow-100 border border-orange-300 text-orange-900 rounded-xl p-3 sm:p-4 shadow-md text-sm sm:text-base font-medium text-center mb-4">
-                  🎁 Almost there! Shop for just ₹{(2000 - total).toFixed(0)} more
-                  and get <span className="font-bold text-orange-700">₹200 OFF</span> with <span className="font-bold">BLKFRY200</span>!
+              {total < 1000 && (
+                <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 text-green-900 rounded-xl p-3 sm:p-4 shadow-md text-sm sm:text-base font-medium text-center mb-4">
+                  💡 Pro Tip: Add products worth ₹{(1000 - total).toFixed(0)} more and get
+                  <span className="font-bold text-green-700"> 10% OFF (up to ₹200) </span>
+                   with coupon <span className="font-bold">YEAREND25</span>!
                 </div>
               )} 
  

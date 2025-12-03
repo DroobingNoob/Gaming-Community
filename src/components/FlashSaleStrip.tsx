@@ -29,7 +29,7 @@ const FlashSaleStrip: React.FC = () => {
   const format = (n: number) => n.toString().padStart(2, "0");
 
   const handleCopyCoupon = () => {
-    navigator.clipboard.writeText("BLKFRY200");
+    navigator.clipboard.writeText("YEAREND25");
     setCopiedCoupon(true);
     setTimeout(() => setCopiedCoupon(false), 2000);
   };
@@ -61,10 +61,10 @@ const FlashSaleStrip: React.FC = () => {
                       <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
                       <div className="flex flex-col">
                         <span className="text-lg sm:text-xl md:text-2xl font-black tracking-tight text-white drop-shadow-lg">
-                          BLACK FRIDAY SALE
+                          YEAR END SALE
                         </span>
                         <span className="text-xs sm:text-sm text-orange-400 font-semibold">
-                          ₹200 OFF on orders ₹2000+
+                          10% OFF (Max ₹200) on orders ₹1000+
                         </span>
                       </div>
                     </motion.div>
@@ -90,7 +90,7 @@ const FlashSaleStrip: React.FC = () => {
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg blur-sm group-hover:blur-md transition-all"></div>
                       <div className="relative flex items-center gap-2 bg-white text-black rounded-lg px-4 py-2 font-bold border-2 border-dashed border-orange-500">
-                        <span className="text-sm sm:text-base font-mono tracking-wider">BLKFRY200</span>
+                        <span className="text-sm sm:text-base font-mono tracking-wider">YEAREND25</span>
                         {copiedCoupon ? (
                           <Check className="w-4 h-4 text-green-600" />
                         ) : (
