@@ -230,7 +230,7 @@ const FAQPage: React.FC<FAQPageProps> = ({ onBackToHome }) => {
                   <strong>WhatsApp:</strong> +91 92665 14434
                 </p>
                 <p>
-                  <strong>Response Time:</strong> Usually within 30 minutes
+                  <strong>Response Time:</strong> Usually within 30 minutes - 4 hours
                 </p>
               </div>
             </div>
