@@ -92,15 +92,16 @@ const goToAllGames = () => {
       isPromo: false
     },
     {
-      title: "⚡ INSTANT DELIVERY ⚡",
-      subtitle: "Games in 15 Minutes",
-      description: "Get your games delivered instantly with 24/7 support",
+      title: "",
+      subtitle: "",
+      description: "",
       couponCode: "",
-      image: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080",
-      overlay: "bg-gradient-to-br from-orange-900/95 via-red-900/90 to-orange-900/85",
-      buttonText: "Browse Games",
-      buttonAction: goToAllGames,
-      isPromo: false
+      image: "/purple modern 11.11 50 discount instagram post (1024 x 768 mm)_20251203_215601_0000.jpg",
+      overlay: "",
+      buttonText: "",
+      buttonAction: () => {},
+      isPromo: false,
+      isBanner: true
     }
   ];
 
@@ -224,8 +225,8 @@ const goToAllGames = () => {
         >
           {slide.isBanner ? (
             <div className={`w-full h-full flex items-center justify-center ${
-              slide.image.includes('purple modern')
-                ? 'bg-white'
+              slide.image.includes('purple modern') || slide.image.includes('215601')
+                ? 'bg-black'
                 : 'bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950'
             }`}>
               <img
@@ -308,21 +309,7 @@ const goToAllGames = () => {
     </>
   )}
 
-  {/* Slide 3: Instant Delivery */}
-  {currentSlide === 3 && (
-    <>
-      <div className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 left-2 sm:left-3 md:left-4 lg:left-6 xl:left-8">
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-1.5 md:py-2 lg:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold shadow-lg animate-pulse">
-          ⚡ INSTANT DELIVERY
-        </div>
-      </div>
-      <div className="absolute top-2 sm:top-3 md:top-4 lg:top-6 xl:top-8 right-2 sm:right-3 md:right-4 lg:right-6 xl:right-8">
-        <div className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-1.5 md:py-2 lg:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold shadow-lg animate-bounce">
-          🕒 24/7 SUPPORT
-        </div>
-      </div>
-    </>
-  )}
+  {/* Slide 3: Banner - No badges */}
 </div>
 
 
