@@ -201,7 +201,7 @@ const RefundPolicyPage: React.FC<RefundPolicyPageProps> = ({ onBackToHome }) => 
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Need Support?</h2>
             <div className="text-gray-700 space-y-3">
               <p>
-                While we cannot offer refunds, our support team is available 24/7 to help with technical issues:
+                While we cannot offer refunds, our support team is available to help with technical issues:
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center space-x-3">
@@ -214,7 +214,7 @@ const RefundPolicyPage: React.FC<RefundPolicyPageProps> = ({ onBackToHome }) => 
                 </div>
               </div>
               <p className="text-sm text-gray-600 mt-4">
-                Average response time: Under 30 minutes
+                Average response time: 30 minutes - 4 hours
               </p>
             </div>
           </section>
