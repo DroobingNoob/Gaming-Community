@@ -572,7 +572,7 @@ This option is best suited for single-player games or customers who prefer offli
                     <Clock className="w-6 xl:w-8 h-6 xl:h-8 text-blue-500 flex-shrink-0" />
                     <div>
                       <div className="font-bold text-gray-800 text-sm xl:text-base">Instant Delivery</div>
-                      <div className="text-gray-600 text-xs xl:text-sm">Within 1 hour</div>
+                      <div className="text-gray-600 text-xs xl:text-sm">Within 3 hours</div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3 xl:space-x-4 p-3 xl:p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
