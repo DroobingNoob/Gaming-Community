@@ -131,7 +131,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigation }) => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3 bg-gradient-to-r from-gray-800/50 to-gray-700/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-600/20 text-center sm:text-left">
               <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
-                <span className="text-white font-bold text-xs sm:text-base">24/7</span>
+                <span className="text-white font-bold text-xs sm:text-base">🤝</span>
               </div>
               <div>
                 <div className="font-bold text-white text-sm sm:text-base">Support</div>
