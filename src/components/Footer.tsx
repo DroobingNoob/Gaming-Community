@@ -84,7 +84,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigation }) => {
                 <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-1.5 sm:p-2 rounded-lg flex-shrink-0">
                   <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
-                <span className="text-sm sm:text-base">Available 24/7 Online</span>
+                <span className="text-sm sm:text-base">Available Support Online</span>
               </div>
             </div>
             
