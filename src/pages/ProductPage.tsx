@@ -925,8 +925,8 @@ This option is best suited for single-player games or customers who prefer offli
                 <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-200">
                   <Clock className="w-5 sm:w-6 h-5 sm:h-6 text-blue-500 flex-shrink-0" />
                   <div>
-                    <div className="font-bold text-gray-800 text-xs sm:text-sm">Instant Delivery</div>
-                    <div className="text-gray-600 text-xs">Within 1 hour</div>
+                    <div className="font-bold text-gray-800 text-xs sm:text-sm">Fast Delivery</div>
+                    <div className="text-gray-600 text-xs">Within 3 hours</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
