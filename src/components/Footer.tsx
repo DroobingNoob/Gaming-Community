@@ -134,8 +134,8 @@ const Footer: React.FC<FooterProps> = ({ onNavigation }) => {
                 <span className="text-white font-bold text-xs sm:text-base">24/7</span>
               </div>
               <div>
-                <div className="font-bold text-white text-sm sm:text-base">24/7 Support</div>
-                <div className="text-gray-400 text-xs sm:text-sm">Always here to help</div>
+                <div className="font-bold text-white text-sm sm:text-base">Support</div>
+                <div className="text-gray-400 text-xs sm:text-sm">Here to help</div>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3 bg-gradient-to-r from-gray-800/50 to-gray-700/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-600/20 text-center sm:text-left">
@@ -143,8 +143,8 @@ const Footer: React.FC<FooterProps> = ({ onNavigation }) => {
                 <span className="text-white font-bold text-sm sm:text-xl">⚡</span>
               </div>
               <div>
-                <div className="font-bold text-white text-sm sm:text-base">Instant Delivery</div>
-                <div className="text-gray-400 text-xs sm:text-sm">Get games immediately</div>
+                <div className="font-bold text-white text-sm sm:text-base">Fast Delivery</div>
+                <div className="text-gray-400 text-xs sm:text-sm">Get games within 4 hours</div>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3 bg-gradient-to-r from-gray-800/50 to-gray-700/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-600/20 text-center sm:text-left">
