@@ -5,13 +5,13 @@ const TrustIndicators: React.FC = () => {
   const indicators = [
     {
       icon: <Clock className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />,
-      title: "Instant Delivery",
-      description: "Get your games immediately"
+      title: "Fast Delivery",
+      description: "Get your games within 30min - 4hours"
     },
     {
       icon: <Shield className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />,
-      title: "24/7 Customer Support",
-      description: "We're here to help anytime"
+      title: "Customer Support",
+      description: "We're here to help"
     },
     {
       icon: <Truck className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />,
