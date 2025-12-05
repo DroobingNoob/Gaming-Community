@@ -493,7 +493,15 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 mb-8 bg-white/80 backdrop-blur-sm rounded-xl p-1 shadow-lg border border-white/20">
+        {/* <div className="flex space-x-1 mb-8 bg-white/80 backdrop-blur-sm rounded-xl p-1 shadow-lg border border-white/20"> */}
+        <div
+  className="
+    mb-8 bg-white/80 backdrop-blur-sm rounded-xl p-1 shadow-lg border border-white/20
+
+    grid grid-cols-2 gap-2 
+    md:flex md:space-x-1
+  "
+>
           {[
             { id: 'games', label: 'Games', count: filteredItems.length },
             { id: 'subscriptions', label: 'Subscriptions', count: subscriptions.length },
