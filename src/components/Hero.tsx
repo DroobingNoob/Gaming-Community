@@ -61,18 +61,6 @@ const goToAllGames = () => {
     subtitle: "",
     description: "",
     couponCode: "",
-    image: "/90banner.jpg",
-    overlay: "",
-    buttonText: "",
-    buttonAction: () => {},
-    isPromo: false,
-    isBanner: true,
-  },
-  {
-    title: "",
-    subtitle: "",
-    description: "",
-    couponCode: "",
     image: "/purple modern 11.11 50 discount instagram post (1024 x 768 mm)_20251203_125637_0000.jpg",
     overlay: "",
     buttonText: "",
@@ -81,17 +69,30 @@ const goToAllGames = () => {
     isBanner: true,
   }, 
     {
-      title: "🎮 PREMIUM GAMING 🎮",
-      subtitle: "Best Games, Best Prices",
-      description: "Experience the latest PS4 & PS5 titles at unbeatable prices",
-      couponCode: "",
-      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080",
-      overlay: "bg-gradient-to-br from-cyan-900/95 via-blue-900/90 to-cyan-900/85",
-      buttonText: "Shop Now",
-      buttonAction: onShopBestsellers,
-      isPromo: false
-    },
-    {
+    title: "",
+    subtitle: "",
+    description: "",
+    couponCode: "",
+    image: "/90banner.jpg",
+    overlay: "",
+    buttonText: "",
+    buttonAction: () => {},
+    isPromo: false,
+    isBanner: true,
+  },
+  // {
+  //   title: "",
+  //   subtitle: "",
+  //   description: "",
+  //   couponCode: "",
+  //   image: "/purple modern 11.11 50 discount instagram post (1024 x 768 mm)_20251203_125637_0000.jpg",
+  //   overlay: "",
+  //   buttonText: "",
+  //   buttonAction: () => {},
+  //   isPromo: false,
+  //   isBanner: true,
+  // }, 
+     {
       title: "",
       subtitle: "",
       description: "",
@@ -103,6 +104,18 @@ const goToAllGames = () => {
       isPromo: false,
       isBanner: true
     }
+    {
+      title: "🎮 PREMIUM GAMING 🎮",
+      subtitle: "Best Games, Best Prices",
+      description: "Experience the latest PS4 & PS5 titles at unbeatable prices",
+      couponCode: "",
+      image: "https://images.pexels.com/photos/1298601/pexels-photo-1298601.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080",
+      overlay: "bg-gradient-to-br from-cyan-900/95 via-blue-900/90 to-cyan-900/85",
+      buttonText: "Shop Now",
+      buttonAction: onShopBestsellers,
+      isPromo: false
+    },
+   
   ];
 
   const renderSlideContent = (slide: any) => {
