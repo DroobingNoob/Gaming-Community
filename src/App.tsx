@@ -26,6 +26,7 @@ import FAQPage from './pages/FAQPage';
 
 import { Game, supabase } from './config/supabase';
 import { CartStorageService } from './services/cartStorageService';
+import { settingsService, ShopStatus } from './services/settingsService';
 
 interface CartItem {
   id: string;
@@ -94,7 +95,12 @@ function App() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showNewsletterBanner, setShowNewsletterBanner] = useState(false);
   const [hasNewsletterDiscount, setHasNewsletterDiscount] = useState(false);
-  
+  const [shopStatus, setShopStatus] = useState<ShopStatus>({
+    isOpen: true,
+    mode: 'working_hours',
+    message: ''
+  });
+
   const navigate = useNavigate();
   const location = useLocation(); 
 
@@ -218,6 +224,28 @@ function App() {
     });
 
     return () => subscription.unsubscribe();
+  }, []);
+
+  // Fetch shop status and subscribe to real-time changes
+  useEffect(() => {
+    const fetchShopStatus = async () => {
+      const status = await settingsService.getShopStatus();
+      setShopStatus(status);
+    };
+
+    fetchShopStatus();
+
+    const subscription = settingsService.subscribeToSettings(async () => {
+      const status = await settingsService.getShopStatus();
+      setShopStatus(status);
+    });
+
+    const interval = setInterval(fetchShopStatus, 60000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   // Save cart to Google Sheets whenever cart changes (for logged-in users)
@@ -584,6 +612,9 @@ function App() {
           onOrderComplete={handleOrderComplete}
           hasNewsletterDiscount={hasNewsletterDiscount}
           user={user}
+          isShopOpen={shopStatus.isOpen}
+          shopClosedMessage={shopStatus.message}
+          shopWorkingHours={shopStatus.workingHours}
         />
 
         {/* Floating Cart Button - Only shows when cart has items */}

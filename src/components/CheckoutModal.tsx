@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, User, Phone, ShoppingBag, Gift, Copy, Check, MessageCircle, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { BackendService } from '../services/backendService';
+import ShopClosedModal from './ShopClosedModal';
  
 interface CartItem {
   id: string;
@@ -21,6 +22,12 @@ interface CheckoutModalProps {
   onOrderComplete: () => void;
   hasNewsletterDiscount?: boolean;
   user?: any;
+  isShopOpen?: boolean;
+  shopClosedMessage?: string;
+  shopWorkingHours?: {
+    start: string;
+    end: string;
+  };
 }
 
 const CheckoutModal: React.FC<CheckoutModalProps> = ({
@@ -29,7 +36,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   cartItems,
   onOrderComplete,
   hasNewsletterDiscount = false,
-  user
+  user,
+  isShopOpen = true,
+  shopClosedMessage = 'The shop is currently closed. Please try again later.',
+  shopWorkingHours
 }) => {
   const [currentStep, setCurrentStep] = useState<'details' | 'payment' | 'confirmation'>('details');
   const [customerName, setCustomerName] = useState('');
@@ -40,6 +50,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderCode, setOrderCode] = useState('');
   const [copiedOrderCode, setCopiedOrderCode] = useState(false);
   const [copiedUpiId, setCopiedUpiId] = useState(false);
+  const [showShopClosedModal, setShowShopClosedModal] = useState(false);
 
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -156,23 +167,36 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
       console.log('Attempting to create order:', orderData);
 
-      // Submit order to backend with fallback
+      // Submit order to backend (Excel population)
       try {
         const result = await BackendService.createOrder(orderData);
         console.log('Backend response:', result);
+
+        // Check if shop is open AFTER Excel population
+        if (!isShopOpen) {
+          setIsProcessing(false);
+          setShowShopClosedModal(true);
+          return;
+        }
 
         if (result.success) {
           setCurrentStep('payment');
           toast.success('Order created successfully! Please complete the payment.');
         } else {
-          // Fallback: Allow user to proceed anyway
           console.warn('Backend returned failure, proceeding with client-side order');
           setCurrentStep('payment');
           toast.info('Order details prepared. Please complete payment.');
         }
       } catch (backendError) {
-        // Fallback: Allow user to proceed even if backend fails
         console.error('Backend error, proceeding with client-side order:', backendError);
+
+        // Check if shop is open AFTER Excel population attempt
+        if (!isShopOpen) {
+          setIsProcessing(false);
+          setShowShopClosedModal(true);
+          return;
+        }
+
         setCurrentStep('payment');
         toast.info('Order details prepared. Please complete payment.');
       }
@@ -618,6 +642,14 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
           {currentStep === 'confirmation' && renderConfirmation()}
         </div>
       </div>
+
+      {/* Shop Closed Modal */}
+      <ShopClosedModal
+        isOpen={showShopClosedModal}
+        onClose={() => setShowShopClosedModal(false)}
+        message={shopClosedMessage}
+        workingHours={shopWorkingHours}
+      />
     </div>
   );
 };

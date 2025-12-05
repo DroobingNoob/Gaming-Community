@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Plus, Edit, Trash2, X, Check, AlertCircle, Search } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, X, Check, AlertCircle, Search, Clock, Power, Settings } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAllGames, useGames, useSubscriptions, useTestimonials } from '../hooks/useSupabaseData';
 import { gamesService, subscriptionsService, testimonialsService } from '../services/supabaseService';
+import { settingsService, ShopSettings, ShopMode } from '../services/settingsService';
+import { supabase } from '../config/supabase';
 
 interface AdminPageProps {
   onBackToHome: () => void;
@@ -22,7 +24,7 @@ interface EditionPricing {
 }
 
 const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
-  const [activeTab, setActiveTab] = useState<'games' | 'subscriptions' | 'testimonials'>('games');
+  const [activeTab, setActiveTab] = useState<'games' | 'subscriptions' | 'testimonials' | 'settings'>('games');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Game | Testimonial | null>(null);
   const [gamesSearchQuery, setGamesSearchQuery] = useState('');
@@ -60,10 +62,25 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
 
   const [newFeature, setNewFeature] = useState('');
 
+  // Shop settings state
+  const [shopSettings, setShopSettings] = useState<ShopSettings | null>(null);
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
+
   // Data hooks
   const { allGames, loading: gamesLoading, refetch: refetchGames } = useAllGames();
   const { subscriptions, loading: subscriptionsLoading, refetch: refetchSubscriptions } = useSubscriptions({ limit: 1000 });
   const { testimonials, loading: testimonialsLoading, refetch: refetchTestimonials } = useTestimonials();
+
+  // Fetch shop settings on mount
+  useEffect(() => {
+    const loadShopSettings = async () => {
+      const settings = await settingsService.getShopSettings();
+      if (settings) {
+        setShopSettings(settings);
+      }
+    };
+    loadShopSettings();
+  }, []);
 
   // Filter items based on active tab and search
   const filteredItems = useMemo(() => {
@@ -480,7 +497,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
           {[
             { id: 'games', label: 'Games', count: filteredItems.length },
             { id: 'subscriptions', label: 'Subscriptions', count: subscriptions.length },
-            { id: 'testimonials', label: 'Screenshots', count: testimonials.length }
+            { id: 'testimonials', label: 'Screenshots', count: testimonials.length },
+            { id: 'settings', label: 'Shop Settings', count: null }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -492,57 +510,158 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               }`}
             >
               <span>{tab.label}</span>
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                activeTab === tab.id ? 'bg-white/20' : 'bg-gray-200'
-              }`}>
-                {tab.count}
-              </span>
+              {tab.count !== null && (
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  activeTab === tab.id ? 'bg-white/20' : 'bg-gray-200'
+                }`}>
+                  {tab.count}
+                </span>
+              )}
             </button>
           ))}
         </div>
 
         {/* Add Button */}
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={() => {
-              setEditingItem(null);
-              resetForm();
-              setIsModalOpen(true);
-            }}
-            className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Add {activeTab === 'games' ? 'Game' : activeTab === 'subscriptions' ? 'Subscription' : 'Screenshot'}</span>
-          </button>
-        </div>
+        {activeTab !== 'settings' && (
+          <div className="flex justify-end mb-6">
+            <button
+              onClick={() => {
+                setEditingItem(null);
+                resetForm();
+                setIsModalOpen(true);
+              }}
+              className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Add {activeTab === 'games' ? 'Game' : activeTab === 'subscriptions' ? 'Subscription' : 'Screenshot'}</span>
+            </button>
+          </div>
+        )}
 
         {/* Search Bar */}
-        <div className="mb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder={`Search ${activeTab === 'games' ? 'games' : activeTab === 'subscriptions' ? 'subscriptions' : 'testimonials'}...`}
-              value={getCurrentSearchQuery()}
-              onChange={(e) => setCurrentSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-            />
-          </div>
-        </div>
+        {activeTab !== 'settings' && (
+          <>
+            <div className="mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder={`Search ${activeTab === 'games' ? 'games' : activeTab === 'subscriptions' ? 'subscriptions' : 'testimonials'}...`}
+                  value={getCurrentSearchQuery()}
+                  onChange={(e) => setCurrentSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                />
+              </div>
+            </div>
 
-        {/* Results Summary */}
-        <div className="mb-4 flex items-center justify-between">
-          <p className="text-gray-600 text-sm">
-            Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} {activeTab}
-          </p>
-          <div className="text-sm text-gray-500">
-            Page {currentPage} of {totalPages}
+            {/* Results Summary */}
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-gray-600 text-sm">
+                Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} {activeTab}
+              </p>
+              <div className="text-sm text-gray-500">
+                Page {currentPage} of {totalPages}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Settings Content */}
+        {activeTab === 'settings' && shopSettings && (
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
+              <div className="flex items-center space-x-3 mb-6">
+                <Settings className="w-8 h-8 text-blue-500" />
+                <h3 className="text-2xl font-bold text-gray-800">Shop Availability Settings</h3>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Shop Mode
+                  </label>
+                  <div className="space-y-3">
+                    {[
+                      { id: 'working_hours', label: 'Working Hours (10:00 AM - 10:00 PM)', icon: Clock },
+                      { id: 'close_now', label: 'Close Now (Temporarily Closed)', icon: AlertCircle },
+                      { id: 'force_open', label: 'Force Open (24/7)', icon: Power }
+                    ].map(({ id, label, icon: Icon }) => (
+                      <div
+                        key={id}
+                        onClick={() => setShopSettings({ ...shopSettings, shop_mode: id as ShopMode })}
+                        className={`flex items-center space-x-3 p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                          shopSettings.shop_mode === id
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <Icon className={`w-5 h-5 ${shopSettings.shop_mode === id ? 'text-blue-500' : 'text-gray-400'}`} />
+                        <span className={`font-medium ${shopSettings.shop_mode === id ? 'text-blue-700' : 'text-gray-700'}`}>
+                          {label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Closed Message
+                  </label>
+                  <textarea
+                    value={shopSettings.closed_message}
+                    onChange={(e) => setShopSettings({ ...shopSettings, closed_message: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    placeholder="Message shown when shop is closed..."
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <div className="text-sm text-gray-500">
+                    {shopSettings.updated_at && (
+                      <p>Last updated: {new Date(shopSettings.updated_at).toLocaleString()}</p>
+                    )}
+                    {shopSettings.updated_by && (
+                      <p>By: {shopSettings.updated_by}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={async () => {
+                      setIsSavingSettings(true);
+                      const { data: { user } } = await supabase.auth.getUser();
+                      const success = await settingsService.updateShopSettings(
+                        {
+                          shop_mode: shopSettings.shop_mode,
+                          closed_message: shopSettings.closed_message
+                        },
+                        user?.email || 'Unknown'
+                      );
+                      setIsSavingSettings(false);
+                      if (success) {
+                        toast.success('Shop settings updated successfully!');
+                        const updatedSettings = await settingsService.getShopSettings();
+                        if (updatedSettings) setShopSettings(updatedSettings);
+                      } else {
+                        toast.error('Failed to update settings');
+                      }
+                    }}
+                    disabled={isSavingSettings}
+                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSavingSettings ? 'Saving...' : 'Save Settings'}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {activeTab === 'games' && (gamesLoading ? (
+        {activeTab !== 'settings' && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {activeTab === 'games' && (gamesLoading ? (
             <div className="col-span-full text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading games...</p>
@@ -674,11 +793,11 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
               </div>
             ))
           ))}
-        </div>
+          </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center space-x-2 mt-8">
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center space-x-2 mt-8">
             <button
               onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
@@ -727,7 +846,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBackToHome }) => {
             >
               Next
             </button>
-          </div>
+            </div>
+          )}
+          </>
         )}
 
         {/* Modal */}
