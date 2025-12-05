@@ -99,7 +99,7 @@ const goToAllGames = () => {
       couponCode: "",
       image: "/purple modern 11.11 50 discount instagram post (1024 x 768 mm)_20251203_215601_0000.jpg",
       overlay: "",
-      buttonText: "",
+      buttonText: "", 
       buttonAction: () => {},
       isPromo: false,
       isBanner: true
