@@ -106,7 +106,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }
 
   const handleApplyCoupon = (couponCode?: string) => {
-    const coupon = (couponCode || appliedCoupon).toUpperCase();
+    const coupon = (couponCode || appliedCoupon);
 
     console.log(
   'subtotal:',
