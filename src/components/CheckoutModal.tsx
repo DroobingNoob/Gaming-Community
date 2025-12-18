@@ -117,7 +117,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setAppliedCoupon('YAARAKASH10');
       setCouponDiscount(50);
       toast.success('Coupon applied! ₹50 off');
-    } } else {
+    } else {
   setCouponDiscount(0);
 
   if (coupon === 'YEAREND25') {
