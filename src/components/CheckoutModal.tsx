@@ -108,6 +108,17 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const handleApplyCoupon = (couponCode?: string) => {
     const coupon = (couponCode || appliedCoupon).toUpperCase();
 
+    console.log(
+  'subtotal:',
+  subtotal,
+  typeof subtotal,
+  cartItems.map(i => ({
+    price: i.price,
+    priceType: typeof i.price,
+    quantity: i.quantity
+  }))
+); 
+    
     if (coupon === 'YEAREND25' && subtotal >= 1000) {
       const discount = Math.min(Math.floor(subtotal * 0.1), 200);
       setAppliedCoupon('YEAREND25');
