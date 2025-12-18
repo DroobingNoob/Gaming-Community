@@ -113,10 +113,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setAppliedCoupon('YEAREND25');
       setCouponDiscount(discount);
       toast.success(`Year End discount applied! ₹${discount} off`);
-    }  else {
+    } else if (coupon === 'YAARAKASH10' && subtotal >= 200) {
+      setAppliedCoupon('YAARAKASH10');
+      setCouponDiscount(50);
+      toast.success('Coupon applied! ₹50 off');
+    } else {
       setCouponDiscount(0);
       if (coupon === 'YEAREND25') {
         toast.error('Minimum cart value of ₹1000 required for YEAREND25');
+      } else if (coupon === 'YAARAKASH10') {
+        toast.error('Minimum cart value of ₹200 required for this coupon');
       } else {
         toast.error('Invalid coupon code');
       }
