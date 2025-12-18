@@ -570,7 +570,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
       </p> */}
     </div>
   );
-
+ 
   const renderConfirmation = () => (
     <div className="text-center space-y-6">
       <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
