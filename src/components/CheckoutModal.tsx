@@ -106,27 +106,37 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }
 
   const handleApplyCoupon = (couponCode?: string) => {
-    const coupon = (couponCode || appliedCoupon).toUpperCase();
+  const coupon = (couponCode || appliedCoupon).toUpperCase();
 
-    if (coupon === 'YEAREND25' && subtotal >= 1000) {
-      const discount = Math.min(Math.floor(subtotal * 0.1), 200);
-      setAppliedCoupon('YEAREND25');
-      setCouponDiscount(discount);
-      toast.success(`Year End discount applied! ₹${discount} off`);
-    } else if (coupon === 'YAARAKASH10' && subtotal >= 200) {
-      const discount = 50;
-      setAppliedCoupon('YAARAKASH10');
-      setCouponDiscount(discount);
-      toast.success(`Discount applied! ₹${discount} off`);
-    } else {
-      setCouponDiscount(0);
-      if (coupon === 'YEAREND25') {
-        toast.error('Minimum cart value of ₹1000 required for YEAREND25');
-      } else {
-        toast.error('Invalid coupon code');
-      }
+  if (coupon === 'YEAREND25') {
+    if (subtotal < 1000) {
+      toast.error('Minimum cart value of ₹1000 required for YEAREND25');
+      return;
     }
-  };
+
+    const discount = Math.min(Math.floor(subtotal * 0.1), 200);
+    setAppliedCoupon('YEAREND25');
+    setCouponDiscount(discount);
+    toast.success(`Year End discount applied! ₹${discount} off`);
+    return;
+  }
+
+  if (coupon === 'YAARAKASH10') {
+    if (subtotal < 200) {
+      toast.error('Minimum cart value of ₹200 required for YAARAKASH10');
+      return;
+    }
+
+    setAppliedCoupon('YAARAKASH10');
+    setCouponDiscount(50);
+    toast.success('Discount applied! ₹50 off');
+    return;
+  }
+
+  setCouponDiscount(0);
+  toast.error('Invalid coupon code');
+};
+ 
 
   const handleProceedToPayment = async () => {
     if (!customerName.trim()) {
