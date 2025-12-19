@@ -520,7 +520,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
           <h4 className="font-bold text-gray-800 mb-4">Scan QR Code</h4>
           <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
             <img
-              src="/1000050269.jpg"
+              src="/upi_new.jpg"
               alt="UPI QR Code"
               className="w-full max-w-xs mx-auto rounded-lg shadow-md"
             />
