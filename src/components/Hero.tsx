@@ -73,7 +73,7 @@ const goToAllGames = () => {
     subtitle: "",
     description: "",
     couponCode: "",
-    image: "/90banner.jpg",
+    image: "/new90banner.jpg",
     overlay: "",
     buttonText: "",
     buttonAction: () => {},
