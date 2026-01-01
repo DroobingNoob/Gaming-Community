@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Phone, ShoppingBag, Gift, Copy, Check, MessageCircle, Clock, AlertCircle } from 'lucide-react';
+import { X, User, Phone, ShoppingBag, Copy, Check, MessageCircle, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { BackendService } from '../services/backendService';
 import ShopClosedModal from './ShopClosedModal';
@@ -44,8 +44,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [currentStep, setCurrentStep] = useState<'details' | 'payment' | 'confirmation'>('details');
   const [customerName, setCustomerName] = useState('');
   const [customerMobile, setCustomerMobile] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState('');
-  const [couponDiscount, setCouponDiscount] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderCode, setOrderCode] = useState('');
   const [copiedOrderCode, setCopiedOrderCode] = useState(false);
@@ -54,14 +52,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  
-  // Apply discounts
-  let discountAmount = 0;
-  if (couponDiscount > 0) {
-    discountAmount = couponDiscount;
-  }
-
-  const total = Math.max(0, subtotal - discountAmount);
+  const total = subtotal;
 
   // Generate unique order code
   const generateOrderCode = () => {
@@ -80,14 +71,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
-      // setCurrentStep('details');
-      // setCustomerName(user?.user_metadata?.full_name || '');
-      // setCustomerMobile(user?.user_metadata?.mobile_number || '');
-      // setAppliedCoupon('');
-      // setCouponDiscount(0);
-      // setOrderCode('');
-      // setCopiedOrderCode(false);
-      // setCopiedUpiId(false);
     }
   }, [isOpen, user]);
 
@@ -97,56 +80,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
      setCurrentStep('details');
       setCustomerName(user?.user_metadata?.full_name || '');
       setCustomerMobile(user?.user_metadata?.mobile_number || '');
-      setAppliedCoupon('');
-      setCouponDiscount(0);
       setOrderCode('');
       setCopiedOrderCode(false);
       setCopiedUpiId(false);
     onClose();
   }
-
-  const handleApplyCoupon = (couponCode?: string) => {
-const rawCoupon =
-  typeof couponCode === 'string'
-    ? couponCode
-    : appliedCoupon;
-
-const coupon = rawCoupon.toUpperCase();
- 
- 
-    console.log(
-  'subtotal:',
-  subtotal,
-  typeof subtotal,
-  cartItems.map(i => ({
-    price: i.price,
-    priceType: typeof i.price,
-    quantity: i.quantity
-  }))
-); 
-    
-    if (coupon === 'YEAREND25' && subtotal >= 1000) {
-      const discount = Math.min(Math.floor(subtotal * 0.1), 200);
-      setAppliedCoupon('YEAREND25');
-      setCouponDiscount(discount);
-      toast.success(`Year End discount applied! ₹${discount} off`);
-    } else if (coupon === 'YAARAKASH10' && subtotal >= 200) {
-      setAppliedCoupon('YAARAKASH10');
-      setCouponDiscount(50);
-      toast.success('Coupon applied! ₹50 off');
-    } else {
-  setCouponDiscount(0);
-
-  if (coupon === 'YEAREND25') {
-    toast.error('Minimum cart value of ₹1000 required for YEAREND25');
-  } else if (coupon === 'YAARAKASH10') {
-    toast.error('Minimum cart value of ₹200 required for this coupon');
-  } else {
-    toast.error('Invalid coupon code');
-  }
-}
- 
-  };
 
   const handleProceedToPayment = async () => {
     if (!customerName.trim()) {
@@ -181,11 +119,8 @@ const coupon = rawCoupon.toUpperCase();
           subtotal: item.price * item.quantity
         })),
         subtotalAmount: subtotal,
-        appliedCoupon: appliedCoupon || undefined,
-        discountAmount: discountAmount,
         totalAmount: total,
         status: 'Payment Pending',
-        mysteryBoxEligible: false,
         paymentMethod: 'UPI',
         paymentStatus: 'Pending'
       };
@@ -266,7 +201,6 @@ const coupon = rawCoupon.toUpperCase();
 ${itemsList}
 
 💰 *Payment Summary:*
-Subtotal: ₹${subtotal}${discountAmount > 0 ? `\nDiscount: -₹${discountAmount}` : ''}${appliedCoupon && discountAmount > 0 ? `\nCoupon: ${appliedCoupon}` : ''}
 *Total Paid: ₹${total}*
 
 ✅ *Payment Status:* Completed via UPI
@@ -332,48 +266,6 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             />
           </div>
         </div>
-
-        {/* Coupon Code */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Coupon Code (Optional)</label>
-          <div className="flex space-x-2">
-            <input
-              type="text"
-              value={appliedCoupon}
-              onChange={(e) => setAppliedCoupon(e.target.value.toUpperCase())}
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-              placeholder="Enter coupon code"
-            />
-            <button
-              onClick={handleApplyCoupon}
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl font-medium transition-colors"
-            >
-              Apply
-            </button>
-          </div>
-
-          {/* Available Coupons */}
-          <div className="mt-3 space-y-2">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Gift className="w-4 h-4 text-green-500" />
-                  <span className="text-green-800 font-medium text-sm">YEAREND25 - 10% off (Max ₹200, Min ₹1000)</span>
-                </div>
-                {subtotal >= 1000 ? (
-                  <button
-                    onClick={() => handleApplyCoupon('YEAREND25')}
-                    className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-md"
-                  >
-                    Use
-                  </button>
-                ) : (
-                  <span className="text-xs text-green-600">Not Eligible</span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Order Summary */}
@@ -384,12 +276,6 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             <span>Subtotal ({cartItems.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
             <span>₹{subtotal.toFixed(2)}</span>
           </div>
-          {discountAmount > 0 && (
-            <div className="flex justify-between text-green-600">
-              <span>Discount {appliedCoupon && `(${appliedCoupon})`}</span>
-              <span>-₹{discountAmount.toFixed(2)}</span>
-            </div>
-          )}
           <div className="border-t pt-2 flex justify-between font-bold text-lg">
             <span>Total</span>
             <span className="text-orange-500">₹{total.toFixed(2)}</span>

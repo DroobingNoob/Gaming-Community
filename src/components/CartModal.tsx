@@ -148,15 +148,6 @@ const CartModal: React.FC<CartModalProps> = ({
           {/* Footer */}
           {cartItems.length > 0 && (
             <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-blue-50">
-                {/* Pro Tip Banner */}
-              {total < 1000 && (
-                <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 text-green-900 rounded-xl p-3 sm:p-4 shadow-md text-sm sm:text-base font-medium text-center mb-4">
-                  💡 Pro Tip: Add products worth ₹{(1000 - total).toFixed(0)} more and get
-                  <span className="font-bold text-green-700"> 10% OFF (up to ₹200) </span>
-                   with coupon <span className="font-bold">YEAREND25</span>!
-                </div>
-              )} 
- 
               <div className="flex justify-between items-center mb-3 sm:mb-4">
                 <span className="text-lg sm:text-xl font-bold text-gray-800">Total:</span>
                 <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">₹{total.toFixed(2)}</span>
