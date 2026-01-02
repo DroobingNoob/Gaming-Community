@@ -37,17 +37,17 @@ const goToAllGames = () => {
   }, [isHovered]);
 
   const slides = [
-    {
-    title: "",
-    subtitle: "",
-    description: "",
-    image: "/purple modern 11.11 50 discount instagram post (1024 x 768 mm)_20251203_125637_0000.jpg",
-    overlay: "",
-    buttonText: "",
-    buttonAction: () => {},
-    isBanner: true,
-  },
-    {
+  //   {
+  //   title: "",
+  //   subtitle: "",
+  //   description: "",
+  //   image: "/purple modern 11.11 50 discount instagram post (1024 x 768 mm)_20251203_125637_0000.jpg",
+  //   overlay: "",
+  //   buttonText: "",
+  //   buttonAction: () => {},
+  //   isBanner: true,
+  // },
+    { 
     title: "",
     subtitle: "",
     description: "",
