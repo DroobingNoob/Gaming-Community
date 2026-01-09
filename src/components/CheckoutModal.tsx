@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Phone, ShoppingBag, Copy, Check, MessageCircle, Clock, AlertCircle } from 'lucide-react';
+import { X, User, Phone, ShoppingBag, Copy, Check, MessageCircle, Clock, AlertCircle, Gift, Tag } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { BackendService } from '../services/backendService';
 import ShopClosedModal from './ShopClosedModal';
@@ -44,6 +44,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [currentStep, setCurrentStep] = useState<'details' | 'payment' | 'confirmation'>('details');
   const [customerName, setCustomerName] = useState('');
   const [customerMobile, setCustomerMobile] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponBenefit, setCouponBenefit] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderCode, setOrderCode] = useState('');
   const [copiedOrderCode, setCopiedOrderCode] = useState(false);
@@ -52,7 +56,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const total = subtotal;
+  const rentGamesCount = cartItems.filter(item => item.type === 'Rent').length;
+  const total = Math.max(0, subtotal - couponDiscount);
 
   // Generate unique order code
   const generateOrderCode = () => {
@@ -80,10 +85,63 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
      setCurrentStep('details');
       setCustomerName(user?.user_metadata?.full_name || '');
       setCustomerMobile(user?.user_metadata?.mobile_number || '');
+      setCouponCode('');
+      setAppliedCoupon('');
+      setCouponDiscount(0);
+      setCouponBenefit('');
       setOrderCode('');
       setCopiedOrderCode(false);
       setCopiedUpiId(false);
     onClose();
+  }
+
+  const handleApplyCoupon = () => {
+    const code = couponCode.toUpperCase().trim();
+
+    if (!code) {
+      toast.error('Please enter a coupon code');
+      return;
+    }
+
+    if (code === 'PLAY10MORE') {
+      if (rentGamesCount >= 2) {
+        setAppliedCoupon('PLAY10MORE');
+        setCouponDiscount(0);
+        setCouponBenefit('Extra 10 days for both rent games');
+        toast.success('Coupon applied! Extra 10 days added for your rent games');
+      } else {
+        toast.error(`Add ${2 - rentGamesCount} more rent game(s) to use this coupon`);
+      }
+    } else if (code === 'PLAY20MORE') {
+      if (rentGamesCount >= 3) {
+        setAppliedCoupon('PLAY20MORE');
+        setCouponDiscount(0);
+        setCouponBenefit('Extra 20 days for all 3 rent games');
+        toast.success('Coupon applied! Extra 20 days added for your rent games');
+      } else {
+        toast.error(`Add ${3 - rentGamesCount} more rent game(s) to use this coupon`);
+      }
+    } else if (code === 'WINTER10') {
+      if (subtotal >= 1200) {
+        const discount = Math.min(Math.floor(subtotal * 0.1), 250);
+        setAppliedCoupon('WINTER10');
+        setCouponDiscount(discount);
+        setCouponBenefit(`₹${discount} discount`);
+        toast.success(`Winter Sale! ₹${discount} discount applied`);
+      } else {
+        toast.error(`Add items worth ₹${(1200 - subtotal).toFixed(0)} more to use this coupon`);
+      }
+    } else {
+      toast.error('Invalid coupon code');
+    }
+  }
+
+  const removeCoupon = () => {
+    setAppliedCoupon('');
+    setCouponCode('');
+    setCouponDiscount(0);
+    setCouponBenefit('');
+    toast.info('Coupon removed');
   }
 
   const handleProceedToPayment = async () => {
@@ -104,22 +162,39 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       const newOrderCode = generateOrderCode();
       setOrderCode(newOrderCode);
 
-      // Prepare order data
-      const orderData = {
-        orderCode: newOrderCode,
-        timestamp: new Date().toISOString(),
-        customerName: customerName.trim(),
-        customerMobile: customerMobile.trim(),
-        items: cartItems.map(item => ({
+      // Prepare order data with coupon info
+      const itemsWithCoupon = [
+        ...cartItems.map(item => ({
           title: item.edition && item.edition !== 'Standard' ? `${item.title} [${item.edition} Edition]` : item.title,
           platform: item.platform,
           type: item.type,
           price: item.price,
           quantity: item.quantity,
           subtotal: item.price * item.quantity
-        })),
+        }))
+      ];
+
+      // Add coupon info as a special item at the end
+      if (appliedCoupon) {
+        itemsWithCoupon.push({
+          title: `COUPON APPLIED: ${appliedCoupon} - ${couponBenefit}`,
+          platform: '',
+          type: 'Coupon',
+          price: 0,
+          quantity: 1,
+          subtotal: -couponDiscount
+        });
+      }
+
+      const orderData = {
+        orderCode: newOrderCode,
+        timestamp: new Date().toISOString(),
+        customerName: customerName.trim(),
+        customerMobile: customerMobile.trim(),
+        items: itemsWithCoupon,
         subtotalAmount: subtotal,
         totalAmount: total,
+        appliedCoupon: appliedCoupon || undefined,
         status: 'Payment Pending',
         paymentMethod: 'UPI',
         paymentStatus: 'Pending'
@@ -191,6 +266,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       return `• ${item.title}${editionText} (${item.platform} - ${item.type}) - ₹${item.price} x ${item.quantity} = ₹${item.price * item.quantity}`;
     }).join('\n');
 
+    const couponText = appliedCoupon ? `\n🎁 *Coupon Applied:* ${appliedCoupon} - ${couponBenefit}` : '';
+
     const message = `🎮 *GAMING COMMUNITY - ORDER DETAILS*
 
 📋 *Order Code:* ${orderCode}
@@ -198,9 +275,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 📱 *Mobile:* ${customerMobile}
 
 🛒 *Items Ordered:*
-${itemsList}
+${itemsList}${couponText}
 
 💰 *Payment Summary:*
+Subtotal: ₹${subtotal}${couponDiscount > 0 ? `\nDiscount: -₹${couponDiscount}` : ''}
 *Total Paid: ₹${total}*
 
 ✅ *Payment Status:* Completed via UPI
@@ -266,6 +344,149 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             />
           </div>
         </div>
+
+        {/* Coupon Code Section */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Coupon Code <span className="text-gray-400">(Optional)</span>
+          </label>
+
+          {!appliedCoupon ? (
+            <>
+              <div className="flex space-x-2">
+                <div className="relative flex-1">
+                  <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                    placeholder="Enter coupon code"
+                  />
+                </div>
+                <button
+                  onClick={handleApplyCoupon}
+                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+
+              {/* Available Coupons */}
+              <div className="mt-3 space-y-2">
+                {/* Play10More Coupon */}
+                <div className={`border rounded-lg p-3 ${rentGamesCount >= 2 ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-gray-300'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Gift className={`w-4 h-4 ${rentGamesCount >= 2 ? 'text-green-600' : 'text-gray-500'}`} />
+                      <div>
+                        <span className={`font-semibold text-sm ${rentGamesCount >= 2 ? 'text-green-800' : 'text-gray-700'}`}>
+                          PLAY10MORE
+                        </span>
+                        <p className="text-xs text-gray-600">Buy 2 Rent Games - Get Extra 10 Days</p>
+                      </div>
+                    </div>
+                    {rentGamesCount >= 2 ? (
+                      <button
+                        onClick={() => {
+                          setCouponCode('PLAY10MORE');
+                          handleApplyCoupon();
+                        }}
+                        className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md font-medium"
+                      >
+                        Apply
+                      </button>
+                    ) : (
+                      <span className="text-xs text-orange-600 font-medium">
+                        Add {2 - rentGamesCount} rent game
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Play20More Coupon */}
+                <div className={`border rounded-lg p-3 ${rentGamesCount >= 3 ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-gray-300'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Gift className={`w-4 h-4 ${rentGamesCount >= 3 ? 'text-green-600' : 'text-gray-500'}`} />
+                      <div>
+                        <span className={`font-semibold text-sm ${rentGamesCount >= 3 ? 'text-green-800' : 'text-gray-700'}`}>
+                          PLAY20MORE
+                        </span>
+                        <p className="text-xs text-gray-600">Buy 3 Rent Games - Get Extra 20 Days</p>
+                      </div>
+                    </div>
+                    {rentGamesCount >= 3 ? (
+                      <button
+                        onClick={() => {
+                          setCouponCode('PLAY20MORE');
+                          handleApplyCoupon();
+                        }}
+                        className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md font-medium"
+                      >
+                        Apply
+                      </button>
+                    ) : (
+                      <span className="text-xs text-orange-600 font-medium">
+                        Add {3 - rentGamesCount} rent games
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Winter10 Coupon */}
+                <div className={`border rounded-lg p-3 ${subtotal >= 1200 ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-300'}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Gift className={`w-4 h-4 ${subtotal >= 1200 ? 'text-blue-600' : 'text-gray-500'}`} />
+                      <div>
+                        <span className={`font-semibold text-sm ${subtotal >= 1200 ? 'text-blue-800' : 'text-gray-700'}`}>
+                          WINTER10 ❄️
+                        </span>
+                        <p className="text-xs text-gray-600">10% OFF on orders ₹1200+ (Max ₹250)</p>
+                      </div>
+                    </div>
+                    {subtotal >= 1200 ? (
+                      <button
+                        onClick={() => {
+                          setCouponCode('WINTER10');
+                          handleApplyCoupon();
+                        }}
+                        className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md font-medium"
+                      >
+                        Apply
+                      </button>
+                    ) : (
+                      <span className="text-xs text-orange-600 font-medium">
+                        Add ₹{(1200 - subtotal).toFixed(0)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="bg-green-50 border-2 border-green-400 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-green-500 rounded-full p-2">
+                    <Check className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-green-800">{appliedCoupon}</p>
+                    <p className="text-sm text-green-700">{couponBenefit}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={removeCoupon}
+                  className="text-red-600 hover:text-red-800 font-medium text-sm underline"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Order Summary */}
@@ -276,6 +497,18 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
             <span>Subtotal ({cartItems.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
             <span>₹{subtotal.toFixed(2)}</span>
           </div>
+          {couponDiscount > 0 && (
+            <div className="flex justify-between text-green-600 font-semibold">
+              <span>Discount ({appliedCoupon})</span>
+              <span>-₹{couponDiscount.toFixed(2)}</span>
+            </div>
+          )}
+          {appliedCoupon && couponDiscount === 0 && (
+            <div className="flex justify-between text-green-600 font-semibold">
+              <span>Benefit ({appliedCoupon})</span>
+              <span>{couponBenefit}</span>
+            </div>
+          )}
           <div className="border-t pt-2 flex justify-between font-bold text-lg">
             <span>Total</span>
             <span className="text-orange-500">₹{total.toFixed(2)}</span>

@@ -39,6 +39,7 @@ const CartModal: React.FC<CartModalProps> = ({
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const rentGamesCount = cartItems.filter(item => item.type === 'Rent').length;
 
   // Filter recommended products only
   const recommendedProducts = [
@@ -148,6 +149,53 @@ const CartModal: React.FC<CartModalProps> = ({
           {/* Footer */}
           {cartItems.length > 0 && (
             <div className="border-t border-gray-200 p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-blue-50">
+              {/* Coupon Eligibility Hints */}
+              <div className="mb-4 space-y-2">
+                {/* PLAY10MORE hint */}
+                {rentGamesCount === 1 && (
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-300 text-green-900 rounded-xl p-3 shadow-md text-sm font-medium">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🎮</span>
+                      <span>Add <span className="font-bold">1 more rent game</span> and get <span className="font-bold text-green-700">Extra 10 Days</span> with coupon <span className="font-bold">PLAY10MORE</span>!</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* PLAY20MORE hint */}
+                {rentGamesCount === 2 && (
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-300 text-blue-900 rounded-xl p-3 shadow-md text-sm font-medium">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🎮</span>
+                      <span>Add <span className="font-bold">1 more rent game</span> and get <span className="font-bold text-blue-700">Extra 20 Days</span> with coupon <span className="font-bold">PLAY20MORE</span>!</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* WINTER10 hint */}
+                {total >= 900 && total < 1200 && (
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-300 text-purple-900 rounded-xl p-3 shadow-md text-sm font-medium">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">❄️</span>
+                      <span>Add items worth <span className="font-bold">₹{(1200 - total).toFixed(0)}</span> more and get <span className="font-bold text-purple-700">10% OFF</span> (up to ₹250) with coupon <span className="font-bold">WINTER10</span>!</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Eligible coupons */}
+                {(rentGamesCount >= 2 || rentGamesCount >= 3 || total >= 1200) && (
+                  <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-400 text-green-900 rounded-xl p-3 shadow-md text-sm font-semibold">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">✨</span>
+                      <span>
+                        {rentGamesCount >= 3 && 'You can use PLAY20MORE for Extra 20 Days! '}
+                        {rentGamesCount === 2 && 'You can use PLAY10MORE for Extra 10 Days! '}
+                        {total >= 1200 && `You can use WINTER10 for ₹${Math.min(Math.floor(total * 0.1), 250)} discount!`}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="flex justify-between items-center mb-3 sm:mb-4">
                 <span className="text-lg sm:text-xl font-bold text-gray-800">Total:</span>
                 <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">₹{total.toFixed(2)}</span>
