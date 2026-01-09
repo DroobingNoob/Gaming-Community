@@ -172,7 +172,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
           type: item.type,
           price: item.price,
           quantity: item.quantity,
-          subtotal: item.price * item.quantity
+          subtotal: item.price * item.quantity,
+          coupon: appliedCoupon
         }))
       ];
 
