@@ -102,7 +102,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       toast.error('Please enter a coupon code');
       return;
     }
-
+ 
     if (code === 'PLAY10MORE') {
       if (rentGamesCount >= 2) {
         setAppliedCoupon('PLAY10MORE');
