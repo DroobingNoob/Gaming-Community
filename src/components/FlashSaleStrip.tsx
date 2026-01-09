@@ -81,7 +81,7 @@ const FlashSaleStrip: React.FC = () => {
         }
 
         .animate-marquee {
-          animation: marquee 15s linear infinite;
+          animation: marquee 10s linear infinite;
         }
 
         .animate-marquee:hover {
