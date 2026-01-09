@@ -389,10 +389,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                     </div>
                     {rentGamesCount >= 2 ? (
                       <button
-                        {/* onClick={() => {
-                          setCouponCode('PLAY10MORE');
-                          handleApplyCoupon();
-                        }} */}
+                        
                         onClick={() => {
   setCouponCode('PLAY10MORE');
   handleApplyCoupon('PLAY10MORE');
