@@ -420,10 +420,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                     </div>
                     {rentGamesCount >= 3 ? (
                       <button
-                        {/* onClick={() => {
-                          setCouponCode('PLAY20MORE');
-                          handleApplyCoupon();
-                        }} */}
+                       
                         onClick={() => {
   setCouponCode('PLAY20MORE');
   handleApplyCoupon('PLAY20MORE');
@@ -454,10 +451,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                     </div>
                     {subtotal >= 1200 ? (
                       <button
-                        {/* onClick={() => {
-                          setCouponCode('WINTER10');
-                          handleApplyCoupon();
-                        }} */}
+                       
                         onClick={() => {
   setCouponCode('WINTER10');
   handleApplyCoupon('WINTER10');
