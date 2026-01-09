@@ -96,8 +96,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }
 
   const handleApplyCoupon = () => {
-    
-
     if (code === 'PLAY10MORE') {
       if (rentGamesCount >= 2) {
         setAppliedCoupon('PLAY10MORE');
