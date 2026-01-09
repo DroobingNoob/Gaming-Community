@@ -95,7 +95,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     onClose();
   }
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = (coupon) => {
     const code = couponCode.toUpperCase().trim();
 
     // if (!code) {
