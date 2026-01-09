@@ -461,6 +461,10 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                           setCouponCode('WINTER10');
                           handleApplyCoupon();
                         }}
+                        onClick={() => {
+  setCouponCode('WINTER10');
+  handleApplyCoupon('WINTER10');
+}}
                         className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md font-medium"
                       >
                         Apply
