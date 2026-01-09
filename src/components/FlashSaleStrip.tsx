@@ -9,50 +9,29 @@ const FlashSaleStrip: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent animate-shimmer" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4">
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm sm:text-base">
-
-          {/* Title */}
-          <div className="flex items-center gap-2 font-semibold tracking-wide uppercase text-white/90">
-            <span className="h-2 w-2 rounded-full bg-yellow-300" />
-            Limited-Time Offers
-          </div>
-
-          <Separator />
-
-          {/* Offer 1 */}
-          <Offer
-            title="Buy 2 Games"
-            benefit="+10 Days Free"
-            code="PLAY10MORE"
-          />
-
-          <Separator />
-
-          {/* Offer 2 */}
-          <Offer
-            title="Buy 3 Games"
-            benefit="+20 Days Free"
-            code="PLAY20MORE"
-          />
-
-          <Separator />
-
-          {/* Offer 3 */}
-          <Offer
-            title="Winter Sale"
-            benefit="10% OFF ₹1200+"
-            code="WINTER10"
-            accent="blue"
-          />
+      <div className="relative z-10 w-full overflow-hidden">
+        {/* Scrolling Track */}
+        <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
+          <MarqueeContent />
+          <MarqueeContent /> {/* duplicate for seamless loop */}
         </div>
       </div>
 
       <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+
+        .animate-marquee {
+          animation: marquee 25s linear infinite;
+        }
+
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
         }
+
         .animate-shimmer {
           animation: shimmer 4s linear infinite;
         }
@@ -63,7 +42,32 @@ const FlashSaleStrip: React.FC = () => {
 
 export default FlashSaleStrip;
 
-/* ----------------- Sub Components ----------------- */
+/* ---------------- Sub Components ---------------- */
+
+const MarqueeContent = () => (
+  <div className="flex items-center gap-x-6 px-4 text-sm sm:text-base">
+    <Title />
+    <Separator />
+    <Offer title="Buy 2 Games" benefit="+10 Days Free" code="PLAY10MORE" />
+    <Separator />
+    <Offer title="Buy 3 Games" benefit="+20 Days Free" code="PLAY20MORE" />
+    <Separator />
+    <Offer
+      title="Winter Sale"
+      benefit="10% OFF ₹1200+"
+      code="WINTER10"
+      accent="blue"
+    />
+    <Separator />
+  </div>
+);
+
+const Title = () => (
+  <div className="flex items-center gap-2 font-semibold uppercase tracking-wide text-white/90">
+    <span className="h-2 w-2 rounded-full bg-yellow-300" />
+    Limited-Time Offers
+  </div>
+);
 
 const Separator = () => (
   <span className="hidden lg:block text-white/30">|</span>
