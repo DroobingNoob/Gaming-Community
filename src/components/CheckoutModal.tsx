@@ -366,7 +366,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                   />
                 </div>
                 <button
-                  onClick={handleApplyCoupon}
+                  onClick={handleApplyCoupon(couponCode)}
                   className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
                 >
                   Apply
@@ -423,10 +423,10 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                     </div>
                     {rentGamesCount >= 3 ? (
                       <button
-                        onClick={() => {
+                        {/* onClick={() => {
                           setCouponCode('PLAY20MORE');
                           handleApplyCoupon();
-                        }}
+                        }} */}
                         onClick={() => {
   setCouponCode('PLAY20MORE');
   handleApplyCoupon('PLAY20MORE');
@@ -457,10 +457,10 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                     </div>
                     {subtotal >= 1200 ? (
                       <button
-                        onClick={() => {
+                        {/* onClick={() => {
                           setCouponCode('WINTER10');
                           handleApplyCoupon();
-                        }}
+                        }} */}
                         onClick={() => {
   setCouponCode('WINTER10');
   handleApplyCoupon('WINTER10');
