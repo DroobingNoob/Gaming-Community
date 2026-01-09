@@ -152,7 +152,7 @@ const CartModal: React.FC<CartModalProps> = ({
               {/* Coupon Eligibility Hints */}
               <div className="mb-4 space-y-2">
                 {/* PLAY10MORE hint */}
-                {rentGamesCount === 1 && (
+                {cartItems.length === 1 && (
                   <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-300 text-green-900 rounded-xl p-3 shadow-md text-sm font-medium">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">🎮</span>
@@ -162,7 +162,7 @@ const CartModal: React.FC<CartModalProps> = ({
                 )}
 
                 {/* PLAY20MORE hint */}
-                {rentGamesCount === 2 && (
+                {cartItems.length === 2 && (
                   <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-300 text-blue-900 rounded-xl p-3 shadow-md text-sm font-medium">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">🎮</span>
@@ -172,7 +172,7 @@ const CartModal: React.FC<CartModalProps> = ({
                 )}
 
                 {/* WINTER10 hint */}
-                {total >= 900 && total < 1200 && (
+                {total < 1200 && (
                   <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-300 text-purple-900 rounded-xl p-3 shadow-md text-sm font-medium">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">❄️</span>
