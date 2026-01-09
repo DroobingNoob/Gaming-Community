@@ -131,7 +131,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       } else {
         toast.error(`Add items worth ₹${(1200 - subtotal).toFixed(0)} more to use this coupon`);
       }
-    } else {
+    } 
+    else {
       if(code === '')
       toast.error('Invalid coupon code');
     }
