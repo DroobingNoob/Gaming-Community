@@ -129,7 +129,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     } else {
       toast.error('Invalid coupon code');
     }
-    const code = appliedCoupon.toUpperCase().trim();
+    const code = appliedCoupon.toUpperCase().trim(); 
     if (!code) {
       toast.error('Please enter a coupon code');
       return;
