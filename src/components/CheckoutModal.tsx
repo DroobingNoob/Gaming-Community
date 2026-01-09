@@ -56,7 +56,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const rentGamesCount = cartItems.filter(item => item.type === 'Rent').length;
+  const rentGamesCount = cartItems.length;
   const total = Math.max(0, subtotal - couponDiscount);
 
   // Generate unique order code
