@@ -393,6 +393,10 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                           setCouponCode('PLAY10MORE');
                           handleApplyCoupon();
                         }}
+                        onClick={() => {
+  setCouponCode('PLAY10MORE');
+  handleApplyCoupon('PLAY10MORE');
+}}
                         className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md font-medium"
                       >
                         Apply
