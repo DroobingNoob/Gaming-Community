@@ -131,6 +131,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       } else {
         toast.error(`Add items worth ₹${(1200 - subtotal).toFixed(0)} more to use this coupon`);
       }
+    } else if (code === 'JUNKIEE100') {
+      if (subtotal >= 1000) {
+        const discount = 100;
+        setAppliedCoupon('JUNKIEE100');
+        setCouponDiscount(discount);
+        setCouponBenefit(`₹${discount} discount`);
+        toast.success(`₹${discount} discount applied`);
+      } else {
+        toast.error(`Add items worth ₹${(1000 - subtotal).toFixed(0)} more to use this coupon`);
+      }
     } 
     // else {
     //   if(code === '')
