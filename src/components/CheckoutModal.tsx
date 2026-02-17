@@ -121,14 +121,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       } else {
         toast.error(`Add ${3 - rentGamesCount} more rent game(s) to use this coupon`);
       }
-    } else if (code === 'WINTER10') {
-      if (subtotal >= 1200) {
-        const discount = Math.min(Math.floor(subtotal * 0.1), 250);
-        setAppliedCoupon('WINTER10');
-        setCouponDiscount(discount);
-        setCouponBenefit(`₹${discount} discount`);
-        toast.success(`Winter Sale! ₹${discount} discount applied`);
-      } else {
+    } else {
         toast.error(`Add items worth ₹${(1200 - subtotal).toFixed(0)} more to use this coupon`);
       }
     } else if (code === 'JUNKIEE100') {
