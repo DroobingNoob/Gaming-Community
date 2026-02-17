@@ -121,9 +121,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       } else {
         toast.error(`Add ${3 - rentGamesCount} more rent game(s) to use this coupon`);
       }
-    } else {
-        toast.error(`Add items worth ₹${(1200 - subtotal).toFixed(0)} more to use this coupon`);
-      }
     } else if (code === 'JUNKIEE100') {
       if (subtotal >= 1000) {
         const discount = 100;
@@ -424,7 +421,7 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                     </div>
                     {rentGamesCount >= 3 ? (
                       <button
-                       
+
                         onClick={() => {
   setCouponCode('PLAY20MORE');
   handleApplyCoupon('PLAY20MORE');
@@ -436,37 +433,6 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
                     ) : (
                       <span className="text-xs text-orange-600 font-medium">
                         Add {3 - rentGamesCount} rent games
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Winter10 Coupon */}
-                <div className={`border rounded-lg p-3 ${subtotal >= 1200 ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-300'}`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Gift className={`w-4 h-4 ${subtotal >= 1200 ? 'text-blue-600' : 'text-gray-500'}`} />
-                      <div>
-                        <span className={`font-semibold text-sm ${subtotal >= 1200 ? 'text-blue-800' : 'text-gray-700'}`}>
-                          WINTER10 ❄️
-                        </span>
-                        <p className="text-xs text-gray-600">10% OFF on orders ₹1200+ (Max ₹250)</p>
-                      </div>
-                    </div>
-                    {subtotal >= 1200 ? (
-                      <button
-                       
-                        onClick={() => {
-  setCouponCode('WINTER10');
-  handleApplyCoupon('WINTER10');
-}}
-                        className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md font-medium"
-                      >
-                        Apply
-                      </button>
-                    ) : (
-                      <span className="text-xs text-orange-600 font-medium">
-                        Add ₹{(1200 - subtotal).toFixed(0)}
                       </span>
                     )}
                   </div>

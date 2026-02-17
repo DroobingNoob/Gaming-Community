@@ -51,13 +51,6 @@ const MarqueeContent = () => (
     <Offer title="Buy 2 Games" benefit="+10 Days Free" code="PLAY10MORE" />
     <Separator />
     <Offer title="Buy 3 Games" benefit="+20 Days Free" code="PLAY20MORE" />
-    {/* <Separator />
-    <Offer
-      title="Winter Sale"
-      benefit="10% OFF ₹1200+"
-      code="WINTER10"
-      accent="blue"
-    /> */} 
     <Separator />
   </div>
 );

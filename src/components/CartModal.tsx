@@ -171,25 +171,14 @@ const CartModal: React.FC<CartModalProps> = ({
                   </div>
                 )}
 
-                {/* WINTER10 hint */}
-                {total < 1200 && (
-                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-300 text-purple-900 rounded-xl p-3 shadow-md text-sm font-medium">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">❄️</span>
-                      <span>Add items worth <span className="font-bold">₹{(1200 - total).toFixed(0)}</span> more and get <span className="font-bold text-purple-700">10% OFF</span> (up to ₹250) with coupon <span className="font-bold">WINTER10</span>!</span>
-                    </div>
-                  </div>
-                )}
-
                 {/* Eligible coupons */}
-                {(rentGamesCount >= 2 || rentGamesCount >= 3 || total >= 1200) && (
+                {(rentGamesCount >= 2 || rentGamesCount >= 3) && (
                   <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-400 text-green-900 rounded-xl p-3 shadow-md text-sm font-semibold">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">✨</span>
                       <span>
                         {rentGamesCount >= 3 && 'You can use PLAY20MORE for Extra 20 Days! '}
                         {rentGamesCount === 2 && 'You can use PLAY10MORE for Extra 10 Days! '}
-                        {total >= 1200 && `You can use WINTER10 for ₹${Math.min(Math.floor(total * 0.1), 250)} discount!`}
                       </span>
                     </div>
                   </div>
