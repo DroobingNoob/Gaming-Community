@@ -1,164 +1,241 @@
-import { createClient } from '@supabase/supabase-js';
+// Temporary Supabase replacement file.
+// Keep this file name for now so existing imports do not break while we migrate.
 
-const supabaseUrl = 'https://qbjymmzgysjzhmmkafaz.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFianltbXpneXNqemhtbWthZmF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyMTMyNzMsImV4cCI6MjA2NTc4OTI3M30.xblro8Quvlg1N9qSz1FcCnQ1ptJgzrV2BlJBHGHvhTg';
+const createNoopSubscription = () => ({
+  unsubscribe: () => {},
+});
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase: any = {
+  auth: {
+    getSession: async () => ({ data: { session: null }, error: null }),
+    getUser: async () => ({ data: { user: null }, error: null }),
+    onAuthStateChange: () => ({
+      data: { subscription: createNoopSubscription() },
+    }),
+    signInWithPassword: async () => ({
+      data: { user: null, session: null },
+      error: new Error("Supabase auth has been disabled during migration."),
+    }),
+    signUp: async () => ({
+      data: { user: null, session: null },
+      error: new Error("Supabase auth has been disabled during migration."),
+    }),
+    signInWithOAuth: async () => ({
+      data: null,
+      error: new Error("Supabase auth has been disabled during migration."),
+    }),
+    updateUser: async () => ({
+      data: { user: null },
+      error: new Error("Supabase auth has been disabled during migration."),
+    }),
+    signOut: async () => ({ error: null }),
+  },
+  channel: () => ({
+    on: () => ({
+      subscribe: () => createNoopSubscription(),
+    }),
+  }),
+};
+
+export interface GamePlatformPrice {
+  id?: string;
+  platform: string;
+  original_price?: number | null;
+  sale_price?: number | null;
+  rent_1_month?: number | null;
+  rent_3_months?: number | null;
+  rent_6_months?: number | null;
+  rent_12_months?: number | null;
+  permanent_offline_price?: number | null;
+  permanent_online_price?: number | null;
+  created_at?: string;
+  updated_at?: string;
+}
 
 // Database types
 export interface Game {
   id?: string;
   title: string;
-  edition?: 'Standard' | 'Premium' | 'Ultimate' | 'Deluxe'; // All four editions
-  base_game_id?: string; // Links different editions of the same game
-  edition_features?: string[]; // Edition-specific features
+  edition?: "Standard" | "Premium" | "Ultimate" | "Deluxe";
+  base_game_id?: string | null;
+  edition_features?: string[];
   image: string;
-  original_price: number;
-  sale_price: number; // Keep for subscriptions compatibility
-  // Rental pricing
-  rent_1_month?: number;
-  rent_3_months?: number;
-  rent_6_months?: number;
-  rent_12_months?: number;
-  // Permanent pricing
-  permanent_offline_price?: number;
-  permanent_online_price?: number;
-  platform: string[];
-  discount: number;
   description: string;
   type: string[];
-  category: 'game' | 'subscription';
+  category: "game" | "subscription";
   show_in_bestsellers?: boolean;
   is_recommended?: boolean;
   created_at?: string;
   updated_at?: string;
+  platform_prices: GamePlatformPrice[];
 }
 
 export interface Testimonial {
   id?: string;
-  image: string; // Phone screenshot URL
+  image: string;
   created_at?: string;
   updated_at?: string;
 }
 
+export const getPlatformsForGame = (game: Game): string[] => {
+  return (game.platform_prices || []).map((p) => p.platform);
+};
+
+export const getPlatformPricing = (
+  game: Game,
+  selectedPlatform: string
+): GamePlatformPrice | undefined => {
+  return (game.platform_prices || []).find(
+    (p) => p.platform === selectedPlatform
+  );
+};
+
 // Helper function to calculate discount percentage for games
-export const calculateGameDiscount = (originalPrice: number, currentPrice: number): number => {
+export const calculateGameDiscount = (
+  originalPrice: number,
+  currentPrice: number
+): number => {
   if (originalPrice <= 0 || currentPrice <= 0) return 0;
   return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
 };
 
 // Helper function to get the display price for games based on selected type
-export const getGameDisplayPrice = (game: Game, selectedType: string, selectedRentDuration?: string): number => {
-  if (game.category === 'subscription') {
-    return game.sale_price; // Subscriptions keep original logic
+export const getGameDisplayPrice = (
+  game: Game,
+  selectedPlatform: string,
+  selectedType: string,
+  selectedRentDuration?: string
+): number => {
+  const pricing = getPlatformPricing(game, selectedPlatform);
+  if (!pricing) return 0;
+
+  if (game.category === "subscription") {
+    return pricing.sale_price || pricing.original_price || 0;
   }
 
-  // For games, calculate based on type
-  if (selectedType === 'Rent') {
+  if (selectedType === "Rent") {
     const rentPrices = {
-      '1_month': game.rent_1_month || 0,
-      '3_months': game.rent_3_months || 0,
-      '6_months': game.rent_6_months || 0,
-      '12_months': game.rent_12_months || 0
+      "1_month": pricing.rent_1_month || 0,
+      "3_months": pricing.rent_3_months || 0,
+      "6_months": pricing.rent_6_months || 0,
+      "12_months": pricing.rent_12_months || 0,
     };
-    return rentPrices[selectedRentDuration as keyof typeof rentPrices] || game.rent_1_month || 0;
-  } else if (selectedType === 'Permanent Offline') {
-    return game.permanent_offline_price || game.original_price;
-  } else if (selectedType === 'Permanent Offline + Online') {
-    return game.permanent_online_price || game.original_price;
+
+    return (
+      rentPrices[selectedRentDuration as keyof typeof rentPrices] ||
+      pricing.rent_1_month ||
+      0
+    );
   }
 
-  // Default: Check if PC game (has permanent_offline_price but no rent_1_month)
-  if (game.permanent_offline_price && !game.rent_1_month) {
-    return game.permanent_offline_price;
+  if (selectedType === "Permanent Offline") {
+    return pricing.permanent_offline_price || pricing.original_price || 0;
   }
 
-  // Otherwise default to 1 month rent price for games
-  return game.rent_1_month || game.original_price;
+  if (selectedType === "Permanent Offline + Online") {
+    return pricing.permanent_online_price || pricing.original_price || 0;
+  }
+
+  return (
+    pricing.rent_1_month ||
+    pricing.permanent_offline_price ||
+    pricing.permanent_online_price ||
+    pricing.sale_price ||
+    pricing.original_price ||
+    0
+  );
 };
 
 // Helper function to get discount percentage for display
-export const getGameDiscountPercentage = (game: Game, selectedType: string, selectedRentDuration?: string): number => {
-  if (game.category === 'subscription') {
-    return game.discount; // Subscriptions keep original logic
-  }
+export const getGameDiscountPercentage = (
+  game: Game,
+  selectedPlatform: string,
+  selectedType: string,
+  selectedRentDuration?: string
+): number => {
+  const pricing = getPlatformPricing(game, selectedPlatform);
+  if (!pricing) return 0;
 
-  // For games, calculate discount based on selected type vs original price
-  const currentPrice = getGameDisplayPrice(game, selectedType, selectedRentDuration);
-  return calculateGameDiscount(game.original_price, currentPrice);
+  const originalPrice =
+    pricing.original_price ||
+    pricing.sale_price ||
+    pricing.permanent_offline_price ||
+    pricing.permanent_online_price ||
+    0;
+
+  const currentPrice = getGameDisplayPrice(
+    game,
+    selectedPlatform,
+    selectedType,
+    selectedRentDuration
+  );
+
+  return calculateGameDiscount(originalPrice, currentPrice);
 };
 
-// Helper function to get available editions for a game (Standard and Premium only)
+export const getStartingPrice = (game: Game): number => {
+  const prices = (game.platform_prices || [])
+    .flatMap((p) => [
+      p.rent_1_month,
+      p.rent_3_months,
+      p.rent_6_months,
+      p.rent_12_months,
+      p.permanent_offline_price,
+      p.permanent_online_price,
+      p.sale_price,
+      p.original_price,
+    ])
+    .filter((v): v is number => typeof v === "number" && v > 0);
+
+  return prices.length ? Math.min(...prices) : 0;
+};
+
+// Helper function to get available editions for a game
 export const getGameEditions = (games: Game[], baseGameId: string): Game[] => {
-  // First try to find by base_game_id relationship
-  let editions = games.filter(game => 
-    game.base_game_id === baseGameId || 
-    game.id === baseGameId ||
-    (game.base_game_id && game.base_game_id === baseGameId)
+  let editions = games.filter(
+    (game) =>
+      game.base_game_id === baseGameId ||
+      game.id === baseGameId ||
+      (game.base_game_id && game.base_game_id === baseGameId)
   );
-  
-  // If no editions found by base_game_id, try to find by title
+
   if (editions.length <= 1) {
-    const baseGame = games.find(game => game.id === baseGameId);
+    const baseGame = games.find((game) => game.id === baseGameId);
     if (baseGame) {
-      editions = games.filter(game => game.title === baseGame.title);
+      editions = games.filter((game) => game.title === baseGame.title);
     }
   }
-  
+
   return editions.sort((a, b) => {
-    // Sort by edition: Standard first, then Premium, Ultimate, Deluxe
-    const editionOrder = { 'Standard': 1, 'Premium': 2, 'Ultimate': 3, 'Deluxe': 4 };
+    const editionOrder = {
+      Standard: 1,
+      Premium: 2,
+      Ultimate: 3,
+      Deluxe: 4,
+    };
     const aOrder = editionOrder[a.edition as keyof typeof editionOrder] || 999;
     const bOrder = editionOrder[b.edition as keyof typeof editionOrder] || 999;
     return aOrder - bOrder;
   });
 };
 
-// Helper function to get the primary edition of a game (for display in listings)
-export const getPrimaryEdition = (games: Game[], gameTitle: string): Game | null => {
-  const editions = games.filter(game => game.title === gameTitle);
-  
+// Helper function to get the primary edition of a game
+export const getPrimaryEdition = (
+  games: Game[],
+  gameTitle: string
+): Game | null => {
+  const editions = games.filter((game) => game.title === gameTitle);
+
   if (editions.length === 0) return null;
-  
-  // Always return Standard edition first, or the first available edition
-  const standardEdition = editions.find(game => game.edition === 'Standard');
+
+  const standardEdition = editions.find((game) => game.edition === "Standard");
   return standardEdition || editions[0];
 };
 
-// Helper function to get unique games (only primary editions for customer view)
-export const getUniqueGamesForCustomer = (games: Game[]): Game[] => {
-  const gameGroups = groupGamesByTitle(games);
-  const uniqueGames: Game[] = [];
-  
-  Object.keys(gameGroups).forEach(title => {
-    const primaryEdition = getPrimaryEdition(games, title);
-    if (primaryEdition) {
-      uniqueGames.push(primaryEdition);
-    }
-  });
-  
-  return uniqueGames.sort((a, b) => {
-    const aDate = new Date(a.created_at || 0);
-    const bDate = new Date(b.created_at || 0);
-    return bDate.getTime() - aDate.getTime(); // Newest first
-  });
-};
-
-// Helper function to get the cheapest edition of a game
-export const getCheapestEdition = (games: Game[], gameTitle: string): Game | null => {
-  const editions = games.filter(game => game.title === gameTitle);
-  
-  if (editions.length === 0) return null;
-  
-  return editions.reduce((cheapest, current) => {
-    const cheapestPrice = getGameDisplayPrice(cheapest, 'Rent', '1_month');
-    const currentPrice = getGameDisplayPrice(current, 'Rent', '1_month');
-    return currentPrice < cheapestPrice ? current : cheapest;
-  });
-};
-
-// Helper function to group games by title (ignoring edition)
-export const groupGamesByTitle = (games: Game[]): { [title: string]: Game[] } => {
+// Helper function to group games by title
+export const groupGamesByTitle = (
+  games: Game[]
+): { [title: string]: Game[] } => {
   return games.reduce((groups, game) => {
     if (!groups[game.title]) {
       groups[game.title] = [];
@@ -168,27 +245,69 @@ export const groupGamesByTitle = (games: Game[]): { [title: string]: Game[] } =>
   }, {} as { [title: string]: Game[] });
 };
 
-// Helper function to find all editions of a game by any edition ID
-export const findAllEditionsByGameId = (games: Game[], gameId: string): Game[] => {
-  const targetGame = games.find(game => game.id === gameId);
+// Helper function to get unique games for customer
+export const getUniqueGamesForCustomer = (games: Game[]): Game[] => {
+  const gameGroups = groupGamesByTitle(games);
+  const uniqueGames: Game[] = [];
+
+  Object.keys(gameGroups).forEach((title) => {
+    const primaryEdition = getPrimaryEdition(games, title);
+    if (primaryEdition) {
+      uniqueGames.push(primaryEdition);
+    }
+  });
+
+  return uniqueGames.sort((a, b) => {
+    const aDate = new Date(a.created_at || 0);
+    const bDate = new Date(b.created_at || 0);
+    return bDate.getTime() - aDate.getTime();
+  });
+};
+
+// Helper function to get cheapest edition
+export const getCheapestEdition = (
+  games: Game[],
+  gameTitle: string
+): Game | null => {
+  const editions = games.filter((game) => game.title === gameTitle);
+
+  if (editions.length === 0) return null;
+
+  return editions.reduce((cheapest, current) => {
+    const cheapestPrice = getStartingPrice(cheapest);
+    const currentPrice = getStartingPrice(current);
+    return currentPrice < cheapestPrice ? current : cheapest;
+  });
+};
+
+// Helper function to find all editions by game id
+export const findAllEditionsByGameId = (
+  games: Game[],
+  gameId: string
+): Game[] => {
+  const targetGame = games.find((game) => game.id === gameId);
   if (!targetGame) return [];
-  
-  // Find all games with the same title
-  const sameTitle = games.filter(game => game.title === targetGame.title);
-  
-  // If we have base_game_id relationships, use those
+
+  const sameTitle = games.filter((game) => game.title === targetGame.title);
+
   const baseGameId = targetGame.base_game_id || targetGame.id;
-  const relatedByBaseId = games.filter(game => 
-    game.base_game_id === baseGameId || 
-    game.id === baseGameId ||
-    (game.base_game_id && game.base_game_id === targetGame.base_game_id)
+  const relatedByBaseId = games.filter(
+    (game) =>
+      game.base_game_id === baseGameId ||
+      game.id === baseGameId ||
+      (game.base_game_id && game.base_game_id === targetGame.base_game_id)
   );
-  
-  // Return the larger set (more comprehensive)
-  const editions = relatedByBaseId.length > sameTitle.length ? relatedByBaseId : sameTitle;
-  
+
+  const editions =
+    relatedByBaseId.length > sameTitle.length ? relatedByBaseId : sameTitle;
+
   return editions.sort((a, b) => {
-    const editionOrder = { 'Standard': 1, 'Premium': 2, 'Ultimate': 3, 'Deluxe': 4 };
+    const editionOrder = {
+      Standard: 1,
+      Premium: 2,
+      Ultimate: 3,
+      Deluxe: 4,
+    };
     const aOrder = editionOrder[a.edition as keyof typeof editionOrder] || 999;
     const bOrder = editionOrder[b.edition as keyof typeof editionOrder] || 999;
     return aOrder - bOrder;

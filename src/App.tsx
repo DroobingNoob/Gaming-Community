@@ -1,32 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import FlashSaleStrip from './components/FlashSaleStrip';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import LoginModal from './components/LoginModal';
-import CartModal from './components/CartModal';
-import CheckoutModal from './components/CheckoutModal';
-import NewsletterModal from './components/NewsletterModal';
-import NewsletterBanner from './components/NewsletterBanner';
-import WhatsAppButton from './components/WhatsAppButton';
-import FloatingCartButton from './components/FloatingCartButton';
+import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import FlashSaleStrip from "./components/FlashSaleStrip";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import LoginModal from "./components/LoginModal";
+import CartModal from "./components/CartModal";
+import CheckoutModal from "./components/CheckoutModal";
+import WhatsAppButton from "./components/WhatsAppButton";
+import FloatingCartButton from "./components/FloatingCartButton";
 
 // Page Components
-import HomePage from './pages/HomePage';
-import GamesPage from './pages/GamesPage';
-import PCGamesPage from './pages/PCGamesPage';
-import SubscriptionsPage from './pages/SubscriptionsPage';
-import ProductPage from './pages/ProductPage';
-import AdminPage from './pages/AdminPage';
-import TermsPage from './pages/TermsPage';
-import RefundPolicyPage from './pages/RefundPolicyPage';
-import FAQPage from './pages/FAQPage';
+import HomePage from "./pages/HomePage";
+import GamesPage from "./pages/GamesPage";
+import PCGamesPage from "./pages/PCGamesPage";
+import SubscriptionsPage from "./pages/SubscriptionsPage";
+import ProductPage from "./pages/ProductPage";
+import AdminPage from "./pages/AdminPage";
+import TermsPage from "./pages/TermsPage";
+import RefundPolicyPage from "./pages/RefundPolicyPage";
+import FAQPage from "./pages/FAQPage";
 
-import { Game, supabase } from './config/supabase';
-import { CartStorageService } from './services/cartStorageService';
-import { settingsService, ShopStatus } from './services/settingsService';
+import { Game } from "./config/supabase";
+import { settingsService, ShopStatus } from "./services/settingsService";
+import { authService, AdminUser } from "./services/authService";
 
 interface CartItem {
   id: string;
@@ -54,7 +52,7 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('App Error Boundary caught an error:', error, errorInfo);
+    console.error("App Error Boundary caught an error:", error, errorInfo);
   }
 
   render() {
@@ -65,9 +63,12 @@ class ErrorBoundary extends React.Component<
             <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-white text-2xl">⚠️</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">Something went wrong</h1>
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+              Something went wrong
+            </h1>
             <p className="text-gray-600 mb-6">
-              We encountered an unexpected error. Please refresh the page to try again.
+              We encountered an unexpected error. Please refresh the page to try
+              again.
             </p>
             <button
               onClick={() => window.location.reload()}
@@ -88,145 +89,47 @@ function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [isNewsletterModalOpen, setIsNewsletterModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AdminUser | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [showNewsletterBanner, setShowNewsletterBanner] = useState(false);
   const [hasNewsletterDiscount, setHasNewsletterDiscount] = useState(false);
   const [shopStatus, setShopStatus] = useState<ShopStatus>({
     isOpen: true,
-    mode: 'working_hours',
-    message: ''
+    mode: "working_hours",
+    message: "",
   });
 
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
 
   useEffect(() => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}, [location.pathname]);
-  
-  // Track if we've already shown login toast to prevent duplicates
-  const hasShownLoginToast = useRef(false);
-  const hasShownLogoutToast = useRef(false);
-  const hasShownNewsletterPrompt = useRef(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [location.pathname]);
 
-  // Load cart from Google Sheets when user logs in
-  const loadUserCart = async (userId: string) => {
-    try {
-      const savedCartItems = await CartStorageService.loadCartItems(userId);
-      if (savedCartItems.length > 0) {
-        setCartItems(savedCartItems);
-        toast.info(`Welcome back! Your cart has ${savedCartItems.length} items.`);
-      }
-    } catch (error) {
-      console.error('Error loading user cart:', error);
-    }
-  };
-
-  // Save cart to Google Sheets when cart changes (for logged-in users)
-  const saveUserCart = async (userId: string, items: CartItem[]) => {
-    try {
-      await CartStorageService.saveCartItems(userId, items);
-    } catch (error) {
-      console.error('Error saving user cart:', error);
-    }
-  };
-
-  // Check if user is eligible for newsletter signup
-  const checkNewsletterEligibility = (userData: any) => {
-    const hasSubscribed = userData?.user_metadata?.newsletter_subscribed;
-    const hasFirstOrderDiscount = userData?.user_metadata?.first_order_discount_available;
-    
-    setHasNewsletterDiscount(hasFirstOrderDiscount === true);
-    
-    // Show newsletter modal for new users who haven't subscribed
-    if (!hasSubscribed && !hasShownNewsletterPrompt.current) {
-      setTimeout(() => {
-        setIsNewsletterModalOpen(true);
-        hasShownNewsletterPrompt.current = true;
-      }, 2000); // Show after 2 seconds
-    }
-  };
-
-  // Check authentication status on app load
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setUser(session.user);
-        setIsLoggedIn(true);
-        // Check if user is admin (you can customize this logic)
-        setIsAdmin(session.user.email === 'communitygamiing1@gmail.com' || session.user.email === 'aayushdasgupta0408@gmail.com'||session.user.user_metadata?.role === 'admin');
-        
-        // Check newsletter eligibility
-        checkNewsletterEligibility(session.user);
-        
-        // Load user's cart from Google Sheets
-        loadUserCart(session.user.id);
-      } else {
-        // Show newsletter banner for non-logged-in users
-        setShowNewsletterBanner(true);
+    const bootAuth = async () => {
+      const storedUser = authService.getStoredUser();
+      if (storedUser) {
+        setUser(storedUser);
       }
-    });
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session);
-      
-      if (session) {
-        setUser(session.user);
+      const currentUser = await authService.getCurrentUser();
+
+      if (currentUser) {
+        setUser(currentUser);
         setIsLoggedIn(true);
-        setShowNewsletterBanner(false);
-        
-        // Check if user is admin (you can customize this logic)
-        setIsAdmin(session.user.email === 'communitygamiing1@gmail.com' || session.user.email === 'aayushdasgupta0408@gmail.com'||session.user.user_metadata?.role === 'admin'); 
-        
-        if (event === 'SIGNED_IN' && !hasShownLoginToast.current) {
-          toast.success('Successfully signed in!');
-          setIsLoginModalOpen(false);
-          hasShownLoginToast.current = true;
-          
-          // Check newsletter eligibility for new login
-          checkNewsletterEligibility(session.user);
-          
-          // Load user's cart from Google Sheets
-          loadUserCart(session.user.id);
-          
-          // Reset after a delay to allow future logins
-          setTimeout(() => {
-            hasShownLoginToast.current = false;
-          }, 5000);
-        }
+        setIsAdmin(currentUser.role === "admin");
       } else {
         setUser(null);
         setIsLoggedIn(false);
         setIsAdmin(false);
-        setShowNewsletterBanner(true);
-        setHasNewsletterDiscount(false);
-        
-        // Clear cart when user logs out
-        setCartItems([]);
-        
-        if (event === 'SIGNED_OUT' && !hasShownLogoutToast.current) {
-          toast.success('Successfully signed out!');
-          hasShownLogoutToast.current = true;
-          // Reset after a delay to allow future logouts
-          setTimeout(() => {
-            hasShownLogoutToast.current = false;
-          }, 5000);
-        }
       }
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    bootAuth();
   }, []);
 
-  // Fetch shop status and subscribe to real-time changes
   useEffect(() => {
     const fetchShopStatus = async () => {
       const status = await settingsService.getShopStatus();
@@ -240,7 +143,7 @@ function App() {
       setShopStatus(status);
     });
 
-    const interval = setInterval(fetchShopStatus, 60000);
+    const interval = setInterval(fetchShopStatus, 60000000);
 
     return () => {
       subscription.unsubscribe();
@@ -248,63 +151,27 @@ function App() {
     };
   }, []);
 
-  // Save cart to Google Sheets whenever cart changes (for logged-in users)
-  useEffect(() => {
-    if (isLoggedIn && user && cartItems.length >= 0) {
-      // Debounce the save operation to avoid too many requests
-      const timeoutId = setTimeout(() => {
-        saveUserCart(user.id, cartItems);
-      }, 1000);
+  const handleLogin = async () => {
+    const currentUser = await authService.getCurrentUser();
 
-      return () => clearTimeout(timeoutId);
+    if (currentUser) {
+      setUser(currentUser);
+      setIsLoggedIn(true);
+      setIsAdmin(currentUser.role === "admin");
+      setIsLoginModalOpen(false);
+      toast.success("Successfully signed in!");
+    } else {
+      toast.error("Login verification failed");
     }
-  }, [cartItems, isLoggedIn, user]);
-
-  const handleLogin = () => {
-    // This will be handled by the auth state change listener
-    setIsLoginModalOpen(false);
   };
 
   const handleLogout = async () => {
-    try {
-      // Clear cart from Google Sheets before logging out
-      if (user) {
-        await CartStorageService.clearCart(user.id);
-      }
-      
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        toast.error('Error signing out: ' + error.message);
-      }
-    } catch (error) {
-      toast.error('An error occurred during sign out');
-      console.error('Logout error:', error);
-    }
-  };
-
-  const handleNewsletterSignup = async (mobile: string) => {
-    try {
-      // Update local state
-      setHasNewsletterDiscount(true);
-      setShowNewsletterBanner(false);
-      
-      // Refresh user data to get updated metadata
-      const { data: { user: updatedUser } } = await supabase.auth.getUser();
-      if (updatedUser) {
-        setUser(updatedUser);
-      }
-    } catch (error) {
-      console.error('Error handling newsletter signup:', error);
-    }
-  };
-
-  const handleNewsletterBannerClick = () => {
-    if (isLoggedIn) {
-      setIsNewsletterModalOpen(true);
-    } else {
-      setIsLoginModalOpen(true);
-      toast.info('Please login first to get your 10% discount!');
-    }
+    authService.logout();
+    setUser(null);
+    setIsLoggedIn(false);
+    setIsAdmin(false);
+    navigate("/");
+    toast.success("Successfully signed out!");
   };
 
   const handleCartClick = () => {
@@ -314,110 +181,96 @@ function App() {
   const handleCheckout = () => {
     try {
       if (cartItems.length === 0) {
-        toast.error('Your cart is empty');
+        toast.error("Your cart is empty");
         return;
       }
       setIsCartModalOpen(false);
       setIsCheckoutModalOpen(true);
     } catch (error) {
-      console.error('Error opening checkout:', error);
-      toast.error('Failed to open checkout. Please try again.');
+      console.error("Error opening checkout:", error);
+      toast.error("Failed to open checkout. Please try again.");
     }
   };
 
   const handleOrderComplete = async () => {
     try {
-      // Clear cart after successful order
-      if (isLoggedIn && user) {
-        await CartStorageService.clearCart(user.id);
-      }
       setCartItems([]);
-      
-      // If user used newsletter discount, mark it as used
-      if (hasNewsletterDiscount && user) {
-        await supabase.auth.updateUser({
-          data: {
-            first_order_discount_available: false,
-            first_order_completed: true,
-            first_order_date: new Date().toISOString()
-          }
-        });
-        setHasNewsletterDiscount(false);
-      }
-      
-      toast.success('Order placed successfully!'); 
+      setHasNewsletterDiscount(false);
+      toast.success("Order placed successfully!");
     } catch (error) {
-      console.error('Error completing order:', error);
-      toast.error('Order completed but there was an issue clearing the cart.');
+      console.error("Error completing order:", error);
+      toast.error("Order completed but there was an issue clearing the cart.");
     }
   };
 
   const handleNavigation = (section: string) => {
     try {
-      if (section === 'admin' && isAdmin) {
-        navigate('/admin');
+      if (section === "admin") {
+        if (isAdmin) {
+          navigate("/admin");
+        } else {
+          setIsLoginModalOpen(true);
+          toast.info("Please log in as admin");
+        }
         return;
       }
 
-      if (section === 'logout' && isLoggedIn) {
+      if (section === "logout" && isLoggedIn) {
         handleLogout();
         return;
       }
 
-      if (section === 'contact') {
-        // Open WhatsApp for contact
-        const phoneNumber = '+91 9266514434';
-        const message = 'Hi! I need help with my gaming purchase.';
+      if (section === "contact") {
+        const phoneNumber = "+91 9266514434";
+        const message = "Hi! I need help with my gaming purchase.";
         const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
+        window.open(whatsappUrl, "_blank");
         return;
       }
 
-      if (section === 'terms') {
-        navigate('/terms');
+      if (section === "terms") {
+        navigate("/terms");
         return;
       }
 
-      if (section === 'refund') {
-        navigate('/refund-policy');
+      if (section === "refund") {
+        navigate("/refund-policy");
         return;
       }
 
-      if (section === 'faq') {
-        navigate('/faq');
+      if (section === "faq") {
+        navigate("/faq");
         return;
       }
 
-      if (section === 'home') {
-        navigate('/');
+      if (section === "home") {
+        navigate("/");
         return;
       }
 
-      if (section === 'categories') {
-        // Scroll to categories section on home page
-        if (location.pathname !== '/') {
-          navigate('/');
+      if (section === "categories") {
+        if (location.pathname !== "/") {
+          navigate("/");
           setTimeout(() => {
-            scrollToSection('categories');
+            scrollToSection("categories");
           }, 100);
         } else {
-          scrollToSection('categories');
+          scrollToSection("categories");
         }
         return;
       }
-      
-      // For other sections, scroll to them if on home page
-      if (location.pathname === '/') {
+
+      if (location.pathname === "/") {
         scrollToSection(section);
       } else {
-        navigate('/');
+        navigate("/");
         setTimeout(() => {
           scrollToSection(section);
         }, 100);
       }
     } catch (error) {
-      console.error('Navigation error:', error);
-      toast.error('Navigation failed. Please try again.');
+      console.error("Navigation error:", error);
+      toast.error("Navigation failed. Please try again.");
     }
   };
 
@@ -425,37 +278,38 @@ function App() {
     try {
       const element = document.getElementById(sectionId);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        element.scrollIntoView({ behavior: "smooth" });
       }
     } catch (error) {
-      console.error('Scroll error:', error);
+      console.error("Scroll error:", error);
     }
   };
 
-  const handleAddToCart = (product: Game, platform: string, type: string, price: number) => {
+  const handleAddToCart = (
+    product: Game,
+    platform: string,
+    type: string,
+    price: number
+  ) => {
     try {
-      // Prevent duplicate rapid additions
       const itemId = `${product.id}-${platform}-${type}`;
-      
-      // Check if we're already processing this item (debounce)
+
       const now = Date.now();
       const lastAddTime = sessionStorage.getItem(`lastAdd_${itemId}`);
-      if (lastAddTime && (now - parseInt(lastAddTime)) < 1000) {
-        console.log('Preventing duplicate cart addition');
+      if (lastAddTime && now - parseInt(lastAddTime) < 1000) {
         return;
       }
       sessionStorage.setItem(`lastAdd_${itemId}`, now.toString());
-      
-      const existingItem = cartItems.find(item => item.id === itemId);
-      
+
+      const existingItem = cartItems.find((item) => item.id === itemId);
+
       if (existingItem) {
-        // Limit quantity to prevent runaway additions
         if (existingItem.quantity >= 10) {
-          toast.warning('Maximum quantity (10) reached for this item');
+          toast.warning("Maximum quantity (10) reached for this item");
           return;
         }
-        setCartItems(items =>
-          items.map(item =>
+        setCartItems((items) =>
+          items.map((item) =>
             item.id === itemId
               ? { ...item, quantity: item.quantity + 1 }
               : item
@@ -465,93 +319,82 @@ function App() {
         const newCartItem: CartItem = {
           id: itemId,
           title: product.title,
-          price: price,
+          price,
           quantity: 1,
           image: product.image,
-          platform: platform,
-          type: type,
-          edition: product.edition
+          platform,
+          type,
+          edition: product.edition,
         };
-        setCartItems(items => [...items, newCartItem]);
+        setCartItems((items) => [...items, newCartItem]);
       }
-      
+
       toast.success(`${product.title} added to cart!`, {
         position: "top-right",
         autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
       });
     } catch (error) {
-      console.error('Error adding to cart:', error);
-      toast.error('Failed to add item to cart. Please try again.');
+      console.error("Error adding to cart:", error);
+      toast.error("Failed to add item to cart. Please try again.");
     }
   };
 
-  const handleBuyNow = (product: Game, platform: string, type: string, price: number) => {
+  const handleBuyNow = (
+    product: Game,
+    platform: string,
+    type: string,
+    price: number
+  ) => {
     try {
-      // Add to cart first
       handleAddToCart(product, platform, type, price);
-      
-      // Open checkout modal
+
       setTimeout(() => {
         setIsCheckoutModalOpen(true);
       }, 500);
-      
-      toast.success('Redirecting to checkout!');
+
+      toast.success("Redirecting to checkout!");
     } catch (error) {
-      console.error('Error in buy now:', error);
-      toast.error('Failed to proceed to checkout. Please try again.');
+      console.error("Error in buy now:", error);
+      toast.error("Failed to proceed to checkout. Please try again.");
     }
   };
 
   const handleUpdateQuantity = (id: string, quantity: number) => {
     try {
-      // Prevent invalid quantities
       if (quantity < 1) {
         handleRemoveItem(id);
         return;
       }
       if (quantity > 10) {
-        toast.warning('Maximum quantity (10) reached for this item');
+        toast.warning("Maximum quantity (10) reached for this item");
         return;
       }
-      
-      setCartItems(items =>
-        items.map(item =>
-          item.id === id ? { ...item, quantity } : item
-        )
+
+      setCartItems((items) =>
+        items.map((item) => (item.id === id ? { ...item, quantity } : item))
       );
     } catch (error) {
-      console.error('Error updating quantity:', error);
-      toast.error('Failed to update quantity. Please try again.');
+      console.error("Error updating quantity:", error);
+      toast.error("Failed to update quantity. Please try again.");
     }
   };
 
   const handleRemoveItem = (id: string) => {
     try {
-      setCartItems(items => items.filter(item => item.id !== id));
+      setCartItems((items) => items.filter((item) => item.id !== id));
     } catch (error) {
-      console.error('Error removing item:', error);
-      toast.error('Failed to remove item. Please try again.');
+      console.error("Error removing item:", error);
+      toast.error("Failed to remove item. Please try again.");
     }
   };
- 
+
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
-        {/* Flash Sale Strip - At the very top with highest z-index */}
-        <FlashSaleStrip /> 
+        <FlashSaleStrip />
 
-        {/* Newsletter Banner - Show for non-logged-in users or logged-in users without newsletter discount */}
-        {/* {(showNewsletterBanner || (isLoggedIn && !user?.user_metadata?.newsletter_subscribed)) && (
-          <NewsletterBanner onSignupClick={handleNewsletterBannerClick} />
-        )} */} 
-
-        {/* Header - Immediately below Flash Sale Strip */}
         <Header
           onLoginClick={() => setIsLoginModalOpen(true)}
           onCartClick={handleCartClick}
@@ -563,38 +406,50 @@ function App() {
           hasNewsletterDiscount={hasNewsletterDiscount}
         />
 
-        {/* Main content - Below header with proper spacing */}
         <main className="relative z-10">
           <Routes>
-            <Route path="/" element={<HomePage onNavigation={handleNavigation} />} />
+            <Route
+              path="/"
+              element={<HomePage onNavigation={handleNavigation} />}
+            />
             <Route path="/games" element={<GamesPage />} />
             <Route path="/pc-games" element={<PCGamesPage />} />
-            <Route path="/games/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
+            <Route
+              path="/games/:id"
+              element={
+                <ProductPage
+                  onAddToCart={handleAddToCart}
+                  onBuyNow={handleBuyNow}
+                />
+              }
+            />
             <Route path="/subscriptions" element={<SubscriptionsPage />} />
-            <Route path="/subscriptions/:id" element={<ProductPage onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />} />
-            <Route path="/admin" element={isAdmin ? <AdminPage /> : <HomePage onNavigation={handleNavigation} />} />
+            <Route
+              path="/subscriptions/:id"
+              element={
+                <ProductPage
+                  onAddToCart={handleAddToCart}
+                  onBuyNow={handleBuyNow}
+                />
+              }
+            />
+            <Route
+              path="/admin"
+              element={isAdmin ? <AdminPage /> : <HomePage onNavigation={handleNavigation} />}
+            />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/refund-policy" element={<RefundPolicyPage />} />
             <Route path="/faq" element={<FAQPage />} />
           </Routes>
         </main>
 
-        {/* Footer */}
         <Footer onNavigation={handleNavigation} />
 
-        {/* Modals - High z-index */}
         <LoginModal
           isOpen={isLoginModalOpen}
           onClose={() => setIsLoginModalOpen(false)}
           onLogin={handleLogin}
         />
-
-        {/* <NewsletterModal
-          isOpen={isNewsletterModalOpen}
-          onClose={() => setIsNewsletterModalOpen(false)}
-          onSignup={handleNewsletterSignup}
-          userEmail={user?.email}
-        /> */} 
 
         <CartModal
           isOpen={isCartModalOpen}
@@ -617,16 +472,12 @@ function App() {
           shopWorkingHours={shopStatus.workingHours}
         />
 
-        {/* Floating Cart Button - Only shows when cart has items */}
         <FloatingCartButton
           cartItemCount={cartItemCount}
           onCartClick={handleCartClick}
         />
 
-        {/* WhatsApp Button */}
         <WhatsAppButton />
-        
-        {/* Toast Container */}
         <ToastContainer />
       </div>
     </ErrorBoundary>

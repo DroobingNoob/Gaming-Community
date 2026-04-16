@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { X, Mail, Phone, Gift, Check, AlertCircle } from 'lucide-react';
-import { toast } from 'react-toastify';
-import { supabase } from '../config/supabase';
+import React, { useState } from "react";
+import { X, Mail, Phone, Gift, Check, AlertCircle } from "lucide-react";
+import { toast } from "react-toastify";
 
 interface NewsletterModalProps {
   isOpen: boolean;
@@ -10,65 +9,61 @@ interface NewsletterModalProps {
   userEmail?: string;
 }
 
-const NewsletterModal: React.FC<NewsletterModalProps> = ({ 
-  isOpen, 
-  onClose, 
+const NewsletterModal: React.FC<NewsletterModalProps> = ({
+  isOpen,
+  onClose,
   onSignup,
-  userEmail 
+  userEmail,
 }) => {
-  const [mobile, setMobile] = useState('');
+  const [mobile, setMobile] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   if (!isOpen) return null;
 
   const handleMobileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Only allow digits and limit to 10 characters
-    const numericValue = value.replace(/\D/g, '').slice(0, 10);
+    const numericValue = value.replace(/\D/g, "").slice(0, 10);
     setMobile(numericValue);
-    setError('');
+    setError("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!mobile.trim()) {
-      setError('Please enter your mobile number');
+      setError("Please enter your mobile number");
       return;
     }
-    
-    // Validate mobile number (basic validation)
+
     const mobileRegex = /^[6-9]\d{9}$/;
     if (!mobileRegex.test(mobile.trim())) {
-      setError('Please enter a valid 10-digit mobile number');
+      setError("Please enter a valid 10-digit mobile number");
       return;
     }
 
     try {
       setIsSubmitting(true);
-      setError('');
+      setError("");
 
-      // Update user metadata with newsletter signup and mobile
-      const { error: updateError } = await supabase.auth.updateUser({
-        data: {
-          newsletter_subscribed: true,
-          mobile_number: mobile,
-          newsletter_signup_date: new Date().toISOString(),
-          first_order_discount_available: true
-        }
-      });
+      localStorage.setItem(
+        "gc_newsletter_signup",
+        JSON.stringify({
+          mobile,
+          email: userEmail || "",
+          signedUpAt: new Date().toISOString(),
+          firstOrderDiscountAvailable: true,
+        })
+      );
 
-      if (updateError) {
-        throw updateError;
-      }
-
-      toast.success('🎉 Newsletter signup successful! You now have a 10% discount on your first order!');
+      toast.success(
+        "🎉 Newsletter signup successful! Your 10% first-order discount is ready."
+      );
       onSignup(mobile);
       onClose();
     } catch (error) {
-      console.error('Newsletter signup error:', error);
-      setError('Failed to sign up for newsletter. Please try again.');
+      console.error("Newsletter signup error:", error);
+      setError("Failed to sign up for newsletter. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -77,7 +72,6 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] p-4">
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl max-w-md w-full shadow-2xl border border-white/20 overflow-hidden">
-        {/* Header */}
         <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 text-white relative">
           <button
             onClick={onClose}
@@ -85,17 +79,18 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({
           >
             <X className="w-6 h-6" />
           </button>
-          
+
           <div className="text-center">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <Gift className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-2xl font-bold mb-2">Get 10% OFF!</h2>
-            <p className="text-white/90">Join our newsletter for exclusive gaming deals</p>
+            <p className="text-white/90">
+              Join our newsletter for exclusive gaming deals
+            </p>
           </div>
         </div>
 
-        {/* Content */}
         <div className="p-6">
           <div className="text-center mb-6">
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200 mb-4">
@@ -104,7 +99,7 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({
                 <span className="font-semibold">Special First Order Discount</span>
               </div>
               <p className="text-green-700 text-sm">
-                Get 10% off your first order when you sign up for our newsletter!
+                Get 10% off your first order when you sign up for our newsletter.
               </p>
             </div>
 
@@ -125,7 +120,6 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email Display */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Email Address
@@ -134,15 +128,14 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="email"
-                  value={userEmail || ''}
+                  value={userEmail || ""}
                   disabled
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-600"
-                  placeholder="Your email address"
+                  placeholder="Optional email"
                 />
               </div>
             </div>
 
-            {/* Mobile Number Input */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Mobile Number <span className="text-red-500">*</span>
@@ -170,7 +163,6 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({
               )}
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting || !mobile.trim()}
@@ -191,8 +183,7 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({
           </form>
 
           <p className="text-xs text-gray-500 text-center mt-4 leading-relaxed">
-            By signing up, you agree to receive promotional emails and SMS. 
-            You can unsubscribe at any time. The 10% discount is valid for your first order only.
+            By signing up, you agree to receive promotional messages. The 10% discount is valid for your first order only.
           </p>
         </div>
       </div>

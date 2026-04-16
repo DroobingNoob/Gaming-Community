@@ -1,5 +1,10 @@
-import { supabase, Game, Testimonial } from '../config/supabase';
-import { openDB } from 'idb'; 
+import {
+  Game,
+  Testimonial,
+  GamePlatformPrice,
+  getStartingPrice,
+} from "../config/supabase";
+import { openDB } from "idb";
 
 // Interface for filtering and pagination parameters
 export interface GameFilters {
@@ -18,21 +23,12 @@ export interface PaginatedResponse<T> {
   currentPage: number;
 }
 
-// Games Service
-const CACHE_TTL = 60 * 60 * 1000; // 1 hour
-const DB_NAME = 'gamesCache';
-const STORE_NAME = 'games'; 
+const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
-function logEgress(data: any, label: string) {
-  try {
-    const sizeInBytes = new TextEncoder().encode(JSON.stringify(data)).length;
-    const sizeInKB = (sizeInBytes / 1024).toFixed(2);
-    const sizeInMB = (sizeInBytes / (1024 * 1024)).toFixed(2);
-    console.log(`[Egress Estimate] ${label}: ${sizeInKB} KB (${sizeInMB} MB)`);
-  } catch (err) {
-    console.error(`[Egress Estimate] Failed to measure:`, err);
-  }
-}
+// Games Service
+const CACHE_TTL = 60 * 60 * 1000;
+const DB_NAME = "gamesCache";
+const STORE_NAME = "games";
 
 async function initDB() {
   return openDB(DB_NAME, 1, {
@@ -69,403 +65,398 @@ async function getAllKeys() {
   return db.getAllKeys(STORE_NAME);
 }
 
-// Remove any cache entry that contains a specific game ID
 async function removeCacheEntriesContainingGame(gameId: string) {
   const db = await initDB();
   const keys = await db.getAllKeys(STORE_NAME);
+
   for (const key of keys) {
     const cached = await db.get(STORE_NAME, key);
+
     if (cached?.data?.data) {
-      // For PaginatedResponse caches
       if (cached.data.data.some((g: Game) => g.id === gameId)) {
         await db.delete(STORE_NAME, key);
-        console.log(`[Cache] Removed key: ${key} (contained game ${gameId})`);
       }
     } else if (Array.isArray(cached?.data)) {
-      // For bestseller arrays
       if (cached.data.some((g: Game) => g.id === gameId)) {
         await db.delete(STORE_NAME, key);
-        console.log(`[Cache] Removed key: ${key} (contained game ${gameId})`);
       }
     }
   }
 }
 
-export const gamesService = {
+function parseNumber(value: any): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const num = Number(value);
+  return Number.isNaN(num) ? null : num;
+}
 
-  // Get all games
+function normalizePlatformPrice(raw: any): GamePlatformPrice {
+  return {
+    ...raw,
+    original_price: parseNumber(raw.original_price),
+    sale_price: parseNumber(raw.sale_price),
+    rent_1_month: parseNumber(raw.rent_1_month),
+    rent_3_months: parseNumber(raw.rent_3_months),
+    rent_6_months: parseNumber(raw.rent_6_months),
+    rent_12_months: parseNumber(raw.rent_12_months),
+    permanent_offline_price: parseNumber(raw.permanent_offline_price),
+    permanent_online_price: parseNumber(raw.permanent_online_price),
+  };
+}
+
+function normalizeGame(raw: any): Game {
+  return {
+    ...raw,
+    type: Array.isArray(raw.type) ? raw.type : [],
+    edition_features: Array.isArray(raw.edition_features)
+      ? raw.edition_features
+      : [],
+    show_in_bestsellers: Boolean(raw.show_in_bestsellers),
+    is_recommended: Boolean(raw.is_recommended),
+    platform_prices: Array.isArray(raw.platform_prices)
+      ? raw.platform_prices.map(normalizePlatformPrice)
+      : [],
+  };
+}
+
+function filterAndPaginateGames(
+  allGames: Game[],
+  filters: GameFilters,
+  category: "game" | "subscription"
+): PaginatedResponse<Game> {
+  const {
+    searchQuery = "",
+    platform = "all",
+    priceRange = [0, 10000],
+    sortBy = "name-asc",
+    page = 1,
+    limit = 24,
+  } = filters;
+
+  let filtered = allGames.filter((game) => game.category === category);
+
+  if (searchQuery.trim()) {
+    const query = searchQuery.trim().toLowerCase();
+    filtered = filtered.filter((game) =>
+      game.title.toLowerCase().includes(query)
+    );
+  }
+
+if (category === "game" && platform !== "all") {
+  filtered = filtered.filter((game) =>
+    (game.platform_prices || []).some((p) => p.platform === platform)
+  );
+}
+if (category === "subscription") {
+  filtered = filtered.filter((game) => {
+    const price = getStartingPrice(game);
+    return price >= priceRange[0] && price <= priceRange[1];
+  });
+}
+  switch (sortBy) {
+    case "name-asc":
+      filtered.sort((a, b) => a.title.localeCompare(b.title));
+      break;
+    case "name-desc":
+      filtered.sort((a, b) => b.title.localeCompare(a.title));
+      break;
+    case "price-low":
+  filtered.sort((a, b) => getStartingPrice(a) - getStartingPrice(b));
+  break;
+    case "price-high":
+  filtered.sort((a, b) => getStartingPrice(b) - getStartingPrice(a));
+  break;
+    default:
+      filtered.sort((a, b) => {
+        const aDate = new Date(a.created_at || 0).getTime();
+        const bDate = new Date(b.created_at || 0).getTime();
+        return bDate - aDate;
+      });
+      break;
+  }
+
+  const count = filtered.length;
+  const totalPages = Math.ceil(count / limit) || 1;
+  const from = (page - 1) * limit;
+  const to = from + limit;
+
+  return {
+    data: filtered.slice(from, to),
+    count,
+    totalPages,
+    currentPage: page,
+  };
+}
+
+async function fetchAllGamesFromApi(): Promise<Game[]> {
+  const response = await fetch(`${API_URL}/games`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch games: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return Array.isArray(data) ? data.map(normalizeGame) : [];
+}
+
+export const gamesService = {
   async getAll(filters: GameFilters = {}): Promise<PaginatedResponse<Game>> {
     try {
       const cacheKey = `getAll:${JSON.stringify(filters)}`;
       const cached = await getFromCache(cacheKey);
       if (cached) return cached;
 
-      console.log(`[Supabase] Fetching from Supabase for key: ${cacheKey}`);
-
-      const {
-        searchQuery = '',
-        platform = 'all',
-        priceRange = [0, 10000],
-        sortBy = 'name-asc',
-        page = 1,
-        limit = 24
-      } = filters;
-
-      let query = supabase
-        .from('games')
-        .select('id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, permanent_offline_price, permanent_online_price, platform, discount, description, type, category, show_in_bestsellers, edition, base_game_id, edition_features, is_recommended', { count: 'exact' })
-        .eq('category', 'game');
-
-      if (searchQuery) query = query.ilike('title', `%${searchQuery}%`);
-      if (platform !== 'all') query = query.contains('platform', [platform]);
-
-      switch (sortBy) {
-        case 'name-asc': query = query.order('title', { ascending: true }); break;
-        case 'name-desc': query = query.order('title', { ascending: false }); break;
-        case 'price-low': query = query.order('rent_1_month', { ascending: true }); break;
-        case 'price-high': query = query.order('rent_1_month', { ascending: false }); break;
-        default: query = query.order('created_at', { ascending: false });
-      }
-
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
-      query = query.range(from, to);
-
-      const { data, error, count } = await query;
-      if (error) throw error;
-
-      logEgress(data, "getAll Games");
-
-      const result = {
-        data: data || [],
-        count: count || 0,
-        totalPages: Math.ceil((count || 0) / limit),
-        currentPage: page
-      };
+      const allGames = await fetchAllGamesFromApi();
+      const result = filterAndPaginateGames(allGames, filters, "game");
 
       await saveToCache(cacheKey, result);
       return result;
-
     } catch (error) {
-      console.error('Error fetching games:', error);
+      console.error("Error fetching games:", error);
       return { data: [], count: 0, totalPages: 0, currentPage: 1 };
     }
   },
 
-  // Get bestseller games
   async getBestsellers(limitCount: number = 6): Promise<Game[]> {
     try {
       const cacheKey = `bestsellers:${limitCount}`;
       const cached = await getFromCache(cacheKey);
       if (cached) return cached;
 
-      console.log(`[Supabase] Fetching from Supabase for key: ${cacheKey}`);
+      const allGames = await fetchAllGamesFromApi();
+      const bestsellers = allGames
+        .filter(
+          (game) => game.category === "game" && game.show_in_bestsellers === true
+        )
+        .sort((a, b) => {
+          const aDate = new Date(a.created_at || 0).getTime();
+          const bDate = new Date(b.created_at || 0).getTime();
+          return bDate - aDate;
+        })
+        .slice(0, limitCount);
 
-      const { data, error } = await supabase
-        .from('games')
-        .select('id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, permanent_offline_price, permanent_online_price, platform, discount, description, type, category, edition, base_game_id, edition_features, is_recommended')
-        .eq('category', 'game')
-        .eq('show_in_bestsellers', true)
-        .order('created_at', { ascending: false })
-        .limit(limitCount);
-
-      if (error) throw error;
-
-      logEgress(data, "getAll Games");
-      
-      await saveToCache(cacheKey, data || []);
-      return data || [];
-
+      await saveToCache(cacheKey, bestsellers);
+      return bestsellers;
     } catch (error) {
-      console.error('Error fetching bestsellers:', error);
+      console.error("Error fetching bestsellers:", error);
       return [];
     }
   },
 
-  // Add new game
-  async add(game: Omit<Game, 'id' | 'created_at' | 'updated_at'>): Promise<string> {
-    try {
-      const { data, error } = await supabase
-        .from('games')
-        .insert([{ ...game, category: 'game' }])
-        .select('id')
-        .single();
+  async add(game: Omit<Game, "id" | "created_at" | "updated_at">): Promise<string> {
+    const response = await fetch(`${API_URL}/games`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...game,
+        category: "game",
+      }),
+    });
 
-      if (error) throw error;
-
-      console.log(`[Cache] Clearing all caches after adding a game`);
-      const keys = await getAllKeys();
-      for (const key of keys) await removeCacheKey(String(key));
-
-      return data.id;
-
-    } catch (error) {
-      console.error('Error adding game:', error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Failed to add game: ${response.status}`);
     }
+
+    const data = normalizeGame(await response.json());
+
+    const keys = await getAllKeys();
+    for (const key of keys) {
+      await removeCacheKey(String(key));
+    }
+
+    return data.id as string;
   },
 
-  // Update game
   async update(id: string, game: Partial<Game>): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('games')
-        .update({ ...game, updated_at: new Date().toISOString() })
-        .eq('id', id);
+    const response = await fetch(`${API_URL}/games/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...game,
+        updated_at: new Date().toISOString(),
+      }),
+    });
 
-      if (error) throw error;
-      console.log(`[Cache] Partial invalidation for game ID: ${id}`);
-      await removeCacheEntriesContainingGame(id);
-
-    } catch (error) {
-      console.error('Error updating game:', error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Failed to update game: ${response.status}`);
     }
+
+    await removeCacheEntriesContainingGame(id);
   },
 
-  // Delete game
   async delete(id: string): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('games')
-        .delete()
-        .eq('id', id);
+    const response = await fetch(`${API_URL}/games/${id}`, {
+      method: "DELETE",
+    });
 
-      if (error) throw error;
-      console.log(`[Cache] Partial invalidation for deleted game ID: ${id}`);
-      await removeCacheEntriesContainingGame(id);
-
-    } catch (error) {
-      console.error('Error deleting game:', error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Failed to delete game: ${response.status}`);
     }
-  }
+
+    await removeCacheEntriesContainingGame(id);
+  },
 };
 
-// Subscriptions Service
-// Subscriptions Service
 export const subscriptionsService = {
-  // Get all subscriptions
   async getAll(filters: GameFilters = {}): Promise<PaginatedResponse<Game>> {
     try {
       const cacheKey = `subscriptions:getAll:${JSON.stringify(filters)}`;
       const cached = await getFromCache(cacheKey);
       if (cached) return cached;
 
-      console.log(`[Supabase] Fetching subscriptions for key: ${cacheKey}`);
-
-      const {
-        searchQuery = '',
-        priceRange = [0, 10000], 
-        sortBy = 'name-asc',
-        page = 1,
-        limit = 24
-      } = filters;
-
-      let query = supabase
-        .from('games')
-        .select(
-          'id, title, image, original_price, sale_price, rent_1_month, rent_3_months, rent_6_months, rent_12_months, platform, discount, description, type, category',
-          { count: 'exact' }
-        )
-        .eq('category', 'subscription');
-
-      if (searchQuery) query = query.ilike('title', `%${searchQuery}%`);
-      query = query
-        .gte('sale_price', priceRange[0])
-        .lte('sale_price', priceRange[1]);
-
-      switch (sortBy) {
-        case 'name-asc': query = query.order('title', { ascending: true }); break;
-        case 'name-desc': query = query.order('title', { ascending: false }); break;
-        case 'price-low': query = query.order('sale_price', { ascending: true }); break;
-        case 'price-high': query = query.order('sale_price', { ascending: false }); break;
-        default: query = query.order('created_at', { ascending: false });
-      }
-
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
-      query = query.range(from, to);
-
-      const { data, error, count } = await query;
-      if (error) throw error;
-
-      const result = {
-        data: data || [],
-        count: count || 0,
-        totalPages: Math.ceil((count || 0) / limit),
-        currentPage: page
-      };
+      const allGames = await fetchAllGamesFromApi();
+      const result = filterAndPaginateGames(allGames, filters, "subscription");
 
       await saveToCache(cacheKey, result);
       return result;
     } catch (error) {
-      console.error('Error fetching subscriptions:', error);
+      console.error("Error fetching subscriptions:", error);
       return { data: [], count: 0, totalPages: 0, currentPage: 1 };
     }
   },
 
-  // Add new subscription
-  async add(subscription: Omit<Game, 'id' | 'created_at' | 'updated_at'>): Promise<string> {
-    try {
-      const { data, error } = await supabase
-        .from('games')
-        .insert([
-          {
-            ...subscription,
-            category: 'subscription',
-            platform: ['Subscription'],
-            type: ['Rent']
-          }
-        ])
-        .select('id')
-        .single();
+  async add(subscription: Omit<Game, "id" | "created_at" | "updated_at">): Promise<string> {
+    const response = await fetch(`${API_URL}/games`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...subscription,
+        category: "subscription",
+        platform: ["Subscription"],
+        type: ["Rent"],
+      }),
+    });
 
-      if (error) throw error;
+    if (!response.ok) {
+      throw new Error(`Failed to add subscription: ${response.status}`);
+    }
 
-      console.log(`[Cache] Clearing all subscription caches after adding`);
-      const keys = await getAllKeys();
-      for (const key of keys) {
-        if (String(key).startsWith('subscriptions:')) {
-          await removeCacheKey(String(key));
-        }
+    const data = normalizeGame(await response.json());
+
+    const keys = await getAllKeys();
+    for (const key of keys) {
+      if (String(key).startsWith("subscriptions:")) {
+        await removeCacheKey(String(key));
       }
-
-      return data.id;
-    } catch (error) {
-      console.error('Error adding subscription:', error);
-      throw error;
     }
+
+    return data.id as string;
   },
 
-  // Update subscription
   async update(id: string, subscription: Partial<Game>): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('games')
-        .update({ ...subscription, updated_at: new Date().toISOString() })
-        .eq('id', id);
+    const response = await fetch(`${API_URL}/games/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...subscription,
+        updated_at: new Date().toISOString(),
+      }),
+    });
 
-      if (error) throw error;
-
-      console.log(`[Cache] Partial invalidation for subscription ID: ${id}`);
-      await removeCacheEntriesContainingGame(id);
-    } catch (error) {
-      console.error('Error updating subscription:', error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Failed to update subscription: ${response.status}`);
     }
+
+    await removeCacheEntriesContainingGame(id);
   },
 
-  // Delete subscription
   async delete(id: string): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('games')
-        .delete()
-        .eq('id', id);
+    const response = await fetch(`${API_URL}/games/${id}`, {
+      method: "DELETE",
+    });
 
-      if (error) throw error;
-
-      console.log(`[Cache] Partial invalidation for deleted subscription ID: ${id}`);
-      await removeCacheEntriesContainingGame(id);
-    } catch (error) {
-      console.error('Error deleting subscription:', error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Failed to delete subscription: ${response.status}`);
     }
-  }
+
+    await removeCacheEntriesContainingGame(id);
+  },
 };
- 
-// Testimonials Service
-// Testimonials Service
+
 export const testimonialsService = {
-  // Get all testimonials
   async getAll(): Promise<Testimonial[]> {
     const cacheKey = `testimonials:getAll`;
 
     try {
-      // Try cache first
       const cached = await getFromCache(cacheKey);
       if (cached) return cached;
 
-      console.log(`[Supabase] Fetching testimonials for key: ${cacheKey}`);
-      const { data, error } = await supabase
-        .from('testimonials')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const response = await fetch(`${API_URL}/testimonials`);
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(`Failed to fetch testimonials: ${response.status}`);
+      }
 
-      await saveToCache(cacheKey, data || []);
-      return data || [];
+      const data = await response.json();
+      const normalized = Array.isArray(data) ? data : [];
+
+      await saveToCache(cacheKey, normalized);
+      return normalized;
     } catch (error) {
-      console.error('Error fetching testimonials:', error);
+      console.error("Error fetching testimonials:", error);
       return [];
     }
   },
 
-  // Add new testimonial
-  async add(testimonial: Omit<Testimonial, 'id' | 'created_at' | 'updated_at'>): Promise<string> {
-    try {
-      const { data, error } = await supabase
-        .from('testimonials')
-        .insert([testimonial])
-        .select('id')
-        .single();
+  async add(
+    testimonial: Omit<Testimonial, "id" | "created_at" | "updated_at">
+  ): Promise<string> {
+    const response = await fetch(`${API_URL}/testimonials`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(testimonial),
+    });
 
-      if (error) throw error;
+    if (!response.ok) {
+      throw new Error(`Failed to add testimonial: ${response.status}`);
+    }
 
-      console.log(`[Cache] Clearing testimonials cache after adding`);
-      const keys = await getAllKeys();
-      for (const key of keys) {
-        if (String(key).startsWith('testimonials:')) {
-          await removeCacheKey(String(key));
-        }
+    const data = await response.json();
+
+    const keys = await getAllKeys();
+    for (const key of keys) {
+      if (String(key).startsWith("testimonials:")) {
+        await removeCacheKey(String(key));
       }
-
-      return data.id;
-    } catch (error) {
-      console.error('Error adding testimonial:', error);
-      throw error;
     }
+
+    return data.id;
   },
 
-  // Update testimonial
   async update(id: string, testimonial: Partial<Testimonial>): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('testimonials')
-        .update({
-          ...testimonial,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      console.log(`[Cache] Partial invalidation for testimonial ID: ${id}`);
-      await removeCacheEntriesContainingGame(id); // Rename helper to something generic if used for testimonials too
-    } catch (error) {
-      console.error('Error updating testimonial:', error);
-      throw error;
-    }
+    // Your current backend does not yet have PUT /testimonials/:id
+    // Leave this here so the UI compiles, but don't use it until backend route is added.
+    console.warn("Testimonial update route is not implemented yet.", {
+      id,
+      testimonial,
+    });
+    throw new Error("Testimonial update route is not implemented yet.");
   },
 
-  // Delete testimonial
   async delete(id: string): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('testimonials')
-        .delete()
-        .eq('id', id);
+    const response = await fetch(`${API_URL}/testimonials/${id}`, {
+      method: "DELETE",
+    });
 
-      if (error) throw error;
-
-      console.log(`[Cache] Partial invalidation for deleted testimonial ID: ${id}`);
-      await removeCacheEntriesContainingGame(id); // same helper issue here
-    } catch (error) {
-      console.error('Error deleting testimonial:', error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Failed to delete testimonial: ${response.status}`);
     }
-  }
+
+    const keys = await getAllKeys();
+    for (const key of keys) {
+      if (String(key).startsWith("testimonials:")) {
+        await removeCacheKey(String(key));
+      }
+    }
+  },
 };
-  

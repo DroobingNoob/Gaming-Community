@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useBestsellers } from '../hooks/useSupabaseData';
-import { Game, getGameDisplayPrice, getGameDiscountPercentage } from '../config/supabase';
-import Loader from './Loader';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useBestsellers } from "../hooks/useSupabaseData";
+import {
+  Game,
+  getPlatformsForGame,
+  getStartingPrice,
+} from "../config/supabase";
+import Loader from "./Loader";
 
 interface BestSellersProps {
   onGameClick: (game: Game) => void;
@@ -15,27 +19,11 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  // Auto-play carousel
-  useEffect(() => {
-    if (!isAutoPlaying || bestsellers.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % Math.ceil(bestsellers.length / getItemsPerSlide()));
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [bestsellers.length, isAutoPlaying]);
-
-  const handleViewAllGames = () => {
-    navigate('/games');
-  };
-
-  // Responsive items per slide
   const getItemsPerSlide = () => {
-    if (typeof window === 'undefined') return 1;
-    if (window.innerWidth >= 1024) return 3; // lg
-    if (window.innerWidth >= 640) return 2; // sm
-    return 1; // mobile
+    if (typeof window === "undefined") return 1;
+    if (window.innerWidth >= 1024) return 3;
+    if (window.innerWidth >= 640) return 2;
+    return 1;
   };
 
   const [itemsPerSlide, setItemsPerSlide] = useState(getItemsPerSlide());
@@ -43,14 +31,28 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
   useEffect(() => {
     const handleResize = () => {
       setItemsPerSlide(getItemsPerSlide());
-      setCurrentSlide(0); // Reset to first slide on resize
+      setCurrentSlide(0);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const totalSlides = Math.ceil(bestsellers.length / itemsPerSlide);
+  const totalSlides = Math.max(1, Math.ceil(bestsellers.length / itemsPerSlide));
+
+  useEffect(() => {
+    if (!isAutoPlaying || bestsellers.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [bestsellers.length, isAutoPlaying, totalSlides]);
+
+  const handleViewAllGames = () => {
+    navigate("/games");
+  };
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % totalSlides);
@@ -90,7 +92,9 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3 sm:mb-4">
               Best Selling Games
             </h2>
-            <p className="text-red-600">Failed to load games. Please try again later.</p>
+            <p className="text-red-600">
+              Failed to load games. Please try again later.
+            </p>
           </div>
         </div>
       </section>
@@ -105,7 +109,9 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3 sm:mb-4">
               Best Selling Games
             </h2>
-            <p className="text-gray-600">No games available. Please check back later.</p>
+            <p className="text-gray-600">
+              No games available. Please check back later.
+            </p>
           </div>
         </div>
       </section>
@@ -124,43 +130,35 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
           </p>
         </div>
 
-        {/* Carousel Container */}
         <div className="relative">
-          {/* Carousel Wrapper */}
-          <div 
+          <div
             className="overflow-hidden rounded-2xl"
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => setIsAutoPlaying(true)}
           >
-            <div 
+            <div
               className="flex transition-transform duration-500 ease-in-out"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
               {Array.from({ length: totalSlides }).map((_, slideIndex) => (
                 <div key={slideIndex} className="w-full flex-shrink-0">
-                  <div className={`grid gap-3 sm:gap-4 md:gap-6 ${
-                    itemsPerSlide === 1 ? 'grid-cols-1' : 
-                    itemsPerSlide === 2 ? 'grid-cols-2' : 
-                    'grid-cols-3'
-                  }`}>
+                  <div
+                    className={`grid gap-3 sm:gap-4 md:gap-6 ${
+                      itemsPerSlide === 1
+                        ? "grid-cols-1"
+                        : itemsPerSlide === 2
+                          ? "grid-cols-2"
+                          : "grid-cols-3"
+                    }`}
+                  >
                     {bestsellers
-                      .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide)
+                      .slice(
+                        slideIndex * itemsPerSlide,
+                        (slideIndex + 1) * itemsPerSlide
+                      )
                       .map((game) => {
-                        // Check if PC game (has permanent_offline_price but no rent_1_month)
-                        const isPCGame = game.permanent_offline_price && !game.rent_1_month;
-
-                        // For PC games, show permanent_offline_price; for other games show 1 month rent; for subscriptions show sale_price
-                        const displayPrice = game.category === 'game'
-                          ? (isPCGame
-                              ? getGameDisplayPrice(game, 'Permanent Offline')
-                              : getGameDisplayPrice(game, 'Rent', '1_month'))
-                          : game.sale_price;
-
-                        const discountPercentage = game.category === 'game'
-                          ? (isPCGame
-                              ? getGameDiscountPercentage(game, 'Permanent Offline')
-                              : getGameDiscountPercentage(game, 'Rent', '1_month'))
-                          : game.discount;
+                        const displayPrice = getStartingPrice(game);
+                        const platforms = getPlatformsForGame(game);
 
                         return (
                           <div
@@ -168,22 +166,18 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
                             className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-3 group cursor-pointer"
                             onClick={() => onGameClick(game)}
                           >
-                            {/* Image Container */}
                             <div className="relative overflow-hidden">
                               <img
                                 src={game.image}
                                 alt={game.title}
                                 className="w-full aspect-square object-cover group-hover:scale-110 transition-transform duration-500"
                               />
-                              {discountPercentage > 0 && (
-                                <div className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold shadow-lg">
-                                  -{discountPercentage}%
-                                </div>
-                              )}
-                              <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-medium shadow-lg">
-                                {game.category === 'game' ? game.platform.join(', ') : 'Subscription'}
+                              <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-medium shadow-lg max-w-[70%] truncate">
+                                {game.category === "game"
+                                  ? platforms.join(", ")
+                                  : "Subscription"}
                               </div>
-                              {game.edition && game.edition !== 'Standard' && (
+                              {game.edition && game.edition !== "Standard" && (
                                 <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-medium shadow-lg">
                                   {game.edition}
                                 </div>
@@ -191,30 +185,22 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
                               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                             </div>
 
-                            {/* Content */}
                             <div className="p-3 sm:p-4 md:p-6">
                               <h3 className="font-bold text-gray-800 text-sm sm:text-base md:text-lg mb-2 sm:mb-3 line-clamp-2 group-hover:text-cyan-600 transition-colors">
                                 {game.title}
                               </h3>
 
-                              {/* Pricing */}
                               <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
-                                <span className="text-lg sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                                  ₹{displayPrice}
-                                </span>
-                                {game.category === 'game' && discountPercentage > 0 && (
-                                  <span className="text-sm sm:text-base md:text-lg text-gray-500 line-through">
-                                    ₹{game.original_price}
+                                <div>
+                                  <div className="text-xs text-gray-500 mb-1">
+                                    Starting from
+                                  </div>
+                                  <span className="text-lg sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                                    ₹{displayPrice}
                                   </span>
-                                )}
-                                {game.category === 'subscription' && game.original_price > game.sale_price && (
-                                  <span className="text-sm sm:text-base md:text-lg text-gray-500 line-through">
-                                    ₹{game.original_price}
-                                  </span>
-                                )}
+                                </div>
                               </div>
 
-                              {/* Select Options Button */}
                               <button className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white py-2 sm:py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm md:text-base transition-all duration-300 flex items-center justify-center space-x-2 group shadow-lg hover:shadow-xl transform hover:scale-105">
                                 <span>Select Options</span>
                               </button>
@@ -228,7 +214,6 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
             </div>
           </div>
 
-          {/* Navigation Arrows - Only show if more than one slide */}
           {totalSlides > 1 && (
             <>
               <button
@@ -246,7 +231,6 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
             </>
           )}
 
-          {/* Slide Indicators - Only show if more than one slide */}
           {totalSlides > 1 && (
             <div className="flex justify-center mt-6 sm:mt-8 space-x-2">
               {Array.from({ length: totalSlides }).map((_, index) => (
@@ -254,9 +238,9 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
                   key={index}
                   onClick={() => goToSlide(index)}
                   className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
-                    index === currentSlide 
-                      ? 'bg-cyan-500 scale-125' 
-                      : 'bg-gray-300 hover:bg-gray-400'
+                    index === currentSlide
+                      ? "bg-cyan-500 scale-125"
+                      : "bg-gray-300 hover:bg-gray-400"
                   }`}
                 />
               ))}
@@ -265,7 +249,7 @@ const BestSellers: React.FC<BestSellersProps> = ({ onGameClick }) => {
         </div>
 
         <div className="text-center mt-8 sm:mt-10 md:mt-12">
-          <button 
+          <button
             onClick={handleViewAllGames}
             className="bg-gradient-to-r from-white to-gray-50 border-2 border-cyan-400 text-cyan-600 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-blue-500 hover:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-bold text-sm sm:text-base transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >

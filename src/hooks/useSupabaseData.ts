@@ -1,35 +1,46 @@
-import { useState, useEffect } from 'react';
-import { gamesService, subscriptionsService, testimonialsService, GameFilters, PaginatedResponse } from '../services/supabaseService';
-import { Game, Testimonial, getUniqueGamesForCustomer } from '../config/supabase';
- 
-// Hook for games data with server-side filtering and pagination
+import { useState, useEffect } from "react";
+import {
+  gamesService,
+  subscriptionsService,
+  testimonialsService,
+  GameFilters,
+  PaginatedResponse,
+} from "../services/supabaseService";
+import {
+  Game,
+  Testimonial,
+  getUniqueGamesForCustomer,
+} from "../config/supabase";
+
+// Hook for games data with filtering and pagination
 export const useGames = (filters: GameFilters = {}) => {
   const [gamesResponse, setGamesResponse] = useState<PaginatedResponse<Game>>({
     data: [],
     count: 0,
     totalPages: 0,
-    currentPage: 1
+    currentPage: 1,
   });
-  const [allGames, setAllGames] = useState<Game[]>([]); // All games including all editions
+  const [allGames, setAllGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchGames = async () => {
     try {
       setLoading(true);
+
       const response = await gamesService.getAll(filters);
-      setGamesResponse(response);
-      
-      // For customer view, show only unique games (primary editions)
+      setAllGames(response.data);
+
       const uniqueGames = getUniqueGamesForCustomer(response.data);
-      setGamesResponse(prev => ({
+
+      setGamesResponse({
         ...response,
-        data: uniqueGames
-      }));
-      
+        data: uniqueGames,
+      });
+
       setError(null);
     } catch (err) {
-      setError('Failed to fetch games');
+      setError("Failed to fetch games");
       console.error(err);
     } finally {
       setLoading(false);
@@ -38,21 +49,21 @@ export const useGames = (filters: GameFilters = {}) => {
 
   useEffect(() => {
     fetchGames();
-  }, [JSON.stringify(filters)]); // Re-fetch when filters change
+  }, [JSON.stringify(filters)]);
 
-  return { 
-    games: gamesResponse.data, 
+  return {
+    games: gamesResponse.data,
     totalCount: gamesResponse.count,
     totalPages: gamesResponse.totalPages,
     currentPage: gamesResponse.currentPage,
-    allGames, 
-    loading, 
-    error, 
-    refetch: fetchGames 
+    allGames,
+    loading,
+    error,
+    refetch: fetchGames,
   };
 };
 
-// Hook for bestseller games (optimized to fetch exact limit)
+// Hook for bestseller games
 export const useBestsellers = (limit: number = 6) => {
   const [bestsellers, setBestsellers] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,14 +72,12 @@ export const useBestsellers = (limit: number = 6) => {
   const fetchBestsellers = async () => {
     try {
       setLoading(true);
-      const bestsellersData = await gamesService.getBestsellers(limit); // Get exact limit
-      
-      // Filter to show only unique games (primary editions)
+      const bestsellersData = await gamesService.getBestsellers(limit);
       const uniqueBestsellers = getUniqueGamesForCustomer(bestsellersData);
       setBestsellers(uniqueBestsellers);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch bestsellers');
+      setError("Failed to fetch bestsellers");
       console.error(err);
     } finally {
       setLoading(false);
@@ -82,7 +91,7 @@ export const useBestsellers = (limit: number = 6) => {
   return { bestsellers, loading, error, refetch: fetchBestsellers };
 };
 
-// Hook for all games data (for admin use - includes all editions) - Keep original for admin
+// Hook for all games data (admin use)
 export const useAllGames = () => {
   const [allGames, setAllGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,12 +100,11 @@ export const useAllGames = () => {
   const fetchAllGames = async () => {
     try {
       setLoading(true);
-      // For admin, we still need all data but with optimized columns
-      const response = await gamesService.getAll({ limit: 1000 }); // Large limit for admin
+      const response = await gamesService.getAll({ limit: 1000 });
       setAllGames(response.data);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch all games');
+      setError("Failed to fetch all games");
       console.error(err);
     } finally {
       setLoading(false);
@@ -110,14 +118,16 @@ export const useAllGames = () => {
   return { allGames, loading, error, refetch: fetchAllGames };
 };
 
-// Hook for subscriptions data with server-side filtering and pagination
+// Hook for subscriptions data
 export const useSubscriptions = (filters: GameFilters = {}) => {
-  const [subscriptionsResponse, setSubscriptionsResponse] = useState<PaginatedResponse<Game>>({
-    data: [],
-    count: 0,
-    totalPages: 0,
-    currentPage: 1
-  });
+  const [subscriptionsResponse, setSubscriptionsResponse] =
+    useState<PaginatedResponse<Game>>({
+      data: [],
+      count: 0,
+      totalPages: 0,
+      currentPage: 1,
+    });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -128,7 +138,7 @@ export const useSubscriptions = (filters: GameFilters = {}) => {
       setSubscriptionsResponse(response);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch subscriptions');
+      setError("Failed to fetch subscriptions");
       console.error(err);
     } finally {
       setLoading(false);
@@ -137,16 +147,16 @@ export const useSubscriptions = (filters: GameFilters = {}) => {
 
   useEffect(() => {
     fetchSubscriptions();
-  }, [JSON.stringify(filters)]); // Re-fetch when filters change
+  }, [JSON.stringify(filters)]);
 
-  return { 
+  return {
     subscriptions: subscriptionsResponse.data,
     totalCount: subscriptionsResponse.count,
     totalPages: subscriptionsResponse.totalPages,
     currentPage: subscriptionsResponse.currentPage,
-    loading, 
-    error, 
-    refetch: fetchSubscriptions 
+    loading,
+    error,
+    refetch: fetchSubscriptions,
   };
 };
 
@@ -160,14 +170,11 @@ export const useTestimonials = () => {
     try {
       setLoading(true);
       const testimonialsData = await testimonialsService.getAll();
-      console.log('Testimonials fetched in hook:', testimonialsData);
-      console.log('Number of testimonials:', testimonialsData.length);
       setTestimonials(testimonialsData);
       setError(null);
     } catch (err) {
-      console.error('Error in useTestimonials hook:', err);
-      setError('Failed to fetch testimonials');
-      console.error(err);
+      console.error("Error in useTestimonials hook:", err);
+      setError("Failed to fetch testimonials");
     } finally {
       setLoading(false);
     }
@@ -178,29 +185,4 @@ export const useTestimonials = () => {
   }, []);
 
   return { testimonials, loading, error, refetch: fetchTestimonials };
-};
-
-//Hook for Payment Settings
-export const paymentSettingsService = {
-  async getSettings() {
-    const { data, error } = await supabase
-      .from('payment_settings')
-      .select('*')
-      .single(); // assuming only one row
-
-    if (error) throw error;
-    return data;
-  },
-
-  async toggleRazorpayEnabled(currentValue: boolean) {
-    const { data, error } = await supabase
-      .from('payment_settings')
-      .update({ razorpay_enabled: !currentValue })
-      .eq('id', 1) // adjust if your row uses a different ID or key
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  }
 };
