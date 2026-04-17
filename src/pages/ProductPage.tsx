@@ -272,6 +272,18 @@ const ProductPage: React.FC<ProductPageProps> = ({
   };
 
   const getTypeDescription = () => {
+
+    if (currentProduct?.category === "subscription") {
+    return `📺 Subscription Access:
+
+✔ We provide access for your selected subscription duration.
+✔ Access will be shared after payment confirmation.
+✔ Features (like offline download, streaming quality, or online access) depend on the selected service.
+✔ Subscription will remain active for the chosen period only.
+✔ Account credentials must not be changed.
+✔ Any misuse or violation of terms may lead to access removal without notice.`;
+  }
+
     if (selectedType === "Rent") {
       return `🎮 Rental Game Access:
 
