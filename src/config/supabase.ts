@@ -109,9 +109,9 @@ export const getGameDisplayPrice = (
   const pricing = getPlatformPricing(game, selectedPlatform);
   if (!pricing) return 0;
 
-  if (game.category === "subscription") {
-    return pricing.sale_price || pricing.original_price || 0;
-  }
+  // if (game.category === "subscription") {
+  //   return pricing.sale_price || pricing.original_price || 0;
+  // }
 
   if (selectedType === "Rent") {
     const rentPrices = {
