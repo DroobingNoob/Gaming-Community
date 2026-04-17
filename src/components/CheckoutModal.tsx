@@ -286,7 +286,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         orderCode: newOrderCode,
         timestamp: new Date().toISOString(),
         customerName: customerName.trim(),
-        customerMobile: fullCustomerMobile.trim(),
+        customerMobile: fullCustomerMobile.replace("+", "").trim(),
         items: itemsWithCoupon,
         subtotalAmount: subtotal,
         totalAmount: total,
