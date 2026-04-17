@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Search, Filter, Grid, List, Gamepad2 } from "lucide-react";
 import { useGames } from "../hooks/useSupabaseData";
 import {
@@ -7,9 +7,9 @@ import {
   getStartingPrice,
 } from "../config/supabase";
 import Loader from "../components/Loader";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-const platformOptions = ["all", "PS5", "PS4","PSVR2", "Xbox", "PC"];
+const platformOptions = ["all", "PS5", "PS4", "PSVR2", "Xbox", "PC"];
 const sortOptions = [
   { value: "name-asc", label: "Name: A to Z" },
   { value: "name-desc", label: "Name: Z to A" },
@@ -19,13 +19,58 @@ const sortOptions = [
 
 const GamesPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPlatform, setSelectedPlatform] = useState("all");
-  const [sortBy, setSortBy] = useState("name-asc");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
+  const [selectedPlatform, setSelectedPlatform] = useState(
+    searchParams.get("platform") || "all"
+  );
+  const [sortBy, setSortBy] = useState(searchParams.get("sort") || "name-asc");
+
+  const [tempSearchQuery, setTempSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
+  const [tempSelectedPlatform, setTempSelectedPlatform] = useState(
+    searchParams.get("platform") || "all"
+  );
+  const [tempSortBy, setTempSortBy] = useState(
+    searchParams.get("sort") || "name-asc"
+  );
+
+  const [currentPage, setCurrentPage] = useState(
+    Number(searchParams.get("page")) || 1
+  );
+  const [viewMode, setViewMode] = useState<"grid" | "list">(
+    (searchParams.get("view") as "grid" | "list") || "grid"
+  );
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchQuery) params.set("search", searchQuery);
+    if (selectedPlatform !== "all") params.set("platform", selectedPlatform);
+    if (sortBy !== "name-asc") params.set("sort", sortBy);
+    if (currentPage > 1) params.set("page", String(currentPage));
+    if (viewMode !== "grid") params.set("view", viewMode);
+
+    const nextParams = params.toString();
+    const currentParams = searchParams.toString();
+
+    if (nextParams !== currentParams) {
+      setSearchParams(params, { replace: true });
+    }
+  }, [
+    searchQuery,
+    selectedPlatform,
+    sortBy,
+    currentPage,
+    viewMode,
+    searchParams,
+    setSearchParams,
+  ]);
 
   const filters = useMemo(
     () => ({
@@ -40,11 +85,30 @@ const GamesPage: React.FC = () => {
 
   const { games, totalCount, totalPages, loading, error } = useGames(filters);
 
-  const handleProductClick = (game: Game) => {
-    navigate(`/games/${game.id}`);
+ const handleProductClick = (game: Game) => {
+  navigate(`/games/${game.id}`, {
+    state: {
+      page: currentPage,
+      search: searchQuery,
+      platform: selectedPlatform,
+      sort: sortBy,
+      view: viewMode,
+    },
+  });
+};
+
+  const applyFilters = () => {
+    setSearchQuery(tempSearchQuery);
+    setSelectedPlatform(tempSelectedPlatform);
+    setSortBy(tempSortBy);
+    setCurrentPage(1);
   };
 
   const resetFilters = () => {
+    setTempSearchQuery("");
+    setTempSelectedPlatform("all");
+    setTempSortBy("name-asc");
+
     setSearchQuery("");
     setSelectedPlatform("all");
     setSortBy("name-asc");
@@ -254,13 +318,23 @@ const GamesPage: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search for games..."
-                value={searchQuery}
+                value={tempSearchQuery}
                 onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
+                  setTempSearchQuery(e.target.value);
                 }}
-                className="w-full pl-12 pr-4 py-3 rounded-2xl border border-gray-200 bg-white/90 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                  }
+                }}
+                className="w-full pl-12 pr-32 py-3 rounded-2xl border border-gray-200 bg-white/90 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
               />
+              <button
+                onClick={applyFilters}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-5 py-2 rounded-xl font-semibold transition-all duration-300 shadow-md"
+              >
+                Search
+              </button>
             </div>
 
             <div className="flex items-center gap-3">
@@ -308,10 +382,9 @@ const GamesPage: React.FC = () => {
                   Platform
                 </label>
                 <select
-                  value={selectedPlatform}
+                  value={tempSelectedPlatform}
                   onChange={(e) => {
-                    setSelectedPlatform(e.target.value);
-                    setCurrentPage(1);
+                    setTempSelectedPlatform(e.target.value);
                   }}
                   className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-white/90 focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 >
@@ -328,10 +401,9 @@ const GamesPage: React.FC = () => {
                   Sort by
                 </label>
                 <select
-                  value={sortBy}
+                  value={tempSortBy}
                   onChange={(e) => {
-                    setSortBy(e.target.value);
-                    setCurrentPage(1);
+                    setTempSortBy(e.target.value);
                   }}
                   className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-white/90 focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 >

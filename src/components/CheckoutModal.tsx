@@ -80,6 +80,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const [availableCoupons, setAvailableCoupons] = useState<Coupon[]>([]);
   const [loadingCoupons, setLoadingCoupons] = useState(false);
+  const [customerCountryCode, setCustomerCountryCode] = useState("+91");
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -116,6 +117,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setOrderCode("");
       setCopiedOrderCode(false);
       setCopiedUpiId(false);
+      setCustomerCountryCode("+91");
     }
   }, [isOpen]);
 
@@ -157,6 +159,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setOrderCode("");
     setCopiedOrderCode(false);
     setCopiedUpiId(false);
+    setCustomerCountryCode("+91");
     onClose();
   };
 
@@ -233,16 +236,18 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     toast.info("Coupon removed");
   };
 
+  const fullCustomerMobile = `${customerCountryCode} ${customerMobile.trim()}`;
+
   const handleProceedToPayment = async () => {
     if (!customerName.trim()) {
       toast.error("Please enter your name");
       return;
     }
 
-    if (!customerMobile.trim() || !/^[6-9]\d{9}$/.test(customerMobile.trim())) {
-      toast.error("Please enter a valid 10-digit mobile number");
-      return;
-    }
+   if (!customerMobile.trim()) {
+  toast.error("Please enter your mobile number");
+  return;
+}
 
     setIsProcessing(true);
 
@@ -281,7 +286,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         orderCode: newOrderCode,
         timestamp: new Date().toISOString(),
         customerName: customerName.trim(),
-        customerMobile: customerMobile.trim(),
+        customerMobile: fullCustomerMobile,
         items: itemsWithCoupon,
         subtotalAmount: subtotal,
         totalAmount: total,
@@ -366,7 +371,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
 📋 *Order Code:* ${orderCode}
 👤 *Name:* ${customerName}
-📱 *Mobile:* ${customerMobile}
+📱 *Mobile:* ${fullCustomerMobile}
 
 🛒 *Items Ordered:*
 ${itemsList}${couponText}
@@ -411,25 +416,36 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Mobile Number <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              type="tel"
-              value={customerMobile}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-                setCustomerMobile(value);
-              }}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-              placeholder="Enter 10-digit mobile number"
-              maxLength={10}
-              required
-            />
-          </div>
-        </div>
+  <label className="block text-sm font-semibold text-gray-700 mb-2">
+    Mobile Number <span className="text-red-500">*</span>
+  </label>
+
+  <div className="flex gap-2">
+   <div className="w-28">
+  <input
+    type="text"
+    value={customerCountryCode}
+    onChange={(e) => setCustomerCountryCode(e.target.value)}
+    className="w-full py-3 px-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-white"
+    placeholder="+91"
+  />
+</div>
+
+    <div className="relative flex-1">
+      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+      <input
+  type="tel"
+  value={customerMobile}
+  onChange={(e) => {
+    setCustomerMobile(e.target.value);
+  }}
+  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+  placeholder="Enter mobile number"
+  required
+/>
+    </div>
+  </div>
+</div>
 
         <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-200">
           <div className="flex items-center space-x-2 mb-3">

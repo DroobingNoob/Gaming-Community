@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   Shield,
@@ -65,6 +65,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
   const isLoading = gamesLoading || subscriptionsLoading;
   const currentProduct = selectedEdition || product;
+
+  const location = useLocation();
 
   useEffect(() => {
     if (id && !isLoading) {
@@ -352,7 +354,23 @@ const ProductPage: React.FC<ProductPageProps> = ({
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => {
+  if (location.state) {
+    const { page, search, platform, sort, view } = location.state as any;
+
+    const params = new URLSearchParams();
+
+    if (search) params.set("search", search);
+    if (platform && platform !== "all") params.set("platform", platform);
+    if (sort && sort !== "name-asc") params.set("sort", sort);
+    if (page && page > 1) params.set("page", String(page));
+    if (view && view !== "grid") params.set("view", view);
+
+    navigate(`/games?${params.toString()}`);
+  } else {
+    navigate("/games");
+  }
+}}
             className="flex items-center space-x-1 sm:space-x-2 text-cyan-600 hover:text-orange-500 transition-colors mb-6 sm:mb-8 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-lg text-sm sm:text-base"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -373,7 +391,23 @@ const ProductPage: React.FC<ProductPageProps> = ({
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => {
+  if (location.state) {
+    const { page, search, platform, sort, view } = location.state as any;
+
+    const params = new URLSearchParams();
+
+    if (search) params.set("search", search);
+    if (platform && platform !== "all") params.set("platform", platform);
+    if (sort && sort !== "name-asc") params.set("sort", sort);
+    if (page && page > 1) params.set("page", String(page));
+    if (view && view !== "grid") params.set("view", view);
+
+    navigate(`/games?${params.toString()}`);
+  } else {
+    navigate("/games");
+  }
+}}
             className="flex items-center space-x-1 sm:space-x-2 text-cyan-600 hover:text-orange-500 transition-colors mb-6 sm:mb-8 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-lg text-sm sm:text-base"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -773,7 +807,23 @@ const ProductPage: React.FC<ProductPageProps> = ({
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => {
+  if (location.state) {
+    const { page, search, platform, sort, view } = location.state as any;
+
+    const params = new URLSearchParams();
+
+    if (search) params.set("search", search);
+    if (platform && platform !== "all") params.set("platform", platform);
+    if (sort && sort !== "name-asc") params.set("sort", sort);
+    if (page && page > 1) params.set("page", String(page));
+    if (view && view !== "grid") params.set("view", view);
+
+    navigate(`/games?${params.toString()}`);
+  } else {
+    navigate("/games");
+  }
+}}
           className="flex items-center space-x-1 sm:space-x-2 text-cyan-600 hover:text-orange-500 transition-colors mb-6 sm:mb-8 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-lg text-sm sm:text-base"
         >
           <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />

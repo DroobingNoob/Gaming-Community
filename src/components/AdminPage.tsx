@@ -88,10 +88,7 @@ const emptyGameForm = (
   edition: category === "game" ? "Standard" : undefined,
   base_game_id: null,
   edition_features: [],
-  platform_prices:
-    category === "subscription"
-      ? [emptyPlatformPrice("Subscription")]
-      : [emptyPlatformPrice("")],
+  platform_prices: [emptyPlatformPrice("")]
 });
 
 const AdminPage: React.FC = () => {
@@ -335,9 +332,10 @@ const AdminPage: React.FC = () => {
               permanent_online_price: p.permanent_online_price ?? null,
             }))
           : [
-              emptyPlatformPrice(
-                item.category === "subscription" ? "Subscription" : ""
-              ),
+            emptyPlatformPrice("")
+              // emptyPlatformPrice(
+              //   item.category === "subscription" ? "Subscription" : ""
+              // ),
             ],
     });
     setIsModalOpen(true);
@@ -407,7 +405,8 @@ const AdminPage: React.FC = () => {
       ...prev,
       platform_prices: [
         ...prev.platform_prices,
-        emptyPlatformPrice(prev.category === "subscription" ? "Subscription" : ""),
+        // emptyPlatformPrice(prev.category === "subscription" ? "Subscription" : ""),
+        emptyPlatformPrice("")
       ],
     }));
   };
@@ -1442,11 +1441,11 @@ const AdminPage: React.FC = () => {
                       updatePlatformPrice(index, "platform", e.target.value)
                     }
                     className="w-full max-w-xs p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                    disabled={activeTab === "subscriptions"}
+                    // disabled={activeTab === "subscriptions"}
                   >
                     <option value="">Select Platform</option>
                     {(activeTab === "subscriptions"
-                      ? ["Subscription"]
+                      ? PLATFORM_OPTIONS
                       : PLATFORM_OPTIONS.filter((p) => p !== "Subscription")
                     ).map((platform) => (
                       <option key={platform} value={platform}>

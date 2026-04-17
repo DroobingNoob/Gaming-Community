@@ -45,9 +45,17 @@ const SubscriptionsPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleSubscriptionClick = (subscription: Game) => {
-    navigate(`/subscriptions/${subscription.id}`);
-  };
+ const handleSubscriptionClick = (subscription: Game) => {
+  navigate(`/subscriptions/${subscription.id}`, {
+    state: {
+      page: currentPage,
+      search: searchQuery,
+      priceRange,
+      sort: sortBy,
+      view: viewMode,
+    },
+  });
+};
 
   const showingFrom = totalCount === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
   const showingTo = Math.min(currentPage * itemsPerPage, totalCount);
