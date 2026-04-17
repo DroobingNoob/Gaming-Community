@@ -890,13 +890,13 @@ const AdminPage: React.FC = () => {
     <input
       type="number"
       placeholder="e.g. 100 or 10"
-      value={couponForm.value}
-      onChange={(e) =>
-        setCouponForm({
-          ...couponForm,
-          value: Number(e.target.value),
-        })
-      }
+      value={couponForm.value === 0 ? "" : couponForm.value}
+onChange={(e) =>
+  setCouponForm({
+    ...couponForm,
+    value: e.target.value === "" ? 0 : Number(e.target.value),
+  })
+}
       className="w-full px-4 py-3 border border-gray-300 rounded-xl"
       disabled={couponForm.coupon_type === "message_only"}
     />
@@ -912,13 +912,13 @@ const AdminPage: React.FC = () => {
     <input
       type="number"
       placeholder="e.g. 1000"
-      value={couponForm.min_order_amount}
-      onChange={(e) =>
-        setCouponForm({
-          ...couponForm,
-          min_order_amount: Number(e.target.value),
-        })
-      }
+      value={couponForm.min_order_amount === 0 ? "" : couponForm.min_order_amount}
+onChange={(e) =>
+  setCouponForm({
+    ...couponForm,
+    min_order_amount: e.target.value === "" ? 0 : Number(e.target.value),
+  })
+}
       className="w-full px-4 py-3 border border-gray-300 rounded-xl"
     />
     <p className="text-xs text-gray-500 mt-1">
@@ -933,13 +933,13 @@ const AdminPage: React.FC = () => {
     <input
       type="number"
       placeholder="e.g. 2"
-      value={couponForm.min_game_count}
-      onChange={(e) =>
-        setCouponForm({
-          ...couponForm,
-          min_game_count: Number(e.target.value),
-        })
-      }
+    value={couponForm.min_game_count === 0 ? "" : couponForm.min_game_count}
+onChange={(e) =>
+  setCouponForm({
+    ...couponForm,
+    min_game_count: e.target.value === "" ? 0 : Number(e.target.value),
+  })
+}
       className="w-full px-4 py-3 border border-gray-300 rounded-xl"
     />
     <p className="text-xs text-gray-500 mt-1">
