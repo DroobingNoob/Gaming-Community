@@ -287,20 +287,34 @@ const ProductPage: React.FC<ProductPageProps> = ({
     if (selectedType === "Rent") {
       return `🎮 Rental Game Access:
 
-✔️ We provide access for your selected rental duration.
-✔️ Download and play after payment confirmation.
-✔️ Online play availability depends on the selected product.
-✔️ After the selected rental period ends, the game must be returned as per the agreed process.
-✔️ Credentials cannot be changed unless clearly allowed.`;
+✔ Games are playable on the account provided by us
+✔ Simple QR code login process (steps shared on WhatsApp after payment)
+✔ Game delivery within 30 minutes to 4 hours
+
+✔ Access is valid for your selected rental duration
+✔ Internet connection required – to play the games smoothly 
+
+⚠️ Important:
+• Ensure stable internet connection for smooth gameplay
+• Do not change account details
+• Follow shared steps carefully for smooth gameplay
+
+🚀 Best option to enjoy latest games at lowest cost without full purchase`;
     }
 
     if (selectedType === "Permanent Offline") {
-      return `🎮 Permanent Offline Access:
+      return `📴 Permanent Offline Access (PC & Console):
 
-✔️ Permanent access on a single device/console.
-✔️ Offline play supported.
-✔️ Warranty and setup support provided.
-✔️ Good for users who do not need online access.`;
+✔ Play the game permanently in offline mode only
+✔ Single device access (PC/Console)
+✔ Internet required only for initial setup
+
+⚠️ Important:
+Keep the system offline after setup. Going online may lock the game
+
+❌ No Refund / No Replacement if instructions are not followed
+
+✔ Best for story mode / offline gaming`;
     }
 
     if (selectedType === "Permanent Offline + Online") {
