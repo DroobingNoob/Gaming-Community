@@ -157,6 +157,10 @@ const AdminPage: React.FC = () => {
 
   const itemsPerPage = 9;
 
+  const [gamesSpecialFilter, setGamesSpecialFilter] = useState<
+  "all" | "bestsellers" | "recommended"
+>("all");
+
   const { allGames, loading: gamesLoading, refetch: refetchGames } =
     useAllGames();
   const {
@@ -232,35 +236,46 @@ const AdminPage: React.FC = () => {
   };
 
   const filteredItems = useMemo(() => {
-    if (activeTab === "games") {
-      return (allGames || []).filter((item) =>
-        item.title.toLowerCase().includes(gamesSearchQuery.toLowerCase())
-      );
-    }
+  if (activeTab === "games") {
+    return (allGames || []).filter((item) => {
+      const matchesSearch = item.title
+        .toLowerCase()
+        .includes(gamesSearchQuery.toLowerCase());
 
-    if (activeTab === "subscriptions") {
-      return (subscriptions || []).filter((item) =>
-        item.title.toLowerCase().includes(subscriptionsSearchQuery.toLowerCase())
-      );
-    }
+      const matchesSpecialFilter =
+        gamesSpecialFilter === "all"
+          ? true
+          : gamesSpecialFilter === "bestsellers"
+            ? item.show_in_bestsellers
+            : item.is_recommended;
 
-    if (activeTab === "testimonials") {
-      return (testimonials || []).filter((item) =>
-        item.image.toLowerCase().includes(testimonialsSearchQuery.toLowerCase())
-      );
-    }
+      return matchesSearch && matchesSpecialFilter;
+    });
+  }
 
-    return [];
-  }, [
-    activeTab,
-    allGames,
-    subscriptions,
-    testimonials,
-    gamesSearchQuery,
-    subscriptionsSearchQuery,
-    testimonialsSearchQuery,
-  ]);
+  if (activeTab === "subscriptions") {
+    return (subscriptions || []).filter((item) =>
+      item.title.toLowerCase().includes(subscriptionsSearchQuery.toLowerCase())
+    );
+  }
 
+  if (activeTab === "testimonials") {
+    return (testimonials || []).filter((item) =>
+      item.image.toLowerCase().includes(testimonialsSearchQuery.toLowerCase())
+    );
+  }
+
+  return [];
+}, [
+  activeTab,
+  allGames,
+  subscriptions,
+  testimonials,
+  gamesSearchQuery,
+  subscriptionsSearchQuery,
+  testimonialsSearchQuery,
+  gamesSpecialFilter,
+]);
   const currentPage =
     activeTab === "games"
       ? gamesCurrentPage
@@ -1752,6 +1767,33 @@ onChange={(e) =>
                 />
               </div>
             </div>
+
+            {activeTab === "games" && (
+  <div className="mb-4 flex flex-wrap gap-2">
+    {[
+      { value: "all", label: "All Games" },
+      { value: "bestsellers", label: "Bestsellers" },
+      { value: "recommended", label: "Recommended" },
+    ].map((filter) => (
+      <button
+        key={filter.value}
+        onClick={() => {
+          setGamesSpecialFilter(
+            filter.value as "all" | "bestsellers" | "recommended"
+          );
+          setGamesCurrentPage(1);
+        }}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          gamesSpecialFilter === filter.value
+            ? "bg-gradient-to-r from-cyan-400 to-blue-500 text-white"
+            : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+        }`}
+      >
+        {filter.label}
+      </button>
+    ))}
+  </div>
+)}
 
             <div className="mb-4 flex items-center justify-between">
               <p className="text-gray-600 text-sm">
