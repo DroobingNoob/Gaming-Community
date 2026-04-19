@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({
         }
       }
 
-      setSearchSuggestions(filtered.slice(0, 8));
+      setSearchSuggestions(filtered.slice(0, 15));
       setShowSuggestions(true);
     } else {
       setSearchSuggestions([]);
