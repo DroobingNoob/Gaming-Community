@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -99,6 +100,14 @@ function App() {
     mode: "working_hours",
     message: "",
   });
+    const [flyToCartAnimation, setFlyToCartAnimation] = useState<{
+    image: string;
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    key: number;
+  } | null>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -390,6 +399,58 @@ function App() {
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
+    const animateProductToCart = () => {
+    return new Promise<void>((resolve) => {
+      try {
+        const productImage = document.getElementById("product-main-image") as HTMLImageElement | null;
+        const cartButton = document.getElementById("floating-cart-button");
+
+        if (!productImage || !cartButton) {
+          resolve();
+          return;
+        }
+
+        const imageRect = productImage.getBoundingClientRect();
+        const cartRect = cartButton.getBoundingClientRect();
+
+        const startX = imageRect.left + imageRect.width / 2 - 40;
+        const startY = imageRect.top + imageRect.height / 2 - 40;
+        const endX = cartRect.left + cartRect.width / 2 - 20;
+        const endY = cartRect.top + cartRect.height / 2 - 20;
+
+        setFlyToCartAnimation({
+          image: productImage.src,
+          startX,
+          startY,
+          endX,
+          endY,
+          key: Date.now(),
+        });
+                cartButton.animate(
+          [
+            { transform: "scale(1)" },
+            { transform: "scale(1.18)" },
+            { transform: "scale(0.95)" },
+            { transform: "scale(1)" },
+          ],
+          {
+            duration: 450,
+            delay: 420,
+            easing: "ease-out",
+          }
+        );
+
+        setTimeout(() => {
+          setFlyToCartAnimation(null);
+          resolve();
+        }, 800);
+      } catch (error) {
+        console.error("Fly to cart animation error:", error);
+        resolve();
+      }
+    });
+  };
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
@@ -420,6 +481,7 @@ function App() {
                 <ProductPage
                   onAddToCart={handleAddToCart}
                   onBuyNow={handleBuyNow}
+                  onAnimateToCart={animateProductToCart}
                 />
               }
             />
@@ -430,6 +492,7 @@ function App() {
                 <ProductPage
                   onAddToCart={handleAddToCart}
                   onBuyNow={handleBuyNow}
+                  onAnimateToCart={animateProductToCart}
                 />
               }
             />
@@ -478,6 +541,64 @@ function App() {
         />
 
         <WhatsAppButton />
+                {flyToCartAnimation &&
+          createPortal(
+            <>
+              <style>
+                {`
+                  @keyframes flyToCartAnimation {
+                    0% {
+                      transform: translate(0, 0) scale(1);
+                      opacity: 1;
+                    }
+                    60% {
+                      opacity: 1;
+                    }
+                    100% {
+                      transform: translate(
+                        calc(var(--fly-x-end) - var(--fly-x-start)),
+                        calc(var(--fly-y-end) - var(--fly-y-start))
+                      ) scale(0.2);
+                      opacity: 0.2;
+                    }
+                  }
+
+                  @keyframes cartBounceAnimation {
+                    0% { transform: scale(1); }
+                    30% { transform: scale(1.2); }
+                    60% { transform: scale(0.92); }
+                    100% { transform: scale(1); }
+                  }
+                `}
+              </style>
+
+              <div
+                key={flyToCartAnimation.key}
+                className="pointer-events-none fixed z-[9999] rounded-2xl overflow-hidden shadow-2xl border border-white/60"
+                style={
+                  {
+                    left: `${flyToCartAnimation.startX}px`,
+                    top: `${flyToCartAnimation.startY}px`,
+                    width: "80px",
+                    height: "80px",
+                    "--fly-x-start": `${flyToCartAnimation.startX}px`,
+                    "--fly-y-start": `${flyToCartAnimation.startY}px`,
+                    "--fly-x-end": `${flyToCartAnimation.endX}px`,
+                    "--fly-y-end": `${flyToCartAnimation.endY}px`,
+                    animation:
+                      "flyToCartAnimation 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+                  } as React.CSSProperties
+                }
+              >
+                <img
+                  src={flyToCartAnimation.image}
+                  alt="Flying product"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </>,
+            document.body
+          )}
         <ToastContainer />
       </div>
     </ErrorBoundary>

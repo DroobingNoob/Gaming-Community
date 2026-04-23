@@ -38,6 +38,7 @@ interface ProductPageProps {
     type: string,
     price: number
   ) => void;
+  onAnimateToCart?: () => Promise<void> | void;
 }
 
 type RentDuration = "1_month" | "3_months" | "6_months" | "12_months";
@@ -45,6 +46,8 @@ type RentDuration = "1_month" | "3_months" | "6_months" | "12_months";
 const ProductPage: React.FC<ProductPageProps> = ({
   onAddToCart,
   onBuyNow,
+  onAnimateToCart,
+
 }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -329,18 +332,21 @@ Keep the system offline after setup. Going online may lock the game
     return "Choose the option that best fits your usage.";
   };
 
-  const handleAddToCart = () => {
-    if (!currentProduct) return;
+  const handleAddToCart = async () => {
+  if (!currentProduct) return;
 
-    const price = calculatePrice();
-    const typeWithDuration =
-      selectedType === "Rent"
-        ? `${selectedType} (${selectedRentDuration.replace("_", " ")})`
-        : selectedType;
+  const price = calculatePrice();
+  const typeWithDuration =
+    selectedType === "Rent"
+      ? `${selectedType} (${selectedRentDuration.replace("_", " ")})`
+      : selectedType;
 
-    onAddToCart(currentProduct, selectedPlatform, typeWithDuration, price);
-  };
+  if (onAnimateToCart) {
+    await onAnimateToCart();
+  }
 
+  onAddToCart(currentProduct, selectedPlatform, typeWithDuration, price);
+};
   const handleBuyNow = () => {
     if (!currentProduct) return;
 
@@ -862,6 +868,7 @@ Keep the system offline after setup. Going online may lock the game
               <div className="flex justify-center">
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/20 w-full max-w-lg">
                   <img
+                  id="product-main-image"
                     src={currentProduct.image}
                     alt={currentProduct.title}
                     className="w-full aspect-square object-cover rounded-2xl"
@@ -883,6 +890,7 @@ Keep the system offline after setup. Going online may lock the game
             <div className="flex justify-center">
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-2xl border border-white/20 w-full max-w-sm">
                 <img
+                id="product-main-image"
                   src={currentProduct.image}
                   alt={currentProduct.title}
                   className="w-full aspect-square object-cover rounded-xl"
