@@ -27,6 +27,12 @@ import { Game } from "./config/supabase";
 import { settingsService, ShopStatus } from "./services/settingsService";
 import { authService, AdminUser } from "./services/authService";
 
+declare global {
+  interface Window {
+    fbq?: (...args: any[]) => void;
+  }
+}
+
 interface CartItem {
   id: string;
   title: string;
@@ -115,6 +121,13 @@ function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [location.pathname]);
+
+  useEffect(() => {
+  if (window.fbq) {
+    window.fbq('track', 'PageView');
+    console.log('Meta Pixel PageView fired:', location.pathname);
+  }
+}, [location.pathname]);
 
   useEffect(() => {
     const bootAuth = async () => {
