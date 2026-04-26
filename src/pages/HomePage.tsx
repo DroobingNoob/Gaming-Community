@@ -58,6 +58,50 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigation }) => {
         onShopBestsellers={() => scrollToSection('bestsellers')} 
         onBrowseCategories={() => scrollToSection('categories')} 
       />
+{/* WhatsApp Community CTA */}
+<section className="px-4 sm:px-6 lg:px-8 mt-10">
+  <div className="max-w-7xl mx-auto">
+    <a
+      href="https://whatsapp.com/channel/0029Vaz3HzXBadmdfwWvXQ1A"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="relative group block rounded-2xl overflow-hidden"
+    >
+      {/* Glow background */}
+      <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-20 blur-2xl group-hover:opacity-30 transition duration-500"></div>
+
+      {/* Main card */}
+      <div className="relative border border-orange-300/40 bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-md hover:shadow-xl transition-all duration-300">
+        
+        {/* Badge */}
+        <span className="inline-block mb-3 text-xs font-semibold tracking-wide text-white bg-gradient-to-r from-orange-500 to-red-500 px-3 py-1 rounded-full">
+          🔥 LIMITED OFFERS INSIDE
+        </span>
+
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          
+          {/* Text */}
+          <div>
+            <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              Join our WhatsApp Community
+            </h3>
+
+            <p className="mt-2 text-sm sm:text-base text-gray-600 max-w-xl">
+              Get early access to new games, price drops, rental deals and exclusive discounts before anyone else.
+            </p>
+          </div>
+
+          {/* CTA Button */}
+          <div className="flex items-center">
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-semibold shadow-md group-hover:scale-105 group-hover:shadow-lg transition-all duration-300">
+              Join Now →
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
       <TrustIndicators />
       <Vouches />
        <div id="categories">
