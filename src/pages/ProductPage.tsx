@@ -321,12 +321,35 @@ Keep the system offline after setup. Going online may lock the game
     }
 
     if (selectedType === "Permanent Offline + Online") {
-      return `🎮 Permanent Offline + Online Access:
+      return `About This Option
 
-✔️ Permanent access on a single device/console.
-✔️ Offline and online access supported where applicable.
-✔️ Warranty and setup support provided.
-✔️ Best option for users who want the full experience.`;
+🎮 Permanent Access (Offline + Online):
+
+✔ Enjoy complete freedom to play online or offline anytime
+✔ Works on single device/console
+✔ Playable on Personal Account (mostly supported)
+✔ In case of any exception, our team will confirm before purchase
+
+🔐 Flexibility & Usage:
+
+✔ Play the game as per your preference – online or offline
+✔ You can delete and re-download 
+✔ Smooth and reliable experience with no usage restrictions
+
+🛡️ 12 Months Warranty Included:
+
+✔ Full 12 months support & coverage
+✔ If any issue occurs, replacement or refund will be provided
+✔ Dedicated assistance for setup and troubleshooting
+
+🚀 Why Choose This Option?
+
+✔ Best alternative 
+✔ No limitations like one-time play
+✔ Ideal for users who want complete access + long-term value
+
+✨ Note:
+Please confirm with our team before purchase regarding personal account compatibility for your selected game.`;
     }
 
     return "Choose the option that best fits your usage.";

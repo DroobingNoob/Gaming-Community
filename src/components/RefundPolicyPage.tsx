@@ -129,13 +129,13 @@ const RefundPolicyPage: React.FC<RefundPolicyPageProps> = ({ onBackToHome }) => 
             </div>
             <div className="text-gray-600 leading-relaxed space-y-4">
               <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-                <h3 className="font-bold text-green-800 mb-3">6-Month Warranty Coverage</h3>
+                <h3 className="font-bold text-green-800 mb-3">12-Month Warranty Coverage</h3>
                 <ul className="space-y-2 text-green-700">
-                  <li>• All permanent games include a 6-month warranty period</li>
+                  <li>• All permanent games include a 12-month warranty period</li>
                   <li>• Warranty covers lock/access issues only</li>
                   <li>• We provide support, replacement, or fixes during warranty period</li>
                   <li>• Warranty becomes void if account is shared or transferred</li>
-                  <li>• After 6 months, no support or replacements are available</li>
+                  <li>• After 12 months, no support or replacements are available</li>
                 </ul>
               </div>
             </div>

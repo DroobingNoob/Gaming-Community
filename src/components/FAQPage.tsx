@@ -47,7 +47,7 @@ const FAQPage: React.FC<FAQPageProps> = ({ onBackToHome }) => {
     {
       id: 6,
       question: "What if my game stops working or is locked?",
-      answer: "You are covered under our warranty period:\n\nRental Games: Support provided for 30 days.\nPermanent Games: Warranty available for 6 months.\n\nIn case of any issue, just contact us — we will assist or replace as needed.",
+      answer: "You are covered under our warranty period:\n\nRental Games: Support provided for 30 days.\nPermanent Games: Warranty available for 12 months.\n\nIn case of any issue, just contact us — we will assist or replace as needed.",
       icon: <Shield className="w-5 h-5" />,
       category: "Support"
     },
