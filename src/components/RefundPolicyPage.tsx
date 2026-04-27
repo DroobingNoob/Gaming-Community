@@ -65,7 +65,7 @@ const RefundPolicyPage: React.FC<RefundPolicyPageProps> = ({ onBackToHome }) => 
             </div>
             <div className="text-gray-600 leading-relaxed space-y-4">
               <p>
-                After the <strong>6-month period</strong>, any lock or access issues will not be covered, and <strong>no refund or replacement will be available</strong>.
+                After the <strong>12-month period</strong>, any lock or access issues will not be covered, and <strong>no refund or replacement will be available</strong>.
               </p>
             </div>
           </section>

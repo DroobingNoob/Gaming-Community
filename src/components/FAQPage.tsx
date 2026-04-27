@@ -250,7 +250,7 @@ const FAQPage: React.FC<FAQPageProps> = ({ onBackToHome }) => {
                 </div>
                 <div className="bg-white/50 rounded-lg p-3 sm:p-4">
                   <h4 className="font-semibold text-gray-800 mb-2 text-sm sm:text-base">For Purchases</h4>
-                  <p className="text-gray-600 text-xs sm:text-sm">Keep your account safe to maintain your 6-month warranty coverage.</p>
+                  <p className="text-gray-600 text-xs sm:text-sm">Keep your account safe to maintain your 12-month warranty coverage.</p>
                 </div>
               </div>
             </div>

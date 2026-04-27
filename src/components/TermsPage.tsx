@@ -155,7 +155,7 @@ const TermsPage: React.FC<TermsPageProps> = ({ onBackToHome }) => {
                 <h3 className="text-xl font-bold text-gray-800">Warranty Coverage</h3>
               </div>
               <div className="text-gray-600 leading-relaxed space-y-3 ml-12">
-                <p>• All permanent games come with a <strong>6-month warranty</strong>.</p>
+                <p>• All permanent games come with a <strong>12-month warranty</strong>.</p>
                 <p>• If you face any lock/access issues during this time, we will provide support, and if necessary, offer a replacement or fix.</p>
               </div>
             </div>
