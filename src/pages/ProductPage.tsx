@@ -139,7 +139,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
     selectedPlatformPricing?.rent_12_months
   );
 
-  const hasPermanentOffline = !!selectedPlatformPricing?.permanent_offline_price;
+  // const hasPermanentOffline = !!selectedPlatformPricing?.permanent_offline_price;
+  const isPcPlatform = selectedPlatform.toLowerCase() === "pc";
+
+const hasPermanentOffline =
+  isPcPlatform && !!selectedPlatformPricing?.permanent_offline_price;
   const hasPermanentOnline = !!selectedPlatformPricing?.permanent_online_price;
 
   const availableTypesForCurrentPlatform = useMemo(() => {

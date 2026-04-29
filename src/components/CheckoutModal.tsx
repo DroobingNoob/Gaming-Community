@@ -422,13 +422,23 @@ Please confirm my order and provide delivery details. Thank you! 🙏`;
 
   <div className="flex gap-2">
    <div className="w-28">
-  <input
-    type="text"
+  <div className="w-28">
+  <select
     value={customerCountryCode}
     onChange={(e) => setCustomerCountryCode(e.target.value)}
     className="w-full py-3 px-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-white"
-    placeholder="+91"
-  />
+  >
+    <option value="+91">🇮🇳 +91</option>
+    <option value="+1">🇺🇸 +1</option>
+    <option value="+1">🇨🇦 +1</option>
+    <option value="+49">🇩🇪 +49</option>
+    <option value="+977">🇳🇵 +977</option>
+    <option value="+44">🇬🇧 +44</option>
+    <option value="+61">🇦🇺 +61</option>
+    <option value="+971">🇦🇪 +971</option>
+    <option value="+65">🇸🇬 +65</option>
+  </select>
+</div>
 </div>
 
     <div className="relative flex-1">
