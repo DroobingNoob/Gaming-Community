@@ -327,7 +327,7 @@ Keep the system offline after setup. Going online may lock the game
     if (selectedType === "Permanent") {
       return `About This Option
 
-🎮 Permanent Access (Offline + Online):
+🎮 Permanent Access:
 
 ✔ Enjoy complete freedom to play online or offline anytime
 ✔ Works on single device/console
