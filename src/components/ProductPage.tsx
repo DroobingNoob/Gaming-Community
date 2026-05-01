@@ -88,7 +88,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
         return Boolean(selectedPlatformPrice.permanent_offline_price);
       }
 
-      if (type === "Permanent Offline + Online") {
+      if (type === "Permanent") {
         return Boolean(selectedPlatformPrice.permanent_online_price);
       }
 
@@ -248,7 +248,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
       return selectedPlatformPrice.permanent_offline_price || 0;
     }
 
-    if (selectedType === "Permanent Offline + Online") {
+    if (selectedType === "Permanent") {
       return selectedPlatformPrice.permanent_online_price || 0;
     }
 
@@ -282,7 +282,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
       );
     }
 
-    if (selectedType === "Permanent Offline + Online") {
+    if (selectedType === "Permanent") {
       return (
         selectedPlatformPrice.original_price ||
         selectedPlatformPrice.permanent_online_price ||
@@ -327,8 +327,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
 ✔️ Follow the provided setup instructions carefully to avoid issues.`;
     }
 
-    if (selectedType === "Permanent Offline + Online") {
-      return `Permanent Offline + Online:
+    if (selectedType === "Permanent") {
+      return `Permanent:
 
 ✔️ Game is provided on a purchased account.
 

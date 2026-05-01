@@ -157,7 +157,7 @@ const hasPermanentOffline =
 
     if (hasRentOptions) types.push("Rent");
     if (hasPermanentOffline) types.push("Permanent Offline");
-    if (hasPermanentOnline) types.push("Permanent Offline + Online");
+    if (hasPermanentOnline) types.push("Permanent");
 
     if (types.length === 0) {
       return currentProduct.type || [];
@@ -324,7 +324,7 @@ Keep the system offline after setup. Going online may lock the game
 ✔ Best for story mode / offline gaming`;
     }
 
-    if (selectedType === "Permanent Offline + Online") {
+    if (selectedType === "Permanent") {
       return `About This Option
 
 🎮 Permanent Access (Offline + Online):
