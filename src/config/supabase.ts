@@ -132,7 +132,7 @@ export const getGameDisplayPrice = (
     return pricing.permanent_offline_price || pricing.original_price || 0;
   }
 
-  if (selectedType === "Permanent Offline + Online") {
+  if (selectedType === "Permanent") {
     return pricing.permanent_online_price || pricing.original_price || 0;
   }
 
