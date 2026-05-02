@@ -60,15 +60,10 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigation }) => {
       />
 
       <TrustIndicators />
+      
       <Vouches />
-       <div id="categories">
-        <Categories onViewAllGames={handleViewAllGames} onViewSubscriptions={handleViewSubscriptions} />
-      </div> 
-      <div id="bestsellers">
-        <BestSellers onGameClick={handleGameClick} />
-      </div>
-
-     {/* WhatsApp Community CTA */}
+        
+{/* WhatsApp Community + Channel CTA */}
 <section className="px-4 sm:px-6 lg:px-8 mt-10 mb-10">
   <div className="max-w-5xl mx-auto">
     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-950 via-gray-900 to-black px-5 py-7 sm:px-8 sm:py-8 text-white shadow-2xl">
@@ -101,17 +96,31 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigation }) => {
           </p>
         </div>
 
-        <a
-          href="https://whatsapp.com/channel/0029Vaz3HzXBadmdfwWvXQ1A"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 text-sm sm:text-base font-bold text-white shadow-lg shadow-orange-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-orange-500/40 active:scale-95"
-        >
-          Join WhatsApp Community
-          <span className="transition-transform duration-300 group-hover:translate-x-1">
-            →
-          </span>
-        </a>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+          <a
+            href="https://chat.whatsapp.com/Ji2m3HfTatXFc2q9eYabA1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 text-sm sm:text-base font-bold text-white shadow-lg shadow-orange-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-orange-500/40 active:scale-95"
+          >
+            Join Community
+            <span className="transition-transform duration-300 group-hover:translate-x-1">
+              →
+            </span>
+          </a>
+
+          <a
+            href="https://whatsapp.com/channel/0029Vaz3HzXBadmdfwWvXQ1A"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-6 py-3 text-sm sm:text-base font-bold text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:bg-white/15 active:scale-95"
+          >
+            Join Channel
+            <span className="transition-transform duration-300 group-hover:translate-x-1">
+              →
+            </span>
+          </a>
+        </div>
 
         <p className="text-xs text-gray-400">
           No spam. Only useful game updates and offers.
@@ -120,6 +129,14 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigation }) => {
     </div>
   </div>
 </section>
+       <div id="categories">
+        <Categories onViewAllGames={handleViewAllGames} onViewSubscriptions={handleViewSubscriptions} />
+      </div> 
+      <div id="bestsellers">
+        <BestSellers onGameClick={handleGameClick} />
+      </div>
+
+
      
     </>
   );
