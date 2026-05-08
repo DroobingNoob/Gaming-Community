@@ -52,9 +52,14 @@ const ReviewsSection: React.FC = () => {
     }
 
     if (!customerName.trim()) return toast.error("Please enter your name");
-    if (!customerContact.trim())
+
+    if (!customerContact.trim()) {
       return toast.error("Please enter mobile or email");
-    if (!message.trim()) return toast.error("Please write your review");
+    }
+
+    if (!message.trim()) {
+      return toast.error("Please write your review");
+    }
 
     setSubmitting(true);
 
@@ -75,6 +80,7 @@ const ReviewsSection: React.FC = () => {
     localStorage.setItem(REVIEW_LIMIT_KEY, String(Date.now()));
 
     toast.success("Review submitted! It will appear after 24-48 hours.");
+
     setCustomerName("");
     setCustomerContact("");
     setRating(5);
@@ -108,7 +114,7 @@ const ReviewsSection: React.FC = () => {
         </div>
 
         {reviews.length === 0 ? (
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 text-center shadow-lg border border-white/20">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-lg border border-white/20">
             <p className="text-gray-600">
               No reviews yet. Be the first to add one.
             </p>
@@ -116,11 +122,11 @@ const ReviewsSection: React.FC = () => {
         ) : (
           <div className="relative overflow-hidden min-h-[230px] sm:min-h-[260px]">
             <div className="absolute left-0 top-0 bottom-0 w-10 sm:w-20 bg-gradient-to-r from-orange-50 via-orange-50/80 to-transparent z-10 pointer-events-none" />
+
             <div className="absolute right-0 top-0 bottom-0 w-10 sm:w-20 bg-gradient-to-l from-orange-50 via-orange-50/80 to-transparent z-10 pointer-events-none" />
 
             <div
-              
-  className="flex gap-4 py-3 sm:gap-6 w-max animate-review-scroll will-change-transform transform-gpu"
+              className="flex gap-4 py-3 sm:gap-6 w-max animate-review-scroll will-change-transform transform-gpu"
               style={{
                 animationDuration: `${Math.max(reviews.length * 5, 20)}s`,
               }}
@@ -139,8 +145,8 @@ const ReviewsSection: React.FC = () => {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-[90] p-0 sm:p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20">
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-[90] p-0 sm:p-4 overflow-hidden">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:max-w-lg shadow-2xl border border-white/20">
             <div className="flex items-center justify-between p-5 border-b border-gray-200">
               <div>
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-800">
@@ -154,7 +160,7 @@ const ReviewsSection: React.FC = () => {
 
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100"
+                className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -257,6 +263,7 @@ const ReviewsSection: React.FC = () => {
                 className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white py-3 rounded-xl font-bold transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
+
                 {submitting ? "Submitting..." : "Submit Review"}
               </button>
 
