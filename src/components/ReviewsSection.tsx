@@ -25,6 +25,31 @@ const ReviewsSection: React.FC = () => {
     loadReviews();
   }, []);
 
+  useEffect(() => {
+    if (!showModal) return;
+
+    const scrollY = window.scrollY;
+
+    const originalOverflow = document.body.style.overflow;
+    const originalPosition = document.body.style.position;
+    const originalTop = document.body.style.top;
+    const originalWidth = document.body.style.width;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.width = originalWidth;
+
+      window.scrollTo(0, scrollY);
+    };
+  }, [showModal]);
+
   const canSubmitReview = () => {
     const lastSubmittedAt = localStorage.getItem(REVIEW_LIMIT_KEY);
 
@@ -145,8 +170,8 @@ const ReviewsSection: React.FC = () => {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-[90] p-0 sm:p-4 overflow-hidden">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:max-w-lg shadow-2xl border border-white/20">
+        <div className="fixed inset-0 h-dvh bg-black/50 flex items-end sm:items-center justify-center z-[90] p-0 sm:p-4 overflow-hidden overscroll-none touch-none">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:max-w-lg shadow-2xl border border-white/20 touch-auto">
             <div className="flex items-center justify-between p-5 border-b border-gray-200">
               <div>
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-800">
@@ -263,7 +288,6 @@ const ReviewsSection: React.FC = () => {
                 className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white py-3 rounded-xl font-bold transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
-
                 {submitting ? "Submitting..." : "Submit Review"}
               </button>
 
