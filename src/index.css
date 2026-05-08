@@ -30,3 +30,23 @@
     padding: 4px 8px !important;
   }
 }
+
+@keyframes review-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-review-scroll {
+  animation-name: review-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.animate-review-scroll:hover {
+  animation-play-state: paused;
+}

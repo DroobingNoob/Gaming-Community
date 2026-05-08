@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Star, Send, MessageSquarePlus, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { reviewService, Review } from "../services/reviewService";
@@ -9,8 +9,6 @@ const ONE_HOUR = 60 * 60 * 1000;
 const ReviewsSection: React.FC = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(3);
 
   const [customerName, setCustomerName] = useState("");
   const [customerContact, setCustomerContact] = useState("");
@@ -26,43 +24,6 @@ const ReviewsSection: React.FC = () => {
   useEffect(() => {
     loadReviews();
   }, []);
-
-  useEffect(() => {
-    const updateItemsPerPage = () => {
-      setItemsPerPage(window.innerWidth < 768 ? 2 : 3);
-      setActiveIndex(0);
-    };
-
-    updateItemsPerPage();
-    window.addEventListener("resize", updateItemsPerPage);
-
-    return () => window.removeEventListener("resize", updateItemsPerPage);
-  }, []);
-
-  const loopedReviews = useMemo(() => {
-    if (reviews.length === 0) return [];
-    return [...reviews, ...reviews.slice(0, itemsPerPage)];
-  }, [reviews, itemsPerPage]);
-
-  useEffect(() => {
-    if (reviews.length <= itemsPerPage) return;
-
-    const interval = window.setInterval(() => {
-      setActiveIndex((prev) => prev + 1);
-    }, 3000);
-
-    return () => window.clearInterval(interval);
-  }, [reviews.length, itemsPerPage]);
-
-  useEffect(() => {
-    if (activeIndex !== reviews.length) return;
-
-    const timeout = window.setTimeout(() => {
-      setActiveIndex(0);
-    }, 700);
-
-    return () => window.clearTimeout(timeout);
-  }, [activeIndex, reviews.length]);
 
   const canSubmitReview = () => {
     const lastSubmittedAt = localStorage.getItem(REVIEW_LIMIT_KEY);
@@ -113,7 +74,7 @@ const ReviewsSection: React.FC = () => {
 
     localStorage.setItem(REVIEW_LIMIT_KEY, String(Date.now()));
 
-    toast.success("Review submitted! It will appear after admin approval.");
+    toast.success("Review submitted! It will appear after 24-48 hours.");
     setCustomerName("");
     setCustomerContact("");
     setRating(5);
@@ -124,27 +85,27 @@ const ReviewsSection: React.FC = () => {
   return (
     <section className="py-12 sm:py-16 bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-3 sm:px-4">
-    <div className="text-center mb-8 sm:mb-10 md:mb-12">
-  <p className="text-cyan-600 font-bold text-sm mb-2 tracking-wide">
-    CUSTOMER REVIEWS
-  </p>
+        <div className="text-center mb-8 sm:mb-10 md:mb-12">
+          <p className="text-cyan-600 font-bold text-sm mb-2 tracking-wide">
+            CUSTOMER REVIEWS
+          </p>
 
-  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3 sm:mb-4">
-    What Gamers Say
-  </h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3 sm:mb-4">
+            Built on Trust and Gamer Satisfaction
+          </h2>
 
-  <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto px-4">
-    Real feedback from customers after their orders are verified by admin.
-  </p>
+          <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto px-4">
+            Real feedback from our customers.
+          </p>
 
-  <button
-    onClick={() => setShowModal(true)}
-    className="mt-6 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white px-5 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
-  >
-    <MessageSquarePlus className="w-5 h-5" />
-    Add Review
-  </button>
-</div>
+          <button
+            onClick={() => setShowModal(true)}
+            className="mt-6 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-orange-500 hover:to-red-500 text-white px-5 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
+          >
+            <MessageSquarePlus className="w-5 h-5" />
+            Share Experience
+          </button>
+        </div>
 
         {reviews.length === 0 ? (
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 text-center shadow-lg border border-white/20">
@@ -152,32 +113,21 @@ const ReviewsSection: React.FC = () => {
               No reviews yet. Be the first to add one.
             </p>
           </div>
-        ) : reviews.length <= itemsPerPage ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-            {reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
-            ))}
-          </div>
         ) : (
           <div className="relative overflow-hidden">
+            <div className="absolute left-0 top-0 bottom-0 w-10 sm:w-20 bg-gradient-to-r from-orange-50 via-orange-50/80 to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-10 sm:w-20 bg-gradient-to-l from-orange-50 via-orange-50/80 to-transparent z-10 pointer-events-none" />
+
             <div
-              className={`flex gap-3 sm:gap-6 ${
-                activeIndex === 0
-                  ? "transition-none"
-                  : "transition-transform duration-700 ease-out"
-              }`}
+              className="flex gap-4 py-3 sm:gap-6 w-max animate-review-scroll"
               style={{
-                transform: `translateX(-${activeIndex * (100 / itemsPerPage)}%)`,
+                animationDuration: `${Math.max(reviews.length * 5, 20)}s`,
               }}
             >
-              {loopedReviews.map((review, index) => (
+              {[...reviews, ...reviews].map((review, index) => (
                 <div
                   key={`${review.id}-${index}`}
-                  className={`shrink-0 ${
-                    itemsPerPage === 2
-                      ? "w-[calc(50%-6px)]"
-                      : "w-[calc(33.333%-16px)]"
-                  }`}
+                  className="w-[280px] sm:w-[340px] shrink-0"
                 >
                   <ReviewCard review={review} />
                 </div>
@@ -197,7 +147,7 @@ const ReviewsSection: React.FC = () => {
                 </h3>
 
                 <p className="text-sm text-gray-500">
-                  It will appear after admin approval.
+                  It will appear after 24-48 hours.
                 </p>
               </div>
 
@@ -273,27 +223,31 @@ const ReviewsSection: React.FC = () => {
                 </label>
 
                 <div>
-  <textarea
-    value={message}
-    onChange={(e) => setMessage(e.target.value)}
-    placeholder="Write your experience..."
-    rows={4}
-    maxLength={125}
-    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 resize-none"
-  />
+                  <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Write your experience..."
+                    rows={5}
+                    maxLength={160}
+                    className="w-full px-4 py-3 text-sm sm:text-base border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 resize-none bg-white shadow-sm"
+                  />
 
-  <div className="flex justify-end mt-2">
-    <span
-      className={`text-xs ${
-        message.length > 110
-          ? "text-orange-500"
-          : "text-gray-400"
-      }`}
-    >
-      {message.length}/125
-    </span>
-  </div>
-</div>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-[11px] sm:text-xs text-gray-400">
+                      Keep it short and helpful.
+                    </p>
+
+                    <span
+                      className={`text-[11px] sm:text-xs font-semibold px-2 py-1 rounded-full ${
+                        message.length > 145
+                          ? "bg-orange-50 text-orange-500"
+                          : "bg-gray-100 text-gray-500"
+                      }`}
+                    >
+                      {message.length}/160
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <button
@@ -306,8 +260,8 @@ const ReviewsSection: React.FC = () => {
               </button>
 
               <p className="text-xs text-gray-500 text-center">
-                One review allowed every 1 hour on this device. Admin approval
-                required.
+                One review allowed every 1 hour on this device. Reviews will
+                appear after 24-48 hours.
               </p>
             </div>
           </div>
@@ -319,43 +273,52 @@ const ReviewsSection: React.FC = () => {
 
 const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
   return (
-    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-lg border border-white/20 hover:shadow-xl transition-all h-full">
-      <div className="flex items-start justify-between gap-3 mb-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white flex items-center justify-center font-bold shadow-md shrink-0">
-            {review.customer_name?.charAt(0)?.toUpperCase() || "G"}
-          </div>
+    <div className="group relative bg-white/95 backdrop-blur-sm rounded-3xl p-4 sm:p-6 shadow-md sm:shadow-lg border border-white/70 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 h-full overflow-hidden">
+      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-orange-400" />
 
-          <div className="min-w-0">
-            <h3 className="font-bold text-gray-800 truncate text-sm sm:text-base">
-              {review.customer_name}
-            </h3>
-
-            <p className="text-[11px] sm:text-xs text-green-600 font-semibold">
-              Verified Review
-            </p>
-          </div>
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 text-white flex items-center justify-center font-extrabold shadow-md shrink-0">
+          {review.customer_name?.charAt(0)?.toUpperCase() || "G"}
         </div>
 
-        <span className="hidden sm:block text-xs text-gray-400 shrink-0">
-          {new Date(review.created_at).toLocaleDateString()}
-        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="font-bold text-gray-900 truncate text-sm sm:text-base">
+                {review.customer_name}
+              </h3>
+
+              <p className="text-[11px] sm:text-xs text-green-600 font-bold mt-0.5">
+                Verified Customer
+              </p>
+            </div>
+
+            <span className="text-[10px] sm:text-[11px] text-gray-400 shrink-0">
+              {new Date(review.created_at).toLocaleString([], {
+                day: "2-digit",
+                month: "short",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className="flex gap-1 mb-3">
         {Array.from({ length: 5 }).map((_, index) => (
           <Star
             key={index}
-            className={`w-4 h-4 ${
+            className={`w-4 h-4 sm:w-5 sm:h-5 ${
               index < review.rating
                 ? "text-yellow-400 fill-yellow-400"
-                : "text-gray-300"
+                : "text-gray-200"
             }`}
           />
         ))}
       </div>
 
-      <p className="text-gray-700 text-xs sm:text-sm leading-relaxed line-clamp-4">
+      <p className="text-gray-700 text-xs sm:text-sm leading-relaxed line-clamp-5">
         “{review.message}”
       </p>
     </div>
