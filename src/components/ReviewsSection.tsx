@@ -114,12 +114,13 @@ const ReviewsSection: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="relative overflow-hidden">
+          <div className="relative overflow-hidden min-h-[230px] sm:min-h-[260px]">
             <div className="absolute left-0 top-0 bottom-0 w-10 sm:w-20 bg-gradient-to-r from-orange-50 via-orange-50/80 to-transparent z-10 pointer-events-none" />
             <div className="absolute right-0 top-0 bottom-0 w-10 sm:w-20 bg-gradient-to-l from-orange-50 via-orange-50/80 to-transparent z-10 pointer-events-none" />
 
             <div
-              className="flex gap-4 py-3 sm:gap-6 w-max animate-review-scroll"
+              
+  className="flex gap-4 py-3 sm:gap-6 w-max animate-review-scroll will-change-transform transform-gpu"
               style={{
                 animationDuration: `${Math.max(reviews.length * 5, 20)}s`,
               }}
@@ -273,7 +274,7 @@ const ReviewsSection: React.FC = () => {
 
 const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
   return (
-    <div className="group relative bg-white/95 backdrop-blur-sm rounded-3xl p-4 sm:p-6 shadow-md sm:shadow-lg border border-white/70 md:hover:shadow-2xl md:hover:-translate-y-1 transition-shadow duration-300 h-full overflow-hidden">
+    <div className="group relative bg-white rounded-3xl p-4 sm:p-6 shadow-md sm:shadow-lg border border-white/70 md:hover:shadow-2xl md:hover:-translate-y-1 transition-shadow duration-300 min-h-[210px] sm:min-h-[230px] overflow-hidden">
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-orange-400" />
 
       <div className="flex items-start gap-3 mb-4">
