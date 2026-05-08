@@ -9,6 +9,7 @@ import {
   Settings,
   Copy,
   Tag,
+  Star
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -35,6 +36,7 @@ import {
   ShopMode,
   PaymentSettings,
 } from "../services/settingsService";
+import { reviewService, Review } from "../services/reviewService";
 import { couponService, Coupon } from "../services/couponService";
 
 type AdminTab =
@@ -42,7 +44,8 @@ type AdminTab =
   | "subscriptions"
   | "testimonials"
   | "settings"
-  | "coupons";
+  | "coupons"
+  | "reviews";
 
 interface GameFormState {
   title: string;
@@ -141,6 +144,8 @@ const AdminPage: React.FC = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loadingCoupons, setLoadingCoupons] = useState(false);
   const [editingCouponId, setEditingCouponId] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+const [loadingReviews, setLoadingReviews] = useState(false);
 
   const emptyCouponForm = {
     name: "",
@@ -214,6 +219,17 @@ const AdminPage: React.FC = () => {
 
     loadSettings();
   }, []);
+
+  const loadReviews = async () => {
+  setLoadingReviews(true);
+  const data = await reviewService.getAllReviews();
+  setReviews(data || []);
+  setLoadingReviews(false);
+};
+
+useEffect(() => {
+  loadReviews();
+}, []);
 
   const currentSearchQuery =
     activeTab === "games"
@@ -1103,6 +1119,131 @@ onChange={(e) =>
     );
   };
 
+  const renderReviews = () => {
+  const updateStatus = async (
+    id: string,
+    status: "pending" | "approved" | "rejected"
+  ) => {
+    const success = await reviewService.updateReviewStatus(id, status);
+
+    if (!success) {
+      toast.error("Failed to update review");
+      return;
+    }
+
+    toast.success(`Review ${status}`);
+    await loadReviews();
+  };
+
+  const deleteReview = async (id: string) => {
+    if (!window.confirm("Delete this review?")) return;
+
+    const success = await reviewService.deleteReview(id);
+
+    if (!success) {
+      toast.error("Failed to delete review");
+      return;
+    }
+
+    toast.success("Review deleted");
+    await loadReviews();
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto space-y-6">
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
+        <h3 className="text-2xl font-bold text-gray-800 mb-6">
+          Review Verification
+        </h3>
+
+        {loadingReviews ? (
+          <p className="text-gray-500">Loading reviews...</p>
+        ) : reviews.length === 0 ? (
+          <p className="text-gray-500">No reviews found</p>
+        ) : (
+          <div className="space-y-4">
+            {reviews.map((review) => (
+              <div
+                key={review.id}
+                className="border border-gray-200 rounded-2xl p-4 bg-white"
+              >
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="font-bold text-gray-800">
+                      {review.customer_name}
+                    </div>
+
+                    <div className="text-sm text-gray-500">
+                      {review.customer_contact}
+                    </div>
+
+                    <div className="flex gap-1 mt-2">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <Star
+                          key={index}
+                          className={`w-4 h-4 ${
+                            index < review.rating
+                              ? "text-yellow-400 fill-yellow-400"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+
+                    <p className="text-gray-700 mt-3">{review.message}</p>
+
+                    <div className="text-xs text-gray-500 mt-2">
+                      Submitted: {new Date(review.created_at).toLocaleString()}
+                    </div>
+
+                    <div className="text-sm mt-2">
+                      Status:{" "}
+                      <span
+                        className={
+                          review.status === "approved"
+                            ? "text-green-600 font-semibold"
+                            : review.status === "rejected"
+                              ? "text-red-600 font-semibold"
+                              : "text-orange-600 font-semibold"
+                        }
+                      >
+                        {review.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => updateStatus(review.id, "approved")}
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                    >
+                      Approve
+                    </button>
+
+                    <button
+                      onClick={() => updateStatus(review.id, "rejected")}
+                      className="px-4 py-2 bg-orange-500 text-white rounded-lg"
+                    >
+                      Reject
+                    </button>
+
+                    <button
+                      onClick={() => deleteReview(review.id)}
+                      className="px-4 py-2 bg-red-500 text-white rounded-lg"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
   const renderSettings = () => {
     return (
       <div className="max-w-3xl mx-auto space-y-6">
@@ -1706,6 +1847,7 @@ onChange={(e) =>
             { id: "testimonials", label: "Screenshots", count: testimonials.length },
             { id: "settings", label: "Shop Settings", count: null },
             { id: "coupons", label: "Coupons", count: null },
+            { id: "reviews", label: "Reviews", count: reviews.length }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1730,7 +1872,9 @@ onChange={(e) =>
           ))}
         </div>
 
-        {activeTab !== "settings" && activeTab !== "coupons" && (
+{activeTab !== "settings" &&
+ activeTab !== "coupons" &&
+ activeTab !== "reviews" && (
           <>
             <div className="flex justify-end mb-6">
               <button
@@ -1739,13 +1883,15 @@ onChange={(e) =>
               >
                 <Plus className="w-5 h-5" />
                 <span>
-                  Add{" "}
-                  {activeTab === "games"
-                    ? "Game"
-                    : activeTab === "subscriptions"
-                      ? "Subscription"
-                      : "Screenshot"}
-                </span>
+  Add{" "}
+  {activeTab === "games"
+    ? "Game"
+    : activeTab === "subscriptions"
+      ? "Subscription"
+      : activeTab === "reviews"
+        ? "Review"
+        : "Screenshot"}
+</span>
               </button>
             </div>
 
@@ -1754,13 +1900,15 @@ onChange={(e) =>
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder={`Search ${
-                    activeTab === "games"
-                      ? "games"
-                      : activeTab === "subscriptions"
-                        ? "subscriptions"
-                        : "screenshots"
-                  }...`}
+                 placeholder={`Search ${
+  activeTab === "games"
+    ? "games"
+    : activeTab === "subscriptions"
+      ? "subscriptions"
+      : activeTab === "reviews"
+        ? "reviews"
+        : "screenshots"
+}...`}
                   value={currentSearchQuery}
                   onChange={(e) => setCurrentSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
@@ -1816,7 +1964,9 @@ onChange={(e) =>
           renderSettings()
         ) : activeTab === "coupons" ? (
           renderCoupons()
-        ) : loading ? (
+        ) : activeTab === "reviews" ? (
+  renderReviews()
+) : loading ? (
           <div className="col-span-full text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading {activeTab}...</p>
@@ -1839,12 +1989,14 @@ onChange={(e) =>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-gray-800">
-                    {editingItem ? "Edit" : "Add"}{" "}
-                    {activeTab === "games"
-                      ? "Game"
-                      : activeTab === "subscriptions"
-                        ? "Subscription"
-                        : "Screenshot"}
+                   {editingItem ? "Edit" : "Add"}{" "}
+{activeTab === "games"
+  ? "Game"
+  : activeTab === "subscriptions"
+    ? "Subscription"
+    : activeTab === "reviews"
+      ? "Review"
+      : "Screenshot"}
                   </h2>
 
                   <button

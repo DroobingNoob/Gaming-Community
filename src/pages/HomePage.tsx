@@ -5,6 +5,7 @@ import TrustIndicators from '../components/TrustIndicators';
 import Vouches from '../components/Vouches';
 import BestSellers from '../components/BestSellers';
 import Categories from '../components/Categories';
+import ReviewsSection from '../components/ReviewsSection';
 import Loader from '../components/Loader';
 import { Game } from '../config/supabase';
 
@@ -135,6 +136,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigation }) => {
       <div id="bestsellers">
         <BestSellers onGameClick={handleGameClick} />
       </div>
+      <ReviewsSection />
 
 
      
