@@ -1173,9 +1173,9 @@ onChange={(e) =>
                       {review.customer_name}
                     </div>
 
-                    <div className="text-sm text-gray-500">
+                    {/* <div className="text-sm text-gray-500">
                       {review.customer_contact}
-                    </div>
+                    </div> */}
 
                     <div className="flex gap-1 mt-2">
                       {Array.from({ length: 5 }).map((_, index) => (

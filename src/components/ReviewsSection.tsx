@@ -11,7 +11,7 @@ const ReviewsSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
 
   const [customerName, setCustomerName] = useState("");
-  const [customerContact, setCustomerContact] = useState("");
+  const [customerContact, setCustomerContact] = useState("9999999999");
   const [rating, setRating] = useState(5);
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -206,7 +206,7 @@ const ReviewsSection: React.FC = () => {
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Mobile or Email
                 </label>
@@ -218,7 +218,7 @@ const ReviewsSection: React.FC = () => {
                   placeholder="Mobile or email"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 />
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
