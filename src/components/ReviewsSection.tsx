@@ -273,7 +273,7 @@ const ReviewsSection: React.FC = () => {
 
 const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
   return (
-    <div className="group relative bg-white/95 backdrop-blur-sm rounded-3xl p-4 sm:p-6 shadow-md sm:shadow-lg border border-white/70 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 h-full overflow-hidden">
+    <div className="group relative bg-white/95 backdrop-blur-sm rounded-3xl p-4 sm:p-6 shadow-md sm:shadow-lg border border-white/70 md:hover:shadow-2xl md:hover:-translate-y-1 transition-shadow duration-300 h-full overflow-hidden">
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-orange-400" />
 
       <div className="flex items-start gap-3 mb-4">
