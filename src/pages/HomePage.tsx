@@ -136,7 +136,10 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigation }) => {
       <div id="bestsellers">
         <BestSellers onGameClick={handleGameClick} />
       </div>
-      <ReviewsSection />
+      <div className='z-[9999]'>
+        <ReviewsSection />
+        </div>
+      
 
 
      
