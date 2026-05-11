@@ -10,6 +10,7 @@ export interface Coupon {
   min_game_count: number;
   message: string;
   is_active: boolean;
+  visible: boolean;
   created_at?: string;
   updated_at?: string;
 }

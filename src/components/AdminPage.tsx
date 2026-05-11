@@ -156,6 +156,7 @@ const [loadingReviews, setLoadingReviews] = useState(false);
     min_game_count: 0,
     message: "",
     is_active: true,
+    visible: true,
   };
 
   const [couponForm, setCouponForm] = useState(emptyCouponForm);
@@ -1014,6 +1015,27 @@ onChange={(e) =>
       Enable or disable this coupon
     </p>
   </div>
+  <div className="md:col-span-2">
+  <label className="flex items-center gap-2">
+    <input
+      type="checkbox"
+      checked={couponForm.visible}
+      onChange={(e) =>
+        setCouponForm({
+          ...couponForm,
+          visible: e.target.checked,
+        })
+      }
+    />
+    <span className="text-sm font-semibold text-gray-700">
+      Show Coupon Publicly
+    </span>
+  </label>
+
+  <p className="text-xs text-gray-500 mt-1">
+    If disabled, customers won't see it in coupon lists but can still use it manually if active
+  </p>
+</div>
 </div>
           <div className="flex gap-3 mt-6">
             <button
@@ -1067,12 +1089,19 @@ onChange={(e) =>
                         Message: {coupon.message}
                       </div>
                     )}
-                    <div className="text-sm mt-1">
-                      Status:{" "}
-                      <span className={coupon.is_active ? "text-green-600" : "text-red-600"}>
-                        {coupon.is_active ? "Active" : "Inactive"}
-                      </span>
-                    </div>
+                   <div className="text-sm mt-1">
+  Status:{" "}
+  <span className={coupon.is_active ? "text-green-600" : "text-red-600"}>
+    {coupon.is_active ? "Active" : "Inactive"}
+  </span>
+</div>
+
+<div className="text-sm mt-1">
+  Visibility:{" "}
+  <span className={coupon.visible ? "text-blue-600" : "text-gray-500"}>
+    {coupon.visible ? "Public" : "Hidden"}
+  </span>
+</div>
                   </div>
 
                   <div className="flex gap-2">
@@ -1088,6 +1117,7 @@ onChange={(e) =>
                           min_game_count: coupon.min_game_count,
                           message: coupon.message,
                           is_active: coupon.is_active,
+                            visible: coupon.visible,
                         });
                       }}
                       className="px-4 py-2 bg-blue-500 text-white rounded-lg"
