@@ -113,6 +113,11 @@ const ProductPage: React.FC<ProductPageProps> = ({
       ? games.filter((game) => game.id !== product.id).slice(0, 4)
       : subscriptions.filter((sub) => sub.id !== product.id).slice(0, 4);
 
+   const recommendedProducts = [
+    ...games.filter((game) => game.is_recommended === true),
+    ...subscriptions.filter((sub) => sub.is_recommended === true),
+  ].slice(0, 6);
+
   useEffect(() => {
     setSelectedPlatform(
       availablePlatforms[0] || (product.category === "subscription" ? "Subscription" : "PS5")
@@ -880,13 +885,13 @@ const ProductPage: React.FC<ProductPageProps> = ({
           <CustomerScreenshots />
         </div>
 
-        {relatedProducts.length > 0 && (
+        {recommendedProducts.length > 0 && (
           <div className="mb-8 sm:mb-12">
             <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6">
               You May Also Like
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-              {relatedProducts.map((item) => (
+              {recommendedProducts.map((item) => (
                 <div
                   key={item.id}
                   className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 sm:hover:-translate-y-2"

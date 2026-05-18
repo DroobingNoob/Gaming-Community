@@ -24,6 +24,8 @@ import {
 import { useAllGames, useSubscriptions } from "../hooks/useSupabaseData";
 import CustomerScreenshots from "../components/CustomerScreenshots";
 import Loader from "../components/Loader";
+import ReviewsSection from "../components/ReviewsSection";
+import ProductReviewsSection from "../components/ProductReviewsSection";
 
 interface ProductPageProps {
   onAddToCart: (
@@ -47,10 +49,10 @@ const ProductPage: React.FC<ProductPageProps> = ({
   onAddToCart,
   onBuyNow,
   onAnimateToCart,
-
 }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { allGames, loading: gamesLoading } = useAllGames();
   const { subscriptions, loading: subscriptionsLoading } = useSubscriptions();
@@ -58,8 +60,10 @@ const ProductPage: React.FC<ProductPageProps> = ({
   const [product, setProduct] = useState<Game | null>(null);
   const [availableEditions, setAvailableEditions] = useState<Game[]>([]);
   const [selectedEdition, setSelectedEdition] = useState<Game | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<Game[]>([]);
-  const [activeAccordion, setActiveAccordion] = useState<string | null>("details");
+  const [recommendedProducts, setRecommendedProducts] = useState<Game[]>([]);
+  const [activeAccordion, setActiveAccordion] = useState<string | null>(
+    "details"
+  );
   const [isImageSticky, setIsImageSticky] = useState(true);
   const [selectedPlatform, setSelectedPlatform] = useState("");
   const [selectedType, setSelectedType] = useState("");
@@ -68,8 +72,6 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
   const isLoading = gamesLoading || subscriptionsLoading;
   const currentProduct = selectedEdition || product;
-
-  const location = useLocation();
 
   useEffect(() => {
     if (id && !isLoading) {
@@ -88,29 +90,21 @@ const ProductPage: React.FC<ProductPageProps> = ({
         const editions = findAllEditionsByGameId(allGames, foundProduct.id!);
         setAvailableEditions(editions);
         setSelectedEdition(foundProduct);
-
-        const uniqueGameTitles = [...new Set(allGames.map((game) => game.title))];
-        const related = uniqueGameTitles
-          .filter((title) => title !== foundProduct.title)
-          .map((title) => {
-            const gameEditions = allGames.filter((game) => game.title === title);
-            return (
-              gameEditions.find((game) => game.edition === "Standard") ||
-              gameEditions[0]
-            );
-          })
-          .filter(Boolean)
-          .slice(0, 4) as Game[];
-
-        setRelatedProducts(related);
       } else {
         setAvailableEditions([foundProduct]);
         setSelectedEdition(foundProduct);
-        const related = subscriptions
-          .filter((sub) => sub.id !== foundProduct.id)
-          .slice(0, 4);
-        setRelatedProducts(related);
       }
+
+      const recommended = [
+        ...allGames.filter(
+          (game) => game.is_recommended === true && game.id !== foundProduct.id
+        ),
+        ...subscriptions.filter(
+          (sub) => sub.is_recommended === true && sub.id !== foundProduct.id
+        ),
+      ].slice(0, 6);
+
+      setRecommendedProducts(recommended);
     }
   }, [id, allGames, subscriptions, isLoading]);
 
@@ -139,12 +133,13 @@ const ProductPage: React.FC<ProductPageProps> = ({
     selectedPlatformPricing?.rent_12_months
   );
 
-  // const hasPermanentOffline = !!selectedPlatformPricing?.permanent_offline_price;
   const isPcPlatform = selectedPlatform.toLowerCase() === "pc";
 
-const hasPermanentOffline =
-  isPcPlatform && !!selectedPlatformPricing?.permanent_offline_price;
-  const hasPermanentOnline = !!selectedPlatformPricing?.permanent_online_price;
+  const hasPermanentOffline =
+    isPcPlatform && !!selectedPlatformPricing?.permanent_offline_price;
+
+  const hasPermanentOnline =
+    !!selectedPlatformPricing?.permanent_online_price;
 
   const availableTypesForCurrentPlatform = useMemo(() => {
     if (!currentProduct) return [];
@@ -177,6 +172,7 @@ const hasPermanentOffline =
 
   useEffect(() => {
     if (availableTypesForCurrentPlatform.length === 0) return;
+
     if (!availableTypesForCurrentPlatform.includes(selectedType)) {
       setSelectedType(availableTypesForCurrentPlatform[0]);
     }
@@ -186,12 +182,17 @@ const hasPermanentOffline =
     if (!selectedPlatformPricing || selectedType !== "Rent") return;
 
     const validDurations: RentDuration[] = [];
+
     if (selectedPlatformPricing.rent_1_month) validDurations.push("1_month");
     if (selectedPlatformPricing.rent_3_months) validDurations.push("3_months");
     if (selectedPlatformPricing.rent_6_months) validDurations.push("6_months");
-    if (selectedPlatformPricing.rent_12_months) validDurations.push("12_months");
+    if (selectedPlatformPricing.rent_12_months)
+      validDurations.push("12_months");
 
-    if (!validDurations.includes(selectedRentDuration) && validDurations.length > 0) {
+    if (
+      !validDurations.includes(selectedRentDuration) &&
+      validDurations.length > 0
+    ) {
       setSelectedRentDuration(validDurations[0]);
     }
   }, [selectedPlatformPricing, selectedType, selectedRentDuration]);
@@ -279,9 +280,8 @@ const hasPermanentOffline =
   };
 
   const getTypeDescription = () => {
-
     if (currentProduct?.category === "subscription") {
-    return `📺 Subscription Access:
+      return `📺 Subscription Access:
 
 ✔ We provide access for your selected subscription duration.
 ✔ Access will be shared after payment confirmation.
@@ -289,7 +289,7 @@ const hasPermanentOffline =
 ✔ Subscription will remain active for the chosen period only.
 ✔ Account credentials must not be changed.
 ✔ Any misuse or violation of terms may lead to access removal without notice.`;
-  }
+    }
 
     if (selectedType === "Rent") {
       return `🎮 Rental Game Access:
@@ -360,24 +360,27 @@ Please confirm with our team before purchase regarding personal account compatib
   };
 
   const handleAddToCart = async () => {
-  if (!currentProduct) return;
+    if (!currentProduct) return;
 
-  const price = calculatePrice();
-  const typeWithDuration =
-    selectedType === "Rent"
-      ? `${selectedType} (${selectedRentDuration.replace("_", " ")})`
-      : selectedType;
+    const price = calculatePrice();
 
-  if (onAnimateToCart) {
-    await onAnimateToCart();
-  }
+    const typeWithDuration =
+      selectedType === "Rent"
+        ? `${selectedType} (${selectedRentDuration.replace("_", " ")})`
+        : selectedType;
 
-  onAddToCart(currentProduct, selectedPlatform, typeWithDuration, price);
-};
+    if (onAnimateToCart) {
+      await onAnimateToCart();
+    }
+
+    onAddToCart(currentProduct, selectedPlatform, typeWithDuration, price);
+  };
+
   const handleBuyNow = () => {
     if (!currentProduct) return;
 
     const price = calculatePrice();
+
     const typeWithDuration =
       selectedType === "Rent"
         ? `${selectedType} (${selectedRentDuration.replace("_", " ")})`
@@ -386,16 +389,17 @@ Please confirm with our team before purchase regarding personal account compatib
     onBuyNow(currentProduct, selectedPlatform, typeWithDuration, price);
   };
 
-  const handleRelatedProductClick = (relatedProduct: Game) => {
-    if (relatedProduct.category === "game") {
-      navigate(`/games/${relatedProduct.id}`);
+  const handleRecommendedProductClick = (recommendedProduct: Game) => {
+    if (recommendedProduct.category === "game") {
+      navigate(`/games/${recommendedProduct.id}`);
     } else {
-      navigate(`/subscriptions/${relatedProduct.id}`);
+      navigate(`/subscriptions/${recommendedProduct.id}`);
     }
   };
 
   const handleEditionChange = (edition: Game) => {
     setSelectedEdition(edition);
+
     const newPlatforms = getPlatformsForGame(edition);
     setSelectedPlatform(newPlatforms[0] || "");
     setSelectedType(edition.type?.[0] || "");
@@ -408,33 +412,36 @@ Please confirm with our team before purchase regarding personal account compatib
     window.history.replaceState(null, "", newUrl);
   };
 
+  const handleBack = () => {
+    if (location.state) {
+      const { page, search, platform, sort, view } = location.state as any;
+
+      const params = new URLSearchParams();
+
+      if (search) params.set("search", search);
+      if (platform && platform !== "all") params.set("platform", platform);
+      if (sort && sort !== "name-asc") params.set("sort", sort);
+      if (page && page > 1) params.set("page", String(page));
+      if (view && view !== "grid") params.set("view", view);
+
+      navigate(`/games?${params.toString()}`);
+    } else {
+      navigate("/games");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
           <button
-            onClick={() => {
-  if (location.state) {
-    const { page, search, platform, sort, view } = location.state as any;
-
-    const params = new URLSearchParams();
-
-    if (search) params.set("search", search);
-    if (platform && platform !== "all") params.set("platform", platform);
-    if (sort && sort !== "name-asc") params.set("sort", sort);
-    if (page && page > 1) params.set("page", String(page));
-    if (view && view !== "grid") params.set("view", view);
-
-    navigate(`/games?${params.toString()}`);
-  } else {
-    navigate("/games");
-  }
-}}
+            onClick={handleBack}
             className="flex items-center space-x-1 sm:space-x-2 text-cyan-600 hover:text-orange-500 transition-colors mb-6 sm:mb-8 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-lg text-sm sm:text-base"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>Back</span>
           </button>
+
           <Loader
             size="large"
             message="Loading product details..."
@@ -450,28 +457,13 @@ Please confirm with our team before purchase regarding personal account compatib
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
           <button
-            onClick={() => {
-  if (location.state) {
-    const { page, search, platform, sort, view } = location.state as any;
-
-    const params = new URLSearchParams();
-
-    if (search) params.set("search", search);
-    if (platform && platform !== "all") params.set("platform", platform);
-    if (sort && sort !== "name-asc") params.set("sort", sort);
-    if (page && page > 1) params.set("page", String(page));
-    if (view && view !== "grid") params.set("view", view);
-
-    navigate(`/games?${params.toString()}`);
-  } else {
-    navigate("/games");
-  }
-}}
+            onClick={handleBack}
             className="flex items-center space-x-1 sm:space-x-2 text-cyan-600 hover:text-orange-500 transition-colors mb-6 sm:mb-8 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-lg text-sm sm:text-base"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>Back</span>
           </button>
+
           <Loader
             size="large"
             message="Searching for product..."
@@ -516,15 +508,17 @@ Please confirm with our team before purchase regarding personal account compatib
       <label className="block text-sm font-semibold text-gray-700 mb-3">
         Type
       </label>
+
       <div className="space-y-2 xl:space-y-3">
         {availableTypesForCurrentPlatform.map((type) => (
           <button
             key={type}
             onClick={() => setSelectedType(type)}
-            className={`w-full px-4 xl:px-6 py-2 xl:py-3 rounded-lg xl:rounded-xl font-medium transition-all duration-300 text-left text-sm xl:text-base ${selectedType === type
+            className={`w-full px-4 xl:px-6 py-2 xl:py-3 rounded-lg xl:rounded-xl font-medium transition-all duration-300 text-left text-sm xl:text-base ${
+              selectedType === type
                 ? "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+            }`}
           >
             {type}
           </button>
@@ -540,15 +534,17 @@ Please confirm with our team before purchase regarding personal account compatib
         <label className="block text-sm font-semibold text-gray-700 mb-3">
           Rental Duration
         </label>
+
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 xl:gap-3">
           {durationOptions.map((duration) => (
             <button
               key={duration.key}
               onClick={() => setSelectedRentDuration(duration.key)}
-              className={`px-3 xl:px-4 py-2 xl:py-3 rounded-lg xl:rounded-xl font-medium transition-all duration-300 text-sm xl:text-base ${selectedRentDuration === duration.key
+              className={`px-3 xl:px-4 py-2 xl:py-3 rounded-lg xl:rounded-xl font-medium transition-all duration-300 text-sm xl:text-base ${
+                selectedRentDuration === duration.key
                   ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+              }`}
             >
               <div className="text-xs xl:text-sm">{duration.label}</div>
               <div className="text-xs opacity-75">₹{duration.price || 0}</div>
@@ -570,6 +566,7 @@ Please confirm with our team before purchase regarding personal account compatib
             {platformList.join(", ")}
           </span>
         )}
+
         {currentProduct.edition && currentProduct.edition !== "Standard" && (
           <span className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-3 xl:px-4 py-1 xl:py-2 rounded-full text-xs xl:text-sm font-medium shadow-lg">
             {currentProduct.edition} Edition
@@ -582,15 +579,17 @@ Please confirm with our team before purchase regarding personal account compatib
           <label className="block text-sm font-semibold text-gray-700 mb-3">
             Choose Edition ({availableEditions.length} available)
           </label>
+
           <div className="grid grid-cols-1 gap-3">
             {availableEditions.map((edition) => (
               <button
                 key={edition.id}
                 onClick={() => handleEditionChange(edition)}
-                className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${selectedEdition?.id === edition.id
+                className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
+                  selectedEdition?.id === edition.id
                     ? "border-purple-500 bg-purple-50"
                     : "border-gray-200 bg-white hover:border-purple-300"
-                  }`}
+                }`}
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -601,29 +600,35 @@ Please confirm with our team before purchase regarding personal account compatib
                       Starting from ₹{getStartingPrice(edition)}
                     </p>
                   </div>
+
                   {selectedEdition?.id === edition.id && (
                     <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
                       <div className="w-2 h-2 bg-white rounded-full"></div>
                     </div>
                   )}
                 </div>
-                {edition.edition_features && edition.edition_features.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {edition.edition_features.slice(0, 3).map((feature, index) => (
-                      <span
-                        key={index}
-                        className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
-                      >
-                        {feature}
-                      </span>
-                    ))}
-                    {edition.edition_features.length > 3 && (
-                      <span className="text-xs text-gray-500">
-                        +{edition.edition_features.length - 3} more
-                      </span>
-                    )}
-                  </div>
-                )}
+
+                {edition.edition_features &&
+                  edition.edition_features.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {edition.edition_features
+                        .slice(0, 3)
+                        .map((feature, index) => (
+                          <span
+                            key={index}
+                            className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
+                          >
+                            {feature}
+                          </span>
+                        ))}
+
+                      {edition.edition_features.length > 3 && (
+                        <span className="text-xs text-gray-500">
+                          +{edition.edition_features.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  )}
               </button>
             ))}
           </div>
@@ -635,15 +640,17 @@ Please confirm with our team before purchase regarding personal account compatib
           <label className="block text-sm font-semibold text-gray-700 mb-3">
             Platform
           </label>
+
           <div className="flex flex-wrap gap-2 xl:gap-3">
             {platformList.map((platform) => (
               <button
                 key={platform}
                 onClick={() => setSelectedPlatform(platform)}
-                className={`px-4 xl:px-6 py-2 xl:py-3 rounded-lg xl:rounded-xl font-medium transition-all duration-300 text-sm xl:text-base ${selectedPlatform === platform
+                className={`px-4 xl:px-6 py-2 xl:py-3 rounded-lg xl:rounded-xl font-medium transition-all duration-300 text-sm xl:text-base ${
+                  selectedPlatform === platform
                     ? "bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-lg"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                }`}
               >
                 {platform}
               </button>
@@ -661,6 +668,7 @@ Please confirm with our team before purchase regarding personal account compatib
             <h4 className="font-bold text-purple-800 mb-3 text-sm xl:text-base">
               {currentProduct.edition} Edition Features
             </h4>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {currentProduct.edition_features.map((feature, index) => (
                 <div key={index} className="flex items-center space-x-2">
@@ -693,6 +701,7 @@ Please confirm with our team before purchase regarding personal account compatib
             <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 xl:px-4 py-1 xl:py-2 rounded-full text-sm xl:text-lg font-bold shadow-lg">
               -{discountPercentage}%
             </span>
+
             {selectedPlatformPricing?.original_price ? (
               <span className="text-lg xl:text-2xl text-gray-500 line-through">
                 ₹{selectedPlatformPricing.original_price}
@@ -737,6 +746,7 @@ Please confirm with our team before purchase regarding personal account compatib
             Safe and supported access
           </p>
         </div>
+
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
           <Clock className="w-6 h-6 mx-auto mb-2 text-blue-600" />
           <h4 className="font-bold text-blue-800 text-sm xl:text-base">
@@ -746,6 +756,7 @@ Please confirm with our team before purchase regarding personal account compatib
             Quick account access
           </p>
         </div>
+
         <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
           <Headphones className="w-6 h-6 mx-auto mb-2 text-orange-600" />
           <h4 className="font-bold text-orange-800 text-sm xl:text-base">
@@ -766,12 +777,14 @@ Please confirm with our team before purchase regarding personal account compatib
             <span className="font-bold text-gray-800 text-base xl:text-lg">
               Product Details
             </span>
+
             {activeAccordion === "details" ? (
               <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
             ) : (
               <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
             )}
           </button>
+
           {activeAccordion === "details" && (
             <div className="px-4 xl:px-6 pb-4 xl:pb-6">
               <p className="text-gray-600 leading-relaxed text-sm xl:text-base">
@@ -789,12 +802,14 @@ Please confirm with our team before purchase regarding personal account compatib
             <span className="font-bold text-gray-800 text-base xl:text-lg">
               Additional Information
             </span>
+
             {activeAccordion === "additional" ? (
               <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
             ) : (
               <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
             )}
           </button>
+
           {activeAccordion === "additional" && (
             <div className="px-4 xl:px-6 pb-4 xl:pb-6">
               <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 xl:p-6">
@@ -807,6 +822,7 @@ Please confirm with our team before purchase regarding personal account compatib
                   properly according to our policy.
                 </p>
               </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 xl:mt-6">
                 <div>
                   <h4 className="font-bold text-gray-800 mb-2 text-sm xl:text-base">
@@ -816,6 +832,7 @@ Please confirm with our team before purchase regarding personal account compatib
                     {selectedPlatform}
                   </p>
                 </div>
+
                 <div>
                   <h4 className="font-bold text-gray-800 mb-2 text-sm xl:text-base">
                     Edition
@@ -837,12 +854,14 @@ Please confirm with our team before purchase regarding personal account compatib
             <span className="font-bold text-gray-800 text-base xl:text-lg">
               FAQ
             </span>
+
             {activeAccordion === "faq" ? (
               <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
             ) : (
               <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
             )}
           </button>
+
           {activeAccordion === "faq" && (
             <div className="px-4 xl:px-6 pb-4 xl:pb-6 space-y-3 xl:space-y-4">
               {faqs.map((faq, index) => (
@@ -866,23 +885,7 @@ Please confirm with our team before purchase regarding personal account compatib
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-orange-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
         <button
-          onClick={() => {
-  if (location.state) {
-    const { page, search, platform, sort, view } = location.state as any;
-
-    const params = new URLSearchParams();
-
-    if (search) params.set("search", search);
-    if (platform && platform !== "all") params.set("platform", platform);
-    if (sort && sort !== "name-asc") params.set("sort", sort);
-    if (page && page > 1) params.set("page", String(page));
-    if (view && view !== "grid") params.set("view", view);
-
-    navigate(`/games?${params.toString()}`);
-  } else {
-    navigate("/games");
-  }
-}}
+          onClick={handleBack}
           className="flex items-center space-x-1 sm:space-x-2 text-cyan-600 hover:text-orange-500 transition-colors mb-6 sm:mb-8 bg-white/80 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full shadow-lg text-sm sm:text-base"
         >
           <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -895,7 +898,7 @@ Please confirm with our team before purchase regarding personal account compatib
               <div className="flex justify-center">
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/20 w-full max-w-lg">
                   <img
-                  id="product-main-image"
+                    id="product-main-image"
                     src={currentProduct.image}
                     alt={currentProduct.title}
                     className="w-full aspect-square object-cover rounded-2xl"
@@ -917,7 +920,7 @@ Please confirm with our team before purchase regarding personal account compatib
             <div className="flex justify-center">
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-2xl border border-white/20 w-full max-w-sm">
                 <img
-                id="product-main-image"
+                  id="product-main-image"
                   src={currentProduct.image}
                   alt={currentProduct.title}
                   className="w-full aspect-square object-cover rounded-xl"
@@ -935,36 +938,66 @@ Please confirm with our team before purchase regarding personal account compatib
           <CustomerScreenshots />
         </div>
 
-        {relatedProducts.length > 0 && (
+        {recommendedProducts.length > 0 && (
           <div className="mt-10 sm:mt-14">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">
-              Related Products
+              You Might Also Like
             </h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {relatedProducts.map((related) => (
-                <div
-                  key={related.id}
-                  onClick={() => handleRelatedProductClick(related)}
-                  className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                >
-                  <img
-                    src={related.image}
-                    alt={related.title}
-                    className="w-full aspect-square object-cover"
-                  />
-                  <div className="p-4">
-                    <h3 className="font-bold text-gray-800 text-sm sm:text-base line-clamp-2 mb-2">
-                      {related.title}
-                    </h3>
-                    <p className="text-orange-600 font-bold">
-                      Starting from ₹{getStartingPrice(related)}
-                    </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+              {recommendedProducts.map((recommended) => {
+                const displayPrice = getStartingPrice(recommended);
+                const platforms = getPlatformsForGame(recommended);
+
+                return (
+                  <div
+                    key={recommended.id}
+                    onClick={() => handleRecommendedProductClick(recommended)}
+                    className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
+                  >
+                    <div className="relative">
+                      <img
+                        src={recommended.image}
+                        alt={recommended.title}
+                        className="w-full aspect-square object-cover"
+                      />
+
+                      {recommended.edition &&
+                        recommended.edition !== "Standard" && (
+                          <div className="absolute bottom-1 left-1 bg-purple-500 text-white px-1.5 py-0.5 rounded-full text-xs font-bold">
+                            {recommended.edition}
+                          </div>
+                        )}
+                    </div>
+
+                    <div className="p-2 sm:p-3">
+                      <h4 className="font-semibold text-gray-800 text-xs sm:text-sm mb-1 line-clamp-2">
+                        {recommended.title}
+                      </h4>
+
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-1">
+                          <span className="text-orange-500 font-bold text-sm">
+                            ₹{displayPrice}
+                          </span>
+                        </div>
+
+                        <div className="text-xs text-gray-500">
+                          {recommended.category === "subscription"
+                            ? "Subscription"
+                            : platforms.join(", ") || "Game"}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
+                <div className="mt-10 sm:mt-14">
+          <ProductReviewsSection/>
+        </div>
       </div>
     </div>
   );
