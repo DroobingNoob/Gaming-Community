@@ -139,7 +139,7 @@ const ProductReviewsSection: React.FC = () => {
               className="shrink-0 inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg sm:rounded-xl font-bold shadow-md transition-all active:scale-95 text-xs sm:text-sm"
             >
               <MessageSquarePlus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              Review
+              Add Your Review
             </button>
           </div>
         </div>
