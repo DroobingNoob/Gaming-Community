@@ -71,9 +71,7 @@ export class BackendService {
     }
   }
 
-  static async createOrder(
-    orderData: OrderData
-  ): Promise<{ success: boolean; orderCode?: string }> {
+static async createOrder(orderData: OrderData): Promise<any> {
     try {
       const response = await fetch(`${API_URL}/orders`, {
         method: "POST",
@@ -89,8 +87,13 @@ export class BackendService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
-      return result;
+     const result = await response.json();
+
+return {
+  success: true,
+  orderCode: result.order_code,
+  order: result,
+};
     } catch (error) {
       console.error("Error creating order:", error);
       return { success: false };
