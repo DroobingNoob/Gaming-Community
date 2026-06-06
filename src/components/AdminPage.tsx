@@ -154,6 +154,9 @@ const [loadingOrders, setLoadingOrders] = useState(false);
 const [ordersSearchQuery, setOrdersSearchQuery] = useState("");
 const [ordersCurrentPage, setOrdersCurrentPage] = useState(1);
 
+const [selectedOrder, setSelectedOrder] =
+  useState<Order | null>(null);
+
 const [orderStatusFilter, setOrderStatusFilter] =
   useState<string>("all");
 
@@ -395,6 +398,18 @@ orderStatusFilter
 
   const renderOrders = () => (
   <div className="bg-white rounded-xl shadow overflow-x-auto">
+  <div className="flex justify-between items-center mb-4">
+  <h3 className="text-xl font-bold">
+    Orders
+  </h3>
+
+  <button
+    onClick={loadOrders}
+    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+  >
+    Refresh
+  </button>
+</div>
     <table className="w-full">
       <thead>
         <tr className="bg-gray-100">
@@ -411,7 +426,14 @@ orderStatusFilter
       <tbody>
         {(paginatedItems as Order[]).map((order) => (
           <tr key={order.id} className="border-b">
-            <td className="p-3">{order.order_code}</td>
+            <td className="p-3">
+  <button
+    onClick={() => setSelectedOrder(order)}
+    className="text-blue-600 hover:underline font-medium"
+  >
+    {order.order_code}
+  </button>
+</td>
 
             <td className="p-3">
               {order.customer_name}
@@ -483,7 +505,7 @@ orderStatusFilter
                     toast.success(
                       "Order deleted"
                     );
-                    loadOrders();
+                    await loadOrders();
                   }
                 }}
                 className="bg-red-500 text-white px-3 py-1 rounded"
@@ -2213,6 +2235,199 @@ onChange={(e) =>
             </div>
           </div>
         )}
+
+        {selectedOrder && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6">
+
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-bold">
+          Order Details
+        </h2>
+
+        <button
+          onClick={() => setSelectedOrder(null)}
+          className="text-gray-500 text-2xl"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-6">
+
+        <div>
+          <p className="text-sm text-gray-500">
+            Order Code
+          </p>
+
+          <p className="font-medium">
+            {selectedOrder.order_code}
+          </p>
+        </div>
+
+        <div>
+          <p className="text-sm text-gray-500">
+            Date
+          </p>
+
+          <p>
+            {new Date(
+              selectedOrder.created_at
+            ).toLocaleString()}
+          </p>
+        </div>
+
+        <div>
+          <p className="text-sm text-gray-500">
+            Customer
+          </p>
+
+          <p>
+            {selectedOrder.customer_name}
+          </p>
+        </div>
+
+        <div>
+          <p className="text-sm text-gray-500">
+            Mobile
+          </p>
+
+          <p>
+            {selectedOrder.customer_mobile}
+          </p>
+        </div>
+
+        <div>
+          <p className="text-sm text-gray-500">
+            Status
+          </p>
+
+          <p>
+            {selectedOrder.status}
+          </p>
+        </div>
+
+        <div>
+          <p className="text-sm text-gray-500">
+            Payment Status
+          </p>
+
+          <p>
+            {selectedOrder.payment_status || "N/A"}
+          </p>
+        </div>
+
+      </div>
+
+      <div className="border rounded-lg p-4 mb-6">
+
+        <h3 className="font-semibold mb-3">
+          Coupon Details
+        </h3>
+
+        <p>
+          <strong>Coupon:</strong>{" "}
+          {selectedOrder.coupon_name ||
+            selectedOrder.applied_coupon ||
+            "No Coupon Used"}
+        </p>
+
+        {selectedOrder.coupon_message && (
+          <p className="mt-2 text-gray-600">
+            {selectedOrder.coupon_message}
+          </p>
+        )}
+
+      </div>
+
+      <div className="border rounded-lg p-4 mb-6">
+
+        <h3 className="font-semibold mb-4">
+          Purchased Items
+        </h3>
+
+        <table className="w-full">
+          <thead>
+            <tr className="border-b">
+              <th className="text-left py-2">
+                Title
+              </th>
+
+              <th className="text-left py-2">
+                Platform
+              </th>
+
+              <th className="text-left py-2">
+                Type
+              </th>
+
+              <th className="text-left py-2">
+                Qty
+              </th>
+
+              <th className="text-left py-2">
+                Price
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {(
+  typeof selectedOrder.items === "string"
+    ? JSON.parse(selectedOrder.items)
+    : selectedOrder.items || []
+).map(
+              (item: any, index: number) => (
+                <tr
+                  key={index}
+                  className="border-b"
+                >
+                  <td className="py-2">
+                    {item.title}
+                  </td>
+
+                  <td className="py-2">
+                    {item.platform}
+                  </td>
+
+                  <td className="py-2">
+                    {item.type}
+                  </td>
+
+                  <td className="py-2">
+                    {item.quantity}
+                  </td>
+
+                  <td className="py-2">
+                    ₹{item.price}
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
+
+      </div>
+
+      <div className="flex justify-end">
+        <div className="text-right">
+
+          <p>
+            Subtotal:
+            ₹{selectedOrder.subtotal_amount}
+          </p>
+
+          <p className="text-xl font-bold">
+            Total:
+            ₹{selectedOrder.total_amount}
+          </p>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+)}
       </div>
     </div>
   );
