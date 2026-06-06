@@ -38,6 +38,7 @@ import {
 } from "../services/settingsService";
 import { reviewService, Review } from "../services/reviewService";
 import { couponService, Coupon } from "../services/couponService";
+import { BackendService, Order } from "../services/backendService";
 
 type AdminTab =
   | "games"
@@ -45,7 +46,8 @@ type AdminTab =
   | "testimonials"
   | "settings"
   | "coupons"
-  | "reviews";
+  | "reviews"
+  | "orders";
 
 interface GameFormState {
   title: string;
@@ -146,6 +148,14 @@ const AdminPage: React.FC = () => {
   const [editingCouponId, setEditingCouponId] = useState<string | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
 const [loadingReviews, setLoadingReviews] = useState(false);
+const [orders, setOrders] = useState<Order[]>([]);
+const [loadingOrders, setLoadingOrders] = useState(false);
+
+const [ordersSearchQuery, setOrdersSearchQuery] = useState("");
+const [ordersCurrentPage, setOrdersCurrentPage] = useState(1);
+
+const [orderStatusFilter, setOrderStatusFilter] =
+  useState<string>("all");
 
   const emptyCouponForm = {
     name: "",
@@ -186,6 +196,19 @@ const [loadingReviews, setLoadingReviews] = useState(false);
     setCoupons(data || []);
     setLoadingCoupons(false);
   };
+
+  const loadOrders = async () => {
+  setLoadingOrders(true);
+
+  const data = await BackendService.getOrders();
+
+  setOrders(data || []);
+  setLoadingOrders(false);
+};
+
+useEffect(() => {
+  loadOrders();
+}, []);
 
   useEffect(() => {
     loadCoupons();
@@ -232,12 +255,14 @@ useEffect(() => {
   loadReviews();
 }, []);
 
-  const currentSearchQuery =
-    activeTab === "games"
-      ? gamesSearchQuery
-      : activeTab === "subscriptions"
-        ? subscriptionsSearchQuery
-        : testimonialsSearchQuery;
+const currentSearchQuery =
+  activeTab === "games"
+    ? gamesSearchQuery
+    : activeTab === "subscriptions"
+    ? subscriptionsSearchQuery
+    : activeTab === "testimonials"
+    ? testimonialsSearchQuery
+    : ordersSearchQuery;
 
   const setCurrentSearchQuery = (value: string) => {
     if (activeTab === "games") {
@@ -249,7 +274,10 @@ useEffect(() => {
     } else if (activeTab === "testimonials") {
       setTestimonialsSearchQuery(value);
       setTestimonialsCurrentPage(1);
-    }
+    } else if (activeTab === "orders") {
+  setOrdersSearchQuery(value);
+  setOrdersCurrentPage(1);
+}
   };
 
   const filteredItems = useMemo(() => {
@@ -282,6 +310,26 @@ useEffect(() => {
     );
   }
 
+  if (activeTab === "orders") {
+  return orders.filter((order) => {
+    const matchesSearch =
+      order.order_code
+        .toLowerCase()
+        .includes(ordersSearchQuery.toLowerCase()) ||
+      order.customer_name
+        .toLowerCase()
+        .includes(ordersSearchQuery.toLowerCase()) ||
+      order.customer_mobile.includes(ordersSearchQuery);
+
+    const matchesStatus =
+      orderStatusFilter === "all"
+        ? true
+        : order.status === orderStatusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+}
+
   return [];
 }, [
   activeTab,
@@ -292,13 +340,18 @@ useEffect(() => {
   subscriptionsSearchQuery,
   testimonialsSearchQuery,
   gamesSpecialFilter,
+  orders,
+ordersSearchQuery,
+orderStatusFilter
 ]);
   const currentPage =
-    activeTab === "games"
-      ? gamesCurrentPage
-      : activeTab === "subscriptions"
-        ? subscriptionsCurrentPage
-        : testimonialsCurrentPage;
+  activeTab === "games"
+    ? gamesCurrentPage
+    : activeTab === "subscriptions"
+    ? subscriptionsCurrentPage
+    : activeTab === "testimonials"
+    ? testimonialsCurrentPage
+    : ordersCurrentPage;
 
   const totalItems = filteredItems.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
@@ -311,6 +364,9 @@ useEffect(() => {
     if (activeTab === "games") setGamesCurrentPage(page);
     else if (activeTab === "subscriptions") setSubscriptionsCurrentPage(page);
     else if (activeTab === "testimonials") setTestimonialsCurrentPage(page);
+    else if (activeTab === "orders") {
+  setOrdersCurrentPage(page);
+}
   };
 
   const resetGameForm = (category: "game" | "subscription" = "game") => {
@@ -336,6 +392,111 @@ useEffect(() => {
 
     setIsModalOpen(true);
   };
+
+  const renderOrders = () => (
+  <div className="bg-white rounded-xl shadow overflow-x-auto">
+    <table className="w-full">
+      <thead>
+        <tr className="bg-gray-100">
+          <th className="p-3 text-left">Order Code</th>
+          <th className="p-3 text-left">Customer</th>
+          <th className="p-3 text-left">Mobile</th>
+          <th className="p-3 text-left">Amount</th>
+          <th className="p-3 text-left">Status</th>
+          <th className="p-3 text-left">Payment</th>
+          <th className="p-3 text-left">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {(paginatedItems as Order[]).map((order) => (
+          <tr key={order.id} className="border-b">
+            <td className="p-3">{order.order_code}</td>
+
+            <td className="p-3">
+              {order.customer_name}
+            </td>
+
+            <td className="p-3">
+              {order.customer_mobile}
+            </td>
+
+            <td className="p-3">
+              ₹{order.total_amount}
+            </td>
+
+            <td className="p-3">
+              <select
+                value={order.status}
+                onChange={async (e) => {
+                  const success =
+                    await BackendService.updateOrderStatus(
+                      order.id,
+                      e.target.value
+                    );
+
+                  if (success) {
+                    toast.success("Order updated");
+                    loadOrders();
+                  }
+                }}
+                className="border rounded px-2 py-1"
+              >
+                <option value="Pending">
+                  Pending
+                </option>
+
+                <option value="Processing">
+                  Processing
+                </option>
+
+                <option value="Completed">
+                  Completed
+                </option>
+
+                <option value="Cancelled">
+                  Cancelled
+                </option>
+              </select>
+            </td>
+
+            <td className="p-3">
+              {order.payment_status}
+            </td>
+
+            <td className="p-3">
+              <button
+                onClick={async () => {
+                  if (
+                    !window.confirm(
+                      "Delete order?"
+                    )
+                  )
+                    return;
+
+                  const success =
+                    await BackendService.deleteOrder(
+                      order.id
+                    );
+
+                  if (success) {
+                    toast.success(
+                      "Order deleted"
+                    );
+                    loadOrders();
+                  }
+                }}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
 
   const handleEditGame = (item: Game) => {
     setEditingItem(item);
@@ -1877,7 +2038,12 @@ onChange={(e) =>
             { id: "testimonials", label: "Screenshots", count: testimonials.length },
             { id: "settings", label: "Shop Settings", count: null },
             { id: "coupons", label: "Coupons", count: null },
-            { id: "reviews", label: "Reviews", count: reviews.length }
+            { id: "reviews", label: "Reviews", count: reviews.length },
+            {
+  id: "orders",
+  label: "Orders",
+  count: orders.length
+},
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1904,7 +2070,8 @@ onChange={(e) =>
 
 {activeTab !== "settings" &&
  activeTab !== "coupons" &&
- activeTab !== "reviews" && (
+ activeTab !== "reviews" &&
+ activeTab !== "orders" && (
           <>
             <div className="flex justify-end mb-6">
               <button
@@ -1990,12 +2157,14 @@ onChange={(e) =>
           </>
         )}
 
-        {activeTab === "settings" ? (
-          renderSettings()
-        ) : activeTab === "coupons" ? (
-          renderCoupons()
-        ) : activeTab === "reviews" ? (
+       {activeTab === "settings" ? (
+  renderSettings()
+) : activeTab === "coupons" ? (
+  renderCoupons()
+) : activeTab === "reviews" ? (
   renderReviews()
+) : activeTab === "orders" ? (
+  renderOrders()
 ) : loading ? (
           <div className="col-span-full text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto"></div>

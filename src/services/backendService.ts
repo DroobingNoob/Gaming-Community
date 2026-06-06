@@ -28,6 +28,24 @@ export interface OrderData {
   paymentStatus?: string;
 }
 
+export interface Order {
+  id: number;
+  order_code: string;
+  timestamp: string;
+  customer_name: string;
+  customer_mobile: string;
+  items: any[];
+  subtotal_amount: number;
+  total_amount: number;
+  applied_coupon?: string;
+  coupon_name?: string;
+  coupon_message?: string;
+  status: string;
+  payment_method?: string;
+  payment_status?: string;
+  created_at: string;
+}
+
 export interface CreateOrderRequest {
   amount: number;
   currency: string;
@@ -100,35 +118,59 @@ return {
     }
   }
 
-  static async updateOrderStatus(
-    orderCode: string,
-    status: string,
-    paymentDetails?: any
-  ): Promise<boolean> {
-    try {
-      const response = await fetch(`${API_URL}/orders/status`, {
-        method: "POST",
+ static async updateOrderStatus(
+  id: number,
+  status: string
+): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `${API_URL}/orders/${id}/status`,
+      {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          orderCode,
-          status,
-          paymentDetails,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        body: JSON.stringify({ status }),
       }
+    );
 
-      const result = await response.json();
-      return result.success;
-    } catch (error) {
-      console.error("Error updating order status:", error);
-      return false;
-    }
+    return response.ok;
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    return false;
   }
+}
+
+static async getOrders(): Promise<Order[]> {
+  try {
+    const response = await fetch(`${API_URL}/orders`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return [];
+  }
+}
+
+static async deleteOrder(id: number): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `${API_URL}/orders/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    return response.ok;
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    return false;
+  }
+}
 
   static async updatePaymentDetails(
     orderCode: string,
