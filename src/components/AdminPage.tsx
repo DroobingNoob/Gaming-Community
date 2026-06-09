@@ -418,7 +418,7 @@ orderStatusFilter
           <th className="p-3 text-left">Mobile</th>
           <th className="p-3 text-left">Amount</th>
           <th className="p-3 text-left">Status</th>
-          <th className="p-3 text-left">Payment</th>
+          {/* <th className="p-3 text-left">Payment</th> */}
           <th className="p-3 text-left">Actions</th>
         </tr>
       </thead>
@@ -482,9 +482,9 @@ orderStatusFilter
               </select>
             </td>
 
-            <td className="p-3">
+            {/* <td className="p-3">
               {order.payment_status}
-            </td>
+            </td> */}
 
             <td className="p-3">
               <button
